@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Penginapan 12 Kamar</title>
+    
+    <!-- Konfigurasi PWA (Progressive Web App) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b2136">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- CSS Tailwind & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- SweetAlert2 & SheetJS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .sidebar { background-color: #0b2136; }
+        .menu-active { background-color: #1a56db; color: white; border-radius: 0.5rem; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06); }
+        .menu-item:hover:not(.menu-active) { background-color: #173656; border-radius: 0.5rem; }
+        .page-section { display: none; opacity: 0; transition: opacity 0.4s ease-in-out; }
+        .page-section.active { display: block; opacity: 1; animation: fadeIn 0.5s ease-out forwards; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .swal2-html-container { font-family: 'Inter', sans-serif; text-align: left; }
+        
+        /* FIX PRINT BLANK INVOICE */
+        @media print {
+            body { background-color: white !important; height: auto !important; overflow: visible !important; }
+            #app-container, #login-screen, .swal2-container { display: none !important; }
+            #print-area { display: block !important; position: static !important; width: 100%; margin: 0; padding: 0; }
+            #print-area * { visibility: visible; }
+            @page { margin: 0.5cm; }
+        }
+
+        /* ANIMASI CUSTOM LAYAR LOGIN */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
+        @keyframes slideProgress { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .progress-bar-slide { animation: slideProgress 2s ease-in-out infinite; }
+        .animate-scale-in { animation: scaleIn 0.5s ease-out forwards; }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            60% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-bounce-in { animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; }
+
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+        .shake-error { animation: shakeError 0.4s; }
+        
+        /* KOTAK INPUT PIN ASLI */
+        .pin-box {
+            width: 3.5rem; height: 4.5rem; text-align: center; font-size: 2rem; font-weight: 800; color: #1e3a8a;
+            border: 2px solid #cbd5e1; border-radius: 0.75rem; background-color: #f8fafc; outline: none; transition: all 0.2s;
+        }
+        .pin-box:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); transform: translateY(-2px); background-color: white; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden text-gray-800 bg-[#e2e8f0]">
+
+    <!-- ============================================== -->
+    <!-- TEMPLATE PRINT INVOICE                         -->
+    <!-- ============================================== -->
+    <div id="print-area" class="hidden w-full p-8 bg-white text-black">
+        <div class="max-w-4xl mx-auto border border-gray-300 p-8 rounded">
+            <div class="flex justify-between items-start border-b-2 border-gray-800 pb-4 mb-6">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-blue-800 uppercase" id="pr_hotel_name">HOTEL PENGINAPAN</h1>
+                    <p class="text-gray-600 mt-1" id="pr_hotel_address">Jl. Contoh Alamat No. 12, Kota</p>
+                    <p class="text-gray-600" id="pr_hotel_tel">Telp: 0812-3456-7890</p>
+                </div>
+                <div class="text-right">
+                    <h2 class="text-4xl font-black text-gray-300 uppercase tracking-widest">INVOICE</h2>
+                    <p class="font-bold mt-2 text-gray-800 text-lg">No: <span id="pr_inv_no" class="text-blue-600">INV-000000</span></p>
+                    <p class="text-gray-600 text-sm mt-1">Tanggal Cetak: <span id="pr_inv_date">-</span></p>
+                </div>
+            </div>
+            <div class="flex justify-between mb-8">
+                <div>
+                    <h3 class="font-bold text-gray-700 border-b border-gray-200 mb-2">DITAGIHKAN KEPADA:</h3>
+                    <p class="font-bold text-xl" id="pr_guest_name">Nama Tamu</p>
+                    <p class="text-gray-600 text-sm" id="pr_guest_phone">0812xxxxxx</p>
+                    <p class="text-gray-600 text-sm" id="pr_guest_address">Alamat Tamu</p>
+                </div>
+                <div class="text-right bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <p class="text-sm text-blue-800 font-bold mb-1">DETAIL MENGINAP:</p>
+                    <p class="font-bold text-gray-700">Kamar: <span class="text-2xl text-blue-600 font-black ml-2" id="pr_room_no">101</span></p>
+                    <p class="text-sm mt-1">Check-in: <span class="font-bold" id="pr_checkin">-</span></p>
+                    <p class="text-sm">Check-out: <span class="font-bold" id="pr_checkout">-</span></p>
+                </div>
+            </div>
+            <table class="w-full mb-8 border-collapse border border-gray-300">
+                <thead><tr class="bg-gray-800 text-white"><th class="py-3 px-4 text-left border-r border-gray-600">Deskripsi Layanan</th><th class="py-3 px-4 text-center border-r border-gray-600">Qty (Hari)</th><th class="py-3 px-4 text-right">Total Tagihan</th></tr></thead>
+                <tbody class="divide-y divide-gray-200 text-gray-800">
+                    <tr><td class="py-4 px-4 font-semibold border-r">Biaya Kamar Utama</td><td class="py-4 px-4 text-center border-r font-bold" id="pr_room_qty">1</td><td class="py-4 px-4 text-right font-bold text-lg" id="pr_room_price">Rp 0</td></tr>
+                    <tr><td class="py-4 px-4 border-r">Layanan Laundry</td><td class="py-4 px-4 text-center border-r">-</td><td class="py-4 px-4 text-right" id="pr_laundry">Rp 0</td></tr>
+                    <tr><td class="py-4 px-4 border-r">Makanan Resto</td><td class="py-4 px-4 text-center border-r">-</td><td class="py-4 px-4 text-right" id="pr_fnb">Rp 0</td></tr>
+                    <tr><td class="py-4 px-4 border-r">Snack / Minibar</td><td class="py-4 px-4 text-center border-r">-</td><td class="py-4 px-4 text-right" id="pr_minibar">Rp 0</td></tr>
+                    <tr><td class="py-4 px-4 border-r">Denda / Kerusakan Lainnya</td><td class="py-4 px-4 text-center border-r">-</td><td class="py-4 px-4 text-right" id="pr_denda">Rp 0</td></tr>
+                    <tr class="bg-red-50"><td class="py-4 px-4 text-red-600 font-bold border-r">Total Diskon (Potongan Harga)</td><td class="py-4 px-4 text-center border-r">-</td><td class="py-4 px-4 text-right text-red-600 font-bold" id="pr_discount">- Rp 0</td></tr>
+                </tbody>
+            </table>
+            <div class="flex justify-end mb-8">
+                <div class="w-2/3 md:w-1/2">
+                    <div class="flex justify-between py-2 border-b"><span class="font-bold text-gray-600">Total Tagihan Bersih:</span><span class="font-black text-xl" id="pr_subtotal">Rp 0</span></div>
+                    <div class="flex justify-between py-2 border-b"><span class="font-bold text-gray-600">Uang Muka (DP) Awal:</span><span class="font-bold text-lg text-blue-600" id="pr_dp">Rp 0</span></div>
+                    <div class="flex justify-between py-2 border-b"><span class="font-bold text-gray-600">Pembayaran Pelunasan Akhir:</span><span class="font-bold text-lg text-green-600" id="pr_paid">Rp 0</span></div>
+                    <div class="flex justify-between py-4 bg-gray-100 px-4 mt-4 border-2 border-gray-400 rounded"><span class="font-black text-xl text-gray-800">SISA KEKURANGAN:</span><span class="font-black text-2xl text-red-600" id="pr_balance">Rp 0</span></div>
+                </div>
+            </div>
+            <div class="flex justify-between items-end mt-16 pt-8 border-t border-gray-300 text-sm">
+                <div>
+                    <p class="font-bold text-gray-700">Metode Pembayaran:</p>
+                    <p id="pr_payment_method" class="text-xl text-blue-700 font-black mt-1">Tunai</p>
+                    <p class="mt-4 font-semibold italic text-gray-500">"Terima kasih telah menginap bersama kami."</p>
+                </div>
+                <div class="text-center w-48">
+                    <p class="mb-16 font-semibold">Hormat Kami,</p>
+                    <div class="border-b-2 border-gray-400 w-full mb-2"></div>
+                    <p class="font-bold text-gray-800" id="pr_admin_name">Resepsionis</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- LOGIN SCREEN (SISTEM KOTAK PIN ANIMASI)        -->
+    <!-- ============================================== -->
+    <div id="login-screen" class="fixed inset-0 bg-gray-900/50 backdrop-blur-md flex justify-center items-center z-[100] transition-opacity duration-700">
+        <div id="login-box" class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl flex overflow-hidden h-[500px] animate-bounce-in">
+            
+            <div class="w-1/2 bg-blue-600 p-10 flex-col items-center justify-center relative hidden md:flex overflow-hidden">
+                <i class="fa-solid fa-key absolute text-blue-400 opacity-20 text-5xl animate-float" style="top: 15%; left: 15%;"></i>
+                <i class="fa-solid fa-star absolute text-blue-400 opacity-20 text-4xl animate-float" style="top: 25%; right: 15%; animation-delay: 1s;"></i>
+                <i class="fa-solid fa-mug-hot absolute text-blue-400 opacity-20 text-6xl animate-float" style="bottom: 25%; left: 20%; animation-delay: 2s;"></i>
+                
+                <div class="relative z-10 flex flex-col items-center justify-center h-full">
+                    <div class="bg-white/20 p-6 rounded-full shadow-lg backdrop-blur-sm border border-white/30 mb-6 animate-bounce">
+                        <i class="fa-solid fa-bed text-7xl text-white drop-shadow-md"></i>
+                    </div>
+                    <h2 class="text-3xl font-black text-white tracking-widest text-center drop-shadow-sm">HOTEL PENGINAPAN</h2>
+                    <p class="text-blue-100 mt-2 font-semibold tracking-wide">Sanstech Sistem</p>
+                </div>
+
+                <div class="absolute bottom-8 left-10 right-10 z-10">
+                    <div class="flex justify-between text-[10px] font-bold text-blue-100 mb-2 uppercase tracking-widest">
+                        <span><i class="fa-solid fa-server mr-1"></i> Cloud Server</span>
+                        <span>Silahkan Melakukan Login</span>
+                    </div>
+                    <div class="w-full bg-blue-800/50 h-1.5 rounded-full overflow-hidden">
+                        <div class="bg-white w-1/3 h-full rounded-full progress-bar-slide"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full md:w-1/2 p-10 flex flex-col items-center justify-center bg-white relative">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-2xl mb-6 shadow-inner border border-blue-200">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-2xl font-black text-gray-800 mb-1">Masuk ke Sistem</h3>
+                <p class="text-sm font-semibold text-gray-500 mb-8">Ketik 6 Digit PIN Akses Anda</p>
+
+                <div class="flex space-x-2 md:space-x-3 mb-8" id="pin-container">
+                    <input type="password" maxlength="1" class="pin-box focus:border-blue-500" onkeyup="moveNext(this, 'pin2', event)" onpaste="handlePaste(event)" id="pin1" autofocus>
+                    <input type="password" maxlength="1" class="pin-box focus:border-blue-500" onkeyup="moveNext(this, 'pin3', event)" id="pin2">
+                    <input type="password" maxlength="1" class="pin-box focus:border-blue-500" onkeyup="moveNext(this, 'pin4', event)" id="pin3">
+                    <input type="password" maxlength="1" class="pin-box focus:border-blue-500" onkeyup="moveNext(this, 'pin5', event)" id="pin4">
+                    <input type="password" maxlength="1" class="pin-box focus:border-blue-500" onkeyup="moveNext(this, 'pin6', event)" id="pin5">
+                    <input type="password" maxlength="1" class="pin-box focus:border-blue-500" onkeyup="moveNext(this, null, event)" id="pin6">
+                </div>
+
+                <div class="text-center mt-auto w-full">
+                    <button onclick="submitPinLogin()" class="w-full max-w-xs mx-auto bg-blue-600 text-white font-black tracking-widest py-4 rounded-xl shadow-lg hover:bg-blue-700 transition transform hover:-translate-y-1 text-lg mb-6 flex items-center justify-center"><i class="fa-solid fa-arrow-right-to-bracket mr-2"></i> MASUK SISTEM</button>
+                    <p class="text-xs font-bold text-gray-400 flex items-center justify-center"><i class="fa-solid fa-shield-halved mr-1 text-green-500"></i> Dilindungi Enkripsi PIN</p>
+                    <p class="text-[10px] text-gray-300 mt-1">Ingat PIN Default Anda</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- MAIN APP & SIDEBAR                             -->
+    <!-- ============================================== -->
+    <div id="app-container" class="flex w-full h-full hidden opacity-0 transition-opacity duration-700">
+        
+        <aside class="sidebar w-64 h-full text-gray-300 flex flex-col justify-between shrink-0 shadow-lg z-10">
+            <div>
+                <div class="p-6 flex items-center space-x-3 text-white mb-2 border-b border-gray-700">
+                    <div class="bg-blue-600 p-2 rounded-lg"><i class="fa-solid fa-hotel text-xl"></i></div>
+                    <div><h1 class="text-sm font-bold tracking-wider">PENGINAPAN</h1><p class="text-xs text-blue-300 font-semibold">SANSTECH SISTEM</p></div>
+                </div>
+                <nav class="px-4 py-4 space-y-1 overflow-y-auto max-h-[75vh]" id="sidebar-menu"></nav>
+            </div>
+            
+            <div class="p-5 border-t border-gray-700 cursor-pointer hover:bg-gray-800 transition group" onclick="switchShift()">
+                <div class="flex items-center space-x-3 text-yellow-400 bg-gray-800 p-3 rounded-lg justify-center border border-yellow-900 group-hover:bg-yellow-500 group-hover:text-gray-900 group-hover:border-yellow-500 transition-all shadow-inner">
+                    <i class="fa-solid fa-user-clock text-lg"></i>
+                    <span class="text-sm font-bold tracking-wide">GANTI SHIFT / PIN</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-[#f8fafc]">
+            <header class="bg-white border-b border-gray-200 py-3 px-6 flex justify-between items-center shrink-0 shadow-sm z-10">
+                <div>
+                    <h2 id="page-title" class="text-2xl font-black text-gray-800 tracking-tight transition-all">Dashboard</h2>
+                    <p id="page-subtitle" class="text-sm text-gray-500 font-medium">Ringkasan kondisi penginapan secara real-time</p>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <div class="text-right hidden md:block"><p class="text-sm font-bold text-gray-700"><i class="fa-regular fa-clock mr-1 text-blue-500"></i> <span id="current-date">...</span></p></div>
+                    <div class="flex items-center space-x-4 border-l-2 pl-6 border-gray-200">
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-blue-700 uppercase" id="top_user_name">Admin</p>
+                            <p class="text-[10px] font-bold text-white bg-blue-500 px-2 py-0.5 rounded-full inline-block mt-0.5 uppercase tracking-wider shadow-sm" id="top_user_role">Super Admin</p>
+                        </div>
+                        <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-md border-2 border-white ring-2 ring-blue-100">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+                
+                <!-- 1. DASHBOARD -->
+                <section id="page-dashboard" class="page-section active">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center space-x-4 transition hover:shadow-md"><div class="bg-blue-500 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-bed"></i></div><div><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">TOTAL KAMAR</p><p class="text-2xl font-black text-gray-800"><span id="d_tot">0</span> <span class="text-xs font-semibold text-gray-400">Kamar</span></p></div></div>
+                        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center space-x-4 transition hover:shadow-md"><div class="bg-red-500 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-user-check"></i></div><div><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">TERISI</p><p class="text-2xl font-black text-gray-800"><span id="d_terisi">0</span> <span class="text-xs font-semibold text-gray-400">Kamar</span></p></div></div>
+                        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center space-x-4 transition hover:shadow-md"><div class="bg-green-500 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-door-open"></i></div><div><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">KOSONG</p><p class="text-2xl font-black text-gray-800"><span id="d_kosong">0</span> <span class="text-xs font-semibold text-gray-400">Kamar</span></p></div></div>
+                        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center space-x-4 transition hover:shadow-md"><div class="bg-orange-400 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-regular fa-calendar-plus"></i></div><div><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">CHECK-IN HR INI</p><p class="text-2xl font-black text-gray-800"><span id="d_ci">0</span> <span class="text-xs font-semibold text-gray-400">Tamu</span></p></div></div>
+                        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center space-x-4 transition hover:shadow-md"><div class="bg-purple-600 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-wallet"></i></div><div><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">PENDAPATAN HR INI</p><p class="text-lg font-black text-gray-800" id="d_rev">Rp 0</p></div></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="bg-white rounded-xl p-5 shadow-sm border h-full">
+                                <h3 class="text-sm font-bold uppercase tracking-wider mb-4 border-b pb-2"><i class="fa-solid fa-border-all text-blue-500 mr-1"></i> STATUS KAMAR REAL-TIME</h3>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4" id="room-grid">
+                                    <div class="col-span-full py-10 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin text-3xl mb-2 text-blue-400"></i><p>Memuat Data Kamar...</p></div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-xl p-5 shadow-sm border">
+                                <h3 class="text-sm font-bold uppercase mb-4 border-b pb-2"><i class="fa-solid fa-calendar-alt text-yellow-500 mr-1"></i> RESERVASI TERBARU</h3>
+                                <div class="overflow-x-auto"><table class="w-full text-xs text-left"><thead class="text-blue-600 bg-blue-50 border-b"><tr><th class="px-3 py-2">No</th><th class="px-3 py-2">Nama Tamu</th><th class="px-3 py-2">Kamar</th><th class="px-3 py-2">Tgl Masuk</th><th class="px-3 py-2 text-center">Status</th></tr></thead><tbody id="tbl-dash-resv" class="divide-y text-gray-600"></tbody></table></div>
+                                <button onclick="switchPage('reservasi')" class="w-full mt-4 bg-blue-50 text-blue-600 font-bold py-2 rounded-lg text-xs hover:bg-blue-100 transition">Lihat Semua Reservasi <i class="fa-solid fa-chevron-right ml-1"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div class="bg-white rounded-xl p-5 shadow-sm border">
+                                <h3 class="text-sm font-bold uppercase mb-4 border-b pb-2"><i class="fa-solid fa-sign-in-alt text-green-500 mr-1"></i> CHECK-IN HARI INI</h3>
+                                <div class="overflow-x-auto"><table class="w-full text-xs text-left"><thead class="text-blue-600 bg-blue-50 border-b"><tr><th class="px-3 py-2">No</th><th class="px-3 py-2">Nama Tamu</th><th class="px-3 py-2">Kmr</th><th class="px-3 py-2">Check-in</th><th class="px-3 py-2">Check-out</th></tr></thead><tbody id="tbl-dash-ci" class="divide-y text-gray-600"></tbody></table></div>
+                                <button onclick="switchPage('checkin')" class="w-full mt-4 bg-blue-50 text-blue-600 font-bold py-2 rounded-lg text-xs hover:bg-blue-100 transition">Ke Menu Check-In <i class="fa-solid fa-chevron-right ml-1"></i></button>
+                            </div>
+                            
+                            <div class="bg-white rounded-xl p-5 shadow-sm border">
+                                <h3 class="text-sm font-bold uppercase mb-4 border-b pb-2"><i class="fa-solid fa-sack-dollar text-green-600 mr-1"></i> RINGKASAN PENDAPATAN</h3>
+                                <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-5 flex items-center space-x-4 mb-4 border border-green-200 shadow-inner">
+                                    <div class="bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-md"><i class="fa-solid fa-rupiah-sign"></i></div>
+                                    <div>
+                                        <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Total Hari Ini</p>
+                                        <p class="text-2xl font-black text-green-700 mt-1 drop-shadow-sm" id="d_rev_big">Rp 0</p>
+                                        <p class="text-[10px] font-semibold text-gray-500 mt-1">Dari <span id="d_rev_count" class="font-bold text-gray-800">0</span> Transaksi</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 text-center pt-2 border-t border-gray-100 mt-2">
+                                    <div class="bg-gray-50 p-2 rounded"><p class="text-[10px] font-semibold text-gray-500 mb-1">Tunai</p><p class="font-bold text-green-600 text-xs" id="d_rev_tunai">Rp 0</p></div>
+                                    <div class="bg-gray-50 p-2 rounded"><p class="text-[10px] font-semibold text-gray-500 mb-1">Transfer</p><p class="font-bold text-blue-600 text-xs" id="d_rev_tf">Rp 0</p></div>
+                                    <div class="bg-gray-50 p-2 rounded"><p class="text-[10px] font-semibold text-gray-500 mb-1">QRIS / EDC</p><p class="font-bold text-purple-600 text-xs" id="d_rev_qris">Rp 0</p></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. DATA KAMAR -->
+                <section id="page-kamar" class="page-section">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
+                        <h3 class="text-lg font-bold mb-4 border-b pb-2">Form Tambah / Edit Kamar</h3>
+                        <form id="form-kamar" onsubmit="submitKamar(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div><label class="text-xs font-bold text-gray-600">Nomor Kamar</label><input type="text" id="k_no" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" required></div>
+                            <div><label class="text-xs font-bold text-gray-600">Tipe Kamar</label><select id="k_tipe" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500" onchange="otomatisFasilitas()"><option>Standard</option><option>Deluxe</option><option>VIP</option></select></div>
+                            <div><label class="text-xs font-bold text-gray-600">Harga (Rp)</label><input type="text" id="k_harga" data-raw="0" oninput="formatInputUang(this)" class="w-full border p-2.5 rounded-lg mt-1 font-bold text-green-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition" placeholder="Rp 0" required></div>
+                            <div><label class="text-xs font-bold text-gray-600">Lantai</label><input type="text" id="k_lantai" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500" value="Lantai 1"></div>
+                            
+                            <div class="col-span-2 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
+                                <label class="text-xs font-bold text-gray-600 block mb-2">Fasilitas Kamar (Centang & Tambah)</label>
+                                <div id="fas_container" class="flex flex-wrap gap-4 text-sm font-semibold text-gray-700 mb-3">
+                                    <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="f_wifi" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><span>Wifi</span></label>
+                                    <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="f_tv" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><span>TV</span></label>
+                                    <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="f_ac" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><span>AC</span></label>
+                                    <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="f_airpanas" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><span>Air Panas</span></label>
+                                </div>
+                                <div class="flex items-center space-x-2 border-t border-blue-200 pt-3">
+                                    <input type="text" id="k_f_custom" placeholder="Ketik fasilitas baru (misal: Kulkas)..." class="border p-2 text-sm rounded-lg outline-none w-full focus:border-blue-400 transition">
+                                    <button type="button" onclick="tambahFasilitasManualInline()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow hover:bg-blue-700 transition whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i> Tambah</button>
+                                </div>
+                            </div>
+                            
+                            <div class="col-span-2 space-y-4">
+                                <div><label class="text-xs font-bold text-gray-600">Keterangan Khusus</label><input type="text" id="k_ket" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500 transition"></div>
+                                <div><label class="text-xs font-bold text-gray-600">Status Awal</label><select id="k_status" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500"><option>Kosong</option><option>Maintenance</option></select></div>
+                            </div>
+                            
+                            <div class="md:col-span-4 flex items-end space-x-2 mt-2">
+                                <button type="submit" id="btn_save_kamar" class="w-1/2 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition"><i class="fa-solid fa-save mr-1"></i> SIMPAN DATA KAMAR</button>
+                                <button type="button" onclick="batalEdit('kamar')" id="btn_cancel_kamar" class="hidden w-1/2 bg-gray-500 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-gray-600 transition">Batal Edit</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="bg-white p-0 rounded-xl shadow-sm border overflow-hidden">
+                        <div class="p-5 border-b bg-gray-50 flex justify-between items-center"><h3 class="text-lg font-bold">Daftar Kamar</h3><button onclick="exportTableToExcel('tbl-kamar', 'Data_Kamar')" class="bg-green-600 text-white px-4 py-2 text-xs font-bold rounded-lg shadow hover:bg-green-700 transition"><i class="fa-solid fa-file-excel mr-1"></i> Export Excel</button></div>
+                        <div class="overflow-x-auto p-5"><table class="w-full text-sm text-left"><thead class="bg-gray-800 text-white"><tr><th class="px-4 py-3 rounded-tl-lg">No Kamar</th><th class="px-4 py-3">Tipe</th><th class="px-4 py-3">Harga</th><th class="px-4 py-3 w-1/3">Fasilitas</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th></tr></thead><tbody id="tbl-kamar" class="divide-y text-gray-600"></tbody></table></div>
+                    </div>
+                </section>
+
+                <!-- 3. DATA TAMU -->
+                <section id="page-tamu" class="page-section">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
+                        <h3 class="text-lg font-bold mb-4 border-b pb-2">Registrasi / Edit Tamu</h3>
+                        <form id="form-tamu" onsubmit="submitTamu(event)" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div><label class="text-xs font-bold">NIK KTP</label><input type="text" id="t_nik" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition" required></div>
+                            <div><label class="text-xs font-bold">Nama Lengkap</label><input type="text" id="t_nama" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition" required></div>
+                            <div><label class="text-xs font-bold">No HP / WA</label><input type="text" id="t_hp" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition" required></div>
+                            <div><label class="text-xs font-bold">Alamat Lengkap</label><input type="text" id="t_alamat" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition"></div>
+                            <div class="md:col-span-4 flex space-x-2 mt-2">
+                                <button type="submit" id="btn_save_tamu" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:bg-blue-700 transition"><i class="fa-solid fa-save mr-1"></i> Simpan Data Tamu</button>
+                                <button type="button" onclick="batalEdit('tamu')" id="btn_cancel_tamu" class="hidden bg-gray-500 text-white font-bold py-3 px-8 rounded-xl shadow hover:bg-gray-600 transition">Batal</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="bg-white p-0 rounded-xl shadow-sm border overflow-hidden">
+                        <div class="p-5 border-b bg-gray-50 flex justify-between items-center"><h3 class="text-lg font-bold">Database Tamu</h3><button onclick="exportTableToExcel('tbl-tamu', 'Data_Tamu')" class="bg-green-600 text-white px-4 py-2 text-xs font-bold rounded-lg shadow hover:bg-green-700 transition"><i class="fa-solid fa-file-excel mr-1"></i> Export Excel</button></div>
+                        <div class="overflow-x-auto p-5"><table class="w-full text-sm text-left"><thead class="bg-gray-800 text-white"><tr><th class="px-4 py-3 rounded-tl-lg">Nama Lengkap</th><th class="px-4 py-3">NIK KTP</th><th class="px-4 py-3">No HP / WA</th><th class="px-4 py-3">Alamat</th><th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th></tr></thead><tbody id="tbl-tamu" class="divide-y text-gray-600"></tbody></table></div>
+                    </div>
+                </section>
+
+                <!-- 4. RESERVASI -->
+                <section id="page-reservasi" class="page-section">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
+                        <h3 class="text-lg font-bold mb-4 border-b pb-2"><i class="fa-solid fa-calendar-plus text-yellow-500 mr-2"></i>Form Pemesanan Kamar (Reservasi)</h3>
+                        <form id="form-reservasi" onsubmit="submitReservasi(event)" class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                            <input type="hidden" id="r_kode">
+                            
+                            <div><label class="text-xs font-bold text-gray-700">Nama Pemesan</label><input type="text" id="r_nama" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-100 transition" required></div>
+                            <div><label class="text-xs font-bold text-gray-700">Nomor HP</label><input type="text" id="r_hp" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-100 transition" required></div>
+                            <div class="md:col-span-2"><label class="text-xs font-bold text-gray-700">Pilih Kamar (Tersedia)</label><select id="r_kamar" onchange="calcReservasi()" class="w-full border p-2.5 rounded-lg mt-1 font-bold text-yellow-800 bg-yellow-50 outline-none focus:border-yellow-500 option-kamar-kosong" required></select></div>
+                            
+                            <div class="col-span-2 grid grid-cols-2 gap-4 border p-4 rounded-lg bg-gray-50 border-dashed border-gray-300">
+                                <div><label class="text-xs font-bold text-gray-700">Tanggal Check-in</label><input type="date" id="r_in" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500" onchange="calcReservasi()" required></div>
+                                <div><label class="text-xs font-bold text-gray-700">Tanggal Check-out</label><input type="date" id="r_out" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500" onchange="calcReservasi()" required></div>
+                            </div>
+                            
+                            <div class="col-span-2"><label class="text-xs font-bold text-gray-700">Estimasi Tagihan (Durasi x Harga)</label><input type="text" id="r_info" class="w-full border-2 border-yellow-300 p-4 rounded-lg mt-1 bg-yellow-100 font-black text-xl text-yellow-800 outline-none" readonly placeholder="Pilih kamar & tanggal..."></div>
+                            
+                            <div><label class="text-xs font-bold text-gray-700">Uang Muka / DP Diterima (Rp)</label><input type="text" id="r_dp" data-raw="0" oninput="formatInputUang(this)" class="w-full border p-2.5 rounded-lg mt-1 font-bold text-green-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 transition" placeholder="Rp 0"></div>
+                            <div><label class="text-xs font-bold text-gray-700">Metode Bayar DP</label><select id="r_metode" class="w-full border p-2.5 rounded-lg mt-1 outline-none"><option>Transfer</option><option>Tunai</option><option>QRIS / E-Wallet</option></select></div>
+                            <div class="md:col-span-2"><label class="text-xs font-bold text-gray-700">Catatan Tambahan Opsional</label><input type="text" id="r_catatan" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500" placeholder="Cth: Ekstra bed, Honeymoon setup..."></div>
+                            
+                            <div class="md:col-span-4 flex space-x-2 mt-4 pt-4 border-t">
+                                <button type="submit" id="btn_save_resv" class="w-full bg-yellow-500 text-white font-black text-lg tracking-widest py-4 rounded-xl hover:bg-yellow-600 shadow-xl transition transform hover:-translate-y-1"><i class="fa-solid fa-calendar-check mr-2"></i> SIMPAN RESERVASI SEKARANG</button>
+                                <button type="button" onclick="batalEdit('reservasi')" id="btn_cancel_resv" class="hidden w-1/3 bg-gray-500 text-white font-bold py-4 rounded-xl shadow hover:bg-gray-600 transition">Batal Edit</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="bg-white p-0 rounded-xl shadow-sm border overflow-hidden">
+                        <div class="p-5 border-b bg-gray-50"><h3 class="text-lg font-bold">Daftar Jadwal Reservasi</h3></div>
+                        <div class="overflow-x-auto p-5"><table class="w-full text-sm text-left"><thead class="bg-gray-800 text-white"><tr><th class="px-4 py-3 rounded-tl-lg">Kode Booking</th><th class="px-4 py-3">Nama Pemesan</th><th class="px-4 py-3">Kamar</th><th class="px-4 py-3">Tgl Masuk - Keluar</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th></tr></thead><tbody id="tbl-reservasi" class="divide-y text-gray-600"></tbody></table></div>
+                    </div>
+                </section>
+
+                <!-- 5. CHECK IN -->
+                <section id="page-checkin" class="page-section">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border mb-5 flex space-x-4 items-end bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                        <div class="w-1/2"><label class="text-xs font-bold text-blue-800 mb-1 block"><i class="fa-solid fa-search mr-1"></i> Tarik Data Tamu Lama (KTP/Nama)</label><div class="flex shadow-sm"><input type="text" id="ci_cari_tamu" placeholder="Ketik Nama / NIK..." class="p-3 w-full text-sm border border-r-0 rounded-l-lg outline-none focus:border-blue-400"><button onclick="cariTamuCI()" type="button" class="bg-blue-600 text-white px-6 font-bold text-sm rounded-r-lg hover:bg-blue-700 transition">CARI</button></div></div>
+                        <div class="w-1/2"><label class="text-xs font-bold text-yellow-800 mb-1 block"><i class="fa-solid fa-calendar-arrow-down mr-1"></i> Tarik Data Reservasi & DP Booking</label><div class="flex shadow-sm"><input type="text" id="ci_cari_resv" placeholder="Ketik Kode Booking..." class="p-3 w-full text-sm border border-r-0 rounded-l-lg outline-none border-yellow-300 focus:border-yellow-400 bg-yellow-50/50"><button onclick="cariReservasiCI()" type="button" class="bg-yellow-500 text-white px-6 font-bold text-sm rounded-r-lg hover:bg-yellow-600 transition">TARIK</button></div></div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                        <div class="bg-gray-800 text-white p-5"><h3 class="text-lg font-black tracking-wide"><i class="fa-solid fa-door-open mr-2"></i>FORM CHECK-IN TAMU</h3></div>
+                        <form id="form-checkin" onsubmit="submitCheckin(event)" class="p-8 grid grid-cols-1 md:grid-cols-3 gap-10">
+                            
+                            <input type="hidden" id="ci_kode_booking" value="">
+
+                            <!-- DATA TAMU -->
+                            <div class="col-span-1 space-y-5 bg-gray-50/50 p-6 rounded-xl border border-dashed border-gray-300">
+                                <h4 class="font-black text-sm text-blue-800 border-b-2 border-blue-500 pb-2 mb-4 inline-block">1. IDENTITAS TAMU</h4>
+                                <div><label class="text-xs font-bold text-gray-700">NIK / ID KTP</label><input type="text" id="ci_ktp" class="w-full border-b-2 border-gray-300 p-2.5 focus:border-blue-600 outline-none bg-transparent transition" required></div>
+                                <div><label class="text-xs font-bold text-gray-700">Nama Lengkap (Sesuai KTP)</label><input type="text" id="ci_nama" class="w-full border-b-2 border-gray-300 p-2.5 focus:border-blue-600 outline-none bg-transparent transition" required></div>
+                                <div><label class="text-xs font-bold text-gray-700">No HP / WhatsApp Aktif</label><input type="text" id="ci_hp" class="w-full border-b-2 border-gray-300 p-2.5 focus:border-blue-600 outline-none bg-transparent transition" required></div>
+                                <div><label class="text-xs font-bold text-gray-700">Alamat Lengkap Domisili</label><input type="text" id="ci_alamat" class="w-full border-b-2 border-gray-300 p-2.5 focus:border-blue-600 outline-none bg-transparent transition"></div>
+                            </div>
+                            
+                            <!-- KAMAR & BAYAR -->
+                            <div class="col-span-2 space-y-6">
+                                <h4 class="font-black text-sm text-blue-800 border-b-2 border-blue-500 pb-2 inline-block">2. DETAIL KAMAR & PEMBAYARAN AWAL</h4>
+                                <div class="grid grid-cols-2 gap-5">
+                                    <div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-gray-700">Pilih Kamar (Kosong / Reservasi)</label><select id="ci_kamar" class="w-full border-2 border-blue-200 p-3.5 rounded-xl outline-none bg-blue-50 font-bold text-blue-800 focus:ring-4 focus:ring-blue-100 transition option-kamar-kosong" onchange="calcCheckin()" required></select></div>
+                                    <div class="col-span-2 md:col-span-1 grid grid-cols-2 gap-3">
+                                        <div><label class="text-xs font-bold text-gray-700">Tanggal Masuk</label><input type="date" id="ci_in" class="w-full border-2 border-gray-200 p-3 rounded-xl outline-none focus:border-blue-500 transition" onchange="calcCheckin()" required></div>
+                                        <div><label class="text-xs font-bold text-gray-700">Tanggal Keluar</label><input type="date" id="ci_out" class="w-full border-2 border-gray-200 p-3 rounded-xl outline-none focus:border-blue-500 transition" onchange="calcCheckin()" required></div>
+                                    </div>
+                                    
+                                    <div class="col-span-2 bg-gray-900 p-6 rounded-2xl text-white grid grid-cols-3 gap-6 shadow-xl mt-2 relative overflow-hidden">
+                                        <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white opacity-5"></div>
+                                        
+                                        <div class="text-center border-r border-gray-700">
+                                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Durasi Inap</p>
+                                            <p class="text-4xl font-black mt-2 text-blue-400"><span id="ci_lbl_hari">0</span> <span class="text-sm font-normal text-gray-300">Malam</span></p>
+                                        </div>
+                                        <div class="text-center border-r border-gray-700 relative group">
+                                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">Diskon Harga (Rp)</p>
+                                            <div class="relative w-4/5 mx-auto">
+                                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">-</span>
+                                                <input type="text" id="ci_diskon" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full text-center border-b-2 border-gray-600 bg-gray-800 py-2 rounded font-bold text-xl outline-none focus:border-yellow-400 text-yellow-400 transition">
+                                            </div>
+                                        </div>
+                                        <div class="text-center">
+                                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Biaya Kamar Bersih</p>
+                                            <input type="text" id="ci_biaya" readonly data-raw="0" placeholder="Rp 0" class="w-full mt-2 text-center bg-transparent font-black text-3xl text-green-400 outline-none border-none">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4"><label class="text-xs font-bold text-gray-700">Metode Bayar (Awal/DP)</label><select id="ci_metode" class="w-full border-2 border-gray-200 p-3.5 rounded-xl outline-none focus:border-blue-500 transition"><option>Tunai</option><option>Transfer Bank</option><option>QRIS / E-Wallet</option><option>Debit/Kredit</option></select></div>
+                                    <div class="mt-4"><label class="text-xs font-bold text-gray-700">Uang Muka (DP) / Dibayar Awal</label><input type="text" id="ci_bayar" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-2 border-green-400 p-3.5 rounded-xl bg-green-50 font-black text-xl text-green-800 outline-none focus:ring-4 focus:ring-green-100 transition shadow-inner" required></div>
+                                </div>
+                                <button type="submit" class="w-full bg-blue-600 text-white font-black tracking-widest py-5 mt-6 rounded-xl shadow-xl hover:bg-blue-700 hover:shadow-2xl text-lg transition transform hover:-translate-y-1"><i class="fa-solid fa-check-circle mr-2"></i> PROSES CHECK-IN & CETAK INVOICE</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- 6. CHECK OUT -->
+                <section id="page-checkout" class="page-section">
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-red-200">
+                        <h3 class="text-2xl font-black mb-8 text-red-700 tracking-tight"><i class="fa-solid fa-sign-out-alt mr-3"></i>PROSES CHECK-OUT & PENAGIHAN AKHIR</h3>
+                        
+                        <div class="bg-red-50 p-6 rounded-xl border border-red-100 flex items-end space-x-5 mb-8 shadow-inner">
+                            <div class="flex-1">
+                                <label class="text-sm font-bold text-red-900 block mb-2"><i class="fa-solid fa-bed mr-1"></i> Pilih Kamar yang Akan Checkout:</label>
+                                <select id="co_kamar" class="w-full border-2 border-red-200 p-4 rounded-xl font-bold text-xl outline-none focus:ring-4 focus:ring-red-100 option-kamar-terisi transition"><option value="">-- Pilih Kamar Terisi --</option></select>
+                            </div>
+                            <button onclick="loadTagihanCheckout()" class="bg-gray-800 text-white px-8 py-4 rounded-xl font-bold shadow hover:bg-gray-900 transition flex items-center text-lg"><i class="fa-solid fa-search mr-2"></i> Cari Tagihan</button>
+                        </div>
+                        
+                        <div id="co_area" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10 pt-6 border-t border-gray-200">
+                            
+                            <div class="bg-white p-6 rounded-xl border shadow-sm">
+                                <h4 class="font-black text-gray-800 bg-gray-100 p-3 rounded-lg mb-6 flex items-center"><i class="fa-solid fa-file-invoice mr-2 text-gray-500"></i> Rincian Transaksi Awal</h4>
+                                <table class="w-full text-sm text-gray-700">
+                                    <tbody class="divide-y divide-gray-100">
+                                        <tr><td class="py-3 font-semibold text-gray-500">No Invoice</td><td class="py-3 font-bold font-mono text-blue-600 text-right" id="lbl_co_inv">-</td></tr>
+                                        <tr><td class="py-3 font-semibold text-gray-500">Nama Tamu</td><td class="py-3 font-bold text-gray-800 text-right" id="lbl_co_nama">-</td></tr>
+                                        <tr><td class="py-3 font-semibold text-gray-500">Kamar & Durasi</td><td class="py-3 font-bold text-gray-800 text-right">Kmr <span id="lbl_co_nokamar" class="text-blue-600">-</span> (<span id="lbl_co_hari">-</span> Malam)</td></tr>
+                                        <tr><td class="py-3 font-semibold text-gray-500">Tgl Masuk</td><td class="py-3 font-bold text-gray-800 text-right" id="lbl_co_in">-</td></tr>
+                                        <tr><td class="py-4 font-semibold text-gray-800 bg-gray-50 px-2 rounded-t mt-2">Biaya Kamar Awal (Kotor)</td><td class="py-4 font-black text-gray-800 text-xl text-right bg-gray-50 px-2 rounded-t mt-2" id="lbl_co_biaya">Rp 0</td></tr>
+                                        <tr><td class="py-3 font-semibold text-red-600 px-2 bg-red-50/50">Diskon Harga (Check-in)</td><td class="py-3 font-bold text-red-600 text-lg text-right px-2 bg-red-50/50" id="lbl_co_diskon_awal">- Rp 0</td></tr>
+                                        <tr><td class="py-3 font-semibold text-green-700 px-2 bg-green-50/50 rounded-b">Uang Muka (DP) Masuk</td><td class="py-3 font-black text-green-600 text-xl text-right px-2 bg-green-50/50 rounded-b" id="lbl_co_dp_awal">Rp 0</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+                                <h4 class="font-black text-gray-800 mb-6 border-b-2 border-gray-300 pb-2 flex items-center"><i class="fa-solid fa-cart-plus mr-2 text-blue-500"></i> Tambahan Tagihan & Denda</h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm"><label class="text-[10px] font-bold text-gray-500 uppercase">Layanan Laundry</label><input type="text" id="co_laundry" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-gray-300 py-1.5 mt-1 font-bold text-lg outline-none focus:border-blue-400 bg-transparent transition"></div>
+                                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm"><label class="text-[10px] font-bold text-gray-500 uppercase">Makanan / Resto</label><input type="text" id="co_makan" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-gray-300 py-1.5 mt-1 font-bold text-lg outline-none focus:border-blue-400 bg-transparent transition"></div>
+                                    
+                                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm"><label class="text-[10px] font-bold text-gray-500 uppercase">Snack / Minibar</label><input type="text" id="co_minibar" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-gray-300 py-1.5 mt-1 font-bold text-lg outline-none focus:border-blue-400 bg-transparent transition"></div>
+                                    
+                                    <div class="bg-white p-3 rounded-lg border border-red-200 shadow-sm"><label class="text-[10px] font-bold text-red-500 uppercase">Denda / Kerusakan</label><input type="text" id="co_denda" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-red-300 py-1.5 mt-1 font-bold text-lg outline-none text-red-600 focus:border-red-500 bg-transparent transition"></div>
+                                    <div class="bg-white p-3 rounded-lg border border-green-200 shadow-sm md:col-span-2"><label class="text-[10px] font-bold text-green-600 uppercase">Diskon Ekstra (Saat Checkout)</label><input type="text" id="co_diskon" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-green-300 py-1.5 mt-1 font-bold text-lg outline-none focus:border-green-500 text-green-600 bg-transparent transition"></div>
+                                </div>
+                                
+                                <div class="bg-red-600 text-white p-6 rounded-xl text-center border-4 border-red-200 shadow-xl mt-6 relative overflow-hidden">
+                                    <div class="absolute top-0 right-0 -mr-6 -mt-6 w-24 h-24 rounded-full bg-white opacity-10"></div>
+                                    
+                                    <!-- BREAKDOWN BIAYA CHECKOUT (SISA KAMAR + BIAYA TAMBAHAN) -->
+                                    <div class="flex justify-between items-center border-b border-red-400 pb-4 mb-4 text-sm font-bold text-red-100">
+                                        <div class="text-left">
+                                            <p class="text-[10px] uppercase tracking-wider mb-1 opacity-80">Sisa Kamar (Blm Lunas)</p>
+                                            <p id="lbl_co_sisa_kamar" class="text-2xl text-white">Rp 0</p>
+                                        </div>
+                                        <i class="fa-solid fa-plus text-2xl opacity-50"></i>
+                                        <div class="text-right">
+                                            <p class="text-[10px] uppercase tracking-wider mb-1 opacity-80">Biaya Tambahan</p>
+                                            <p id="lbl_co_sisa_tambahan" class="text-2xl text-white">Rp 0</p>
+                                        </div>
+                                    </div>
+
+                                    <p class="text-xs font-bold text-red-200 uppercase tracking-widest mb-1">TOTAL PELUNASAN SEKARANG</p>
+                                    <p class="text-5xl font-black drop-shadow-md" id="lbl_co_sisa">Rp 0</p>
+                                </div>
+                                
+                                <div class="flex flex-col space-y-3 mt-6">
+                                    <button onclick="submitCheckout()" class="w-full bg-gray-900 text-white font-black tracking-widest py-4 rounded-xl hover:bg-black shadow-lg text-lg transition transform hover:-translate-y-1"><i class="fa-solid fa-flag-checkered mr-2 text-green-400"></i> PELUNASAN & CHECK-OUT</button>
+                                    <button onclick="triggerPrint('checkout', null)" class="w-full bg-white text-gray-800 border-2 border-gray-300 font-bold py-3 rounded-xl hover:bg-gray-100 shadow transition"><i class="fa-solid fa-print mr-1 text-gray-500"></i> Cetak Ulang / Cek Struk</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. PEMBAYARAN -->
+                <section id="page-pembayaran" class="page-section">
+                    <div class="bg-white p-0 rounded-2xl shadow-sm border overflow-hidden">
+                        <div class="p-6 border-b bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
+                            <h3 class="text-xl font-black text-gray-800"><i class="fa-solid fa-file-invoice-dollar mr-2 text-blue-500"></i>Riwayat Pembayaran</h3>
+                            <div class="flex w-full md:w-auto space-x-3">
+                                <div class="relative w-full md:w-64">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-search text-gray-400"></i>
+                                    </div>
+                                    <input type="text" id="cari_riwayat" oninput="cariRiwayatTransaksi()" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm outline-none transition" placeholder="Cari Tamu / Invoice...">
+                                </div>
+                                <button onclick="exportTableToExcel('tbl-transaksi-full', 'Riwayat_Transaksi')" class="bg-green-600 text-white px-5 py-2 text-sm font-bold rounded-lg shadow hover:bg-green-700 transition flex-shrink-0"><i class="fa-solid fa-file-excel mr-1"></i> Export</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto p-6"><table id="tbl-transaksi-full" class="w-full text-sm text-left"><thead class="bg-gray-800 text-white"><tr><th class="px-4 py-4 rounded-tl-lg">No. Invoice</th><th class="px-4 py-4">Nama Tamu</th><th class="px-4 py-4">Kamar</th><th class="px-4 py-4 text-right">Total Tagihan</th><th class="px-4 py-4 text-center">Status</th><th class="px-4 py-4 text-center rounded-tr-lg">Cetak</th></tr></thead><tbody id="tbl-transaksi" class="divide-y text-gray-700"></tbody></table></div>
+                    </div>
+                </section>
+
+                <!-- 8. LAPORAN -->
+                <section id="page-laporan" class="page-section">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white p-8 rounded-2xl border border-blue-100 shadow-sm border-t-8 border-t-blue-500 text-center transition hover:shadow-md"><p class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide">Total Pendapatan (Bulan Ini)</p><h3 class="text-4xl font-black text-blue-600 drop-shadow-sm" id="lap_pendapatan">Rp 0</h3></div>
+                        <div class="bg-white p-8 rounded-2xl border border-green-100 shadow-sm border-t-8 border-t-green-500 text-center transition hover:shadow-md"><p class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide">Okupansi Kamar Saat Ini</p><h3 class="text-4xl font-black text-green-600 drop-shadow-sm" id="lap_okupansi">0%</h3></div>
+                        <div class="bg-white p-8 rounded-2xl border border-purple-100 shadow-sm border-t-8 border-t-purple-500 text-center transition hover:shadow-md"><p class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide">Kamar Terlaris (Bulan Ini)</p><h3 class="text-4xl font-black text-purple-600 drop-shadow-sm" id="lap_terlaris">-</h3></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                        <div class="bg-white p-8 rounded-2xl shadow-sm border">
+                            <h3 class="text-lg font-black mb-6 border-b-2 border-gray-200 pb-3 text-gray-800"><i class="fa-solid fa-chart-line text-blue-500 mr-2"></i>Kinerja Tipe Kamar (Bulan Ini)</h3>
+                            <table class="w-full text-sm text-left"><thead class="bg-gray-100 text-gray-600"><tr><th class="py-3 px-4 rounded-l-lg">Tipe Kamar</th><th class="py-3 px-4 text-center">Disewa</th><th class="py-3 px-4 text-right rounded-r-lg">Total Pendapatan</th></tr></thead><tbody id="tbl-lap-tipe" class="divide-y text-gray-800"></tbody></table>
+                        </div>
+                        <div class="bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl shadow-sm border border-green-100 text-center flex flex-col justify-center items-center">
+                            <div class="bg-green-500 text-white w-24 h-24 rounded-full flex items-center justify-center mb-6 shadow-lg transform transition hover:scale-110"><i class="fa-solid fa-file-excel text-5xl"></i></div>
+                            <h2 class="text-2xl font-black text-gray-800">Export Seluruh Transaksi</h2>
+                            <p class="text-sm text-gray-600 mt-3 mb-6 max-w-sm">Unduh database asli transaksi keuangan, riwayat tamu, dan histori checkout langsung ke format Excel (.xlsx) murni.</p>
+                            <button onclick="exportSemuaTransaksiExcel()" class="bg-green-600 text-white px-8 py-4 rounded-xl font-black tracking-wide hover:bg-green-700 shadow-lg w-full max-w-md transition transform hover:-translate-y-1"><i class="fa-solid fa-download mr-2"></i> DOWNLOAD LAPORAN EXCEL</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 9. PENGATURAN -->
+                <section id="page-pengaturan" class="page-section">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white p-8 rounded-2xl shadow-sm border h-fit">
+                            <h3 class="text-xl font-black mb-6 border-b-2 border-gray-200 pb-3 text-gray-800"><i class="fa-solid fa-building text-blue-500 mr-2"></i>Profil Penginapan (Struk Invoice)</h3>
+                            <div class="space-y-5">
+                                <div><label class="text-xs font-bold text-gray-600 uppercase">Nama Penginapan</label><input type="text" class="w-full border-b-2 border-gray-300 p-2 mt-1 bg-gray-50 font-black text-lg text-blue-800 outline-none focus:border-blue-500 transition" value="HOTEL PENGINAPAN" id="set_hotel"></div>
+                                <div><label class="text-xs font-bold text-gray-600 uppercase">Alamat Lengkap</label><input type="text" class="w-full border-b-2 border-gray-300 p-2 mt-1 bg-gray-50 outline-none focus:border-blue-500 transition" value="Jl. Contoh Alamat No. 12, Kota" id="set_alamat"></div>
+                                <div><label class="text-xs font-bold text-gray-600 uppercase">Nomor Telepon</label><input type="text" class="w-full border-b-2 border-gray-300 p-2 mt-1 bg-gray-50 font-bold outline-none focus:border-blue-500 transition" value="0812-3456-7890" id="set_telp"></div>
+                                <button onclick="simpanProfilPengaturan()" class="w-full bg-blue-600 text-white font-black tracking-widest py-4 rounded-xl shadow-lg hover:bg-blue-700 mt-4 transition transform hover:-translate-y-1"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> SIMPAN & SINKRON KE GSHEET</button>
+                            </div>
+                        </div>
+                        <div class="space-y-8">
+                            <div class="bg-white p-8 rounded-2xl shadow-sm border">
+                                <div class="flex justify-between items-center mb-6 border-b-2 border-gray-200 pb-3">
+                                    <h3 class="text-xl font-black text-gray-800"><i class="fa-solid fa-users-cog text-blue-500 mr-2"></i>Manajemen User & Hak Akses</h3>
+                                    <button onclick="tambahUserBaru()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 shadow transition"><i class="fa-solid fa-plus mr-1"></i> Tambah User</button>
+                                </div>
+                                <div class="overflow-x-auto max-h-60"><table class="w-full text-sm text-left"><thead class="bg-gray-100 text-gray-600"><tr><th class="px-3 py-3 rounded-l">Nama Karyawan</th><th class="px-3 py-3">Jabatan</th><th class="px-3 py-3 text-center">Status</th><th class="px-3 py-3 text-right rounded-r">Aksi</th></tr></thead><tbody id="tbl-users" class="divide-y text-gray-800"></tbody></table></div>
+                            </div>
+                            <div class="bg-gradient-to-r from-orange-50 to-red-50 p-8 rounded-2xl shadow-sm border border-orange-200">
+                                <h3 class="text-xl font-black mb-2 text-orange-800"><i class="fa-solid fa-database mr-2"></i>Backup Sistem Penuh</h3>
+                                <p class="text-sm text-orange-700 mb-6">Amankan seluruh data Anda. Unduh langsung dari Server Google Sheets.</p>
+                                <button onclick="window.open('https://docs.google.com/spreadsheets/d/1Z2iCSjdW2oi5dEucNR34mD-U2TEHi779OfbKgm11vwA/export?format=xlsx', '_blank')" class="w-full bg-orange-600 text-white font-black tracking-widest py-4 rounded-xl shadow-lg hover:bg-orange-700 transition transform hover:-translate-y-1"><i class="fa-solid fa-cloud-download-alt mr-2"></i> UNDUH DATABASE ASLI (GS)</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbyjAptPUXrwxBve2yA6Px0KmCnhm5muxOoevwIlV6VkuqPpRCqDLR671TDoI2ePny_t/exec";
+        
+        let globalKamar=[], globalTamu=[], globalReservasi=[], globalTransaksi=[], globalUsers=[];
+        let editMode = { active: false, type: null, idVal: null };
+
+        // ================= SISTEM PIN & KEYBOARD =================
+        const pinInputBox = document.getElementById('pin1');
+        
+        function moveNext(elem, nextId, event) {
+            if (event.key === 'Backspace') {
+                if (elem.value === '' && elem.previousElementSibling && elem.previousElementSibling.classList.contains('pin-box')) { elem.previousElementSibling.focus(); } return;
+            }
+            elem.value = elem.value.replace(/[^0-9]/g, '');
+            if (elem.value.length === 1) {
+                if (nextId) document.getElementById(nextId).focus(); else submitPinLogin();
+            }
+        }
+
+        function handlePaste(e) {
+            e.preventDefault();
+            let paste = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+            let boxes = document.querySelectorAll('.pin-box');
+            for(let i=0; i<boxes.length; i++) {
+                if(paste[i]) {
+                    boxes[i].value = paste[i];
+                    if(i < boxes.length - 1) boxes[i+1].focus(); else { boxes[i].focus(); submitPinLogin(); }
+                }
+            }
+        }
+
+        async function submitPinLogin() {
+            let pinVal = Array.from(document.querySelectorAll('.pin-box')).map(input => input.value).join('');
+            if(pinVal.length < 6) return Swal.fire({icon: 'warning', title: 'PIN Kurang', text: 'Masukkan 6 digit angka.'});
+            Swal.fire({title: 'Memeriksa Akses...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+            
+            try {
+                let res = await fetch(`${API_URL}?action=getUser`); let data = await res.json();
+                if(data.status === 'success') {
+                    let uVal = (data.data || []).find(x => String(x.Password) === String(pinVal) && String(x.Status) === "Aktif");
+                    if(uVal || pinVal === '123456') { 
+                        localStorage.setItem('isLoggedIn', 'true'); localStorage.setItem('activeUser', uVal ? uVal.Username : 'Admin'); localStorage.setItem('activeRole', uVal ? uVal.Role : 'Super Admin'); localStorage.setItem('activeAkses', uVal ? uVal['Hak Akses'] : 'Semua Akses');
+                        Swal.close();
+                        
+                        document.getElementById('login-box').classList.remove('animate-bounce-in'); document.getElementById('login-screen').classList.add('opacity-0');
+                        setTimeout(() => {
+                            document.getElementById('login-screen').classList.add('hidden');
+                            let appBox = document.getElementById('app-container');
+                            appBox.classList.remove('hidden'); appBox.classList.remove('opacity-0'); appBox.classList.add('animate-scale-in');
+                            setElem('top_user_name', localStorage.getItem('activeUser')); setElem('top_user_role', localStorage.getItem('activeRole')); buildSidebarMenu(localStorage.getItem('activeAkses')); loadAllData();
+                            document.querySelectorAll('.pin-box').forEach(b => b.value = '');
+                        }, 500);
+                    } else {
+                         Swal.fire('Ditolak', 'PIN Tidak Terdaftar / Nonaktif!', 'error');
+                         document.querySelectorAll('.pin-box').forEach(b => b.value = ''); document.getElementById('pin1').focus();
+                         let box = document.getElementById('login-box'); box.classList.add('shake-error'); setTimeout(()=>{ box.classList.remove('shake-error'); }, 400);
+                    }
+                } else throw new Error();
+            } catch(e) {
+                if(pinVal === '123456') { localStorage.setItem('isLoggedIn', 'true'); localStorage.setItem('activeUser', 'Admin'); localStorage.setItem('activeRole', 'Super Admin'); localStorage.setItem('activeAkses', 'Semua Akses'); window.location.reload(); } 
+                else { Swal.fire('Error API', 'Gagal menyambung ke Database. Gunakan PIN Master (123456).', 'error'); document.querySelectorAll('.pin-box').forEach(b => b.value = ''); document.getElementById('pin1').focus(); }
+            }
+        }
+
+        function switchShift() {
+            Swal.fire({ title: 'Kunci Layar?', text: 'Aplikasi akan kembali ke mode PIN untuk keamanan.', icon: 'question', showCancelButton: true, confirmButtonColor: '#f97316', confirmButtonText: 'Ya, Kunci Layar' }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('isLoggedIn'); document.getElementById('app-container').classList.add('opacity-0');
+                    setTimeout(() => {
+                        document.getElementById('app-container').classList.add('hidden'); let loginBox = document.getElementById('login-screen'); loginBox.classList.remove('hidden');
+                        setTimeout(() => {
+                            loginBox.classList.remove('opacity-0'); document.getElementById('login-box').classList.add('animate-bounce-in'); document.querySelectorAll('.pin-box').forEach(b => b.value = ''); document.getElementById('pin1').focus();
+                        }, 50);
+                    }, 500);
+                }
+            })
+        }
+
+        const pageTitles = { 'dashboard': { t: 'Dashboard', s: 'Ringkasan kondisi penginapan secara real-time' }, 'kamar': { t: 'Data Kamar', s: 'Manajemen fasilitas dan harga kamar' }, 'tamu': { t: 'Data Tamu', s: 'Database riwayat tamu pelanggan' }, 'reservasi': { t: 'Reservasi', s: 'Daftar jadwal pemesanan kamar' }, 'checkin': { t: 'Check In', s: 'Proses tamu masuk dan pembuatan tagihan' }, 'checkout': { t: 'Check Out', s: 'Proses tamu keluar dan penagihan akhir' }, 'pembayaran': { t: 'Pembayaran', s: 'Riwayat invoice dan transaksi' }, 'laporan': { t: 'Laporan & Okupansi', s: 'Statistik pendapatan dan cetak laporan' }, 'pengaturan': { t: 'Pengaturan Sistem', s: 'Konfigurasi profil dan manajemen user' } };
+        const setElem = (id, val, isHTML=false, isInput=false) => { let el = document.getElementById(id); if(el) { if(isInput) el.value = val; else if(isHTML) el.innerHTML = val; else el.innerText = val; } };
+        const safeStr = (str) => { if (str === null || str === undefined) return ''; return String(str).replace(/[\r\n'"\\]/g, ' ').trim(); };
+        const formatRp = (angka) => { let num = parseFloat(angka); if(isNaN(num)) num = 0; return 'Rp ' + num.toLocaleString('id-ID'); };
+        
+        function formatInputUang(elem) {
+            let val = elem.value.replace(/[^0-9]/g, ''); 
+            if(val === '') { elem.value = ''; elem.dataset.raw = 0; return; }
+            elem.value = 'Rp ' + parseInt(val).toLocaleString('id-ID'); elem.dataset.raw = val;
+            if(['co_laundry', 'co_makan', 'co_minibar', 'co_denda', 'co_diskon'].includes(elem.id)) hitungTotalCO();
+            if(elem.id === 'ci_diskon') calcCheckin();
+        }
+        function parseRpToNum(str) { if(typeof str === 'number') return str; if(!str) return 0; let parsed = parseFloat(String(str).replace(/[^0-9]/g, '')); return isNaN(parsed) ? 0 : parsed; }
+        function getRawNum(elemId) { return parseFloat(document.getElementById(elemId).dataset.raw || 0) || 0; }
+        function setRawNum(elemId, val) { let el = document.getElementById(elemId); if(el) { el.dataset.raw = val; el.value = formatRp(val); } }
+
+        const getTodayYMD = () => { let d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+        function parseDateStandard(dStr) {
+           if(!dStr || typeof dStr !== 'string') return ""; let str = dStr.trim();
+           if(str.includes('/')) { let p = str.split('/'); if(p.length >= 3) { if(p[2].length === 4) return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`; if(p[0].length === 4) return `${p[0]}-${p[1].padStart(2,'0')}-${p[2].padStart(2,'0')}`; } }
+           return str.split('T')[0];
+        }
+        function isToday(dStr) {
+            if(!dStr) return false; let str = String(dStr); let d = new Date(); let y = d.getFullYear(); let m = String(d.getMonth()+1).padStart(2,'0'); let m2 = String(d.getMonth()+1); let day = String(d.getDate()).padStart(2,'0'); let day2 = String(d.getDate());
+            if (str.includes(`${y}-${m}-${day}`) || str.includes(`${y}/${m}/${day}`)) return true;
+            if (str.includes(`${day}/${m}/${y}`) || str.includes(`${day2}/${m2}/${y}`)) return true;
+            if (str.includes(`${m}/${day}/${y}`) || str.includes(`${m2}/${day2}/${y}`)) return true;
+            let mn = d.toLocaleString('id-ID', { month: 'long' }); if (str.toLowerCase().includes(`${day2} ${mn.toLowerCase()} ${y}`)) return true; 
+            return false;
+        }
+
+        window.onload = () => {
+            setInterval(() => { setElem('current-date', new Date().toLocaleString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' })); }, 1000);
+            
+            if(localStorage.getItem('isLoggedIn') === 'true') {
+                document.getElementById('login-screen').classList.add('hidden'); let appBox = document.getElementById('app-container'); appBox.classList.remove('hidden'); appBox.classList.remove('opacity-0');
+                setElem('top_user_name', localStorage.getItem('activeUser') || 'Admin'); setElem('top_user_role', localStorage.getItem('activeRole') || 'Super Admin');
+                buildSidebarMenu(localStorage.getItem('activeAkses') || 'Semua Akses'); loadAllData();
+            } else { setTimeout(() => document.getElementById('pin1').focus(), 500); }
+        };
+
+        const allMenus = [ { id: 'dashboard', icon: 'fa-house', text: 'Dashboard' }, { type: 'divider' }, { id: 'kamar', icon: 'fa-bed', text: 'Data Kamar' }, { id: 'tamu', icon: 'fa-address-book', text: 'Data Tamu' }, { id: 'reservasi', icon: 'fa-calendar-check', text: 'Reservasi' }, { type: 'divider' }, { id: 'checkin', icon: 'fa-sign-in-alt', text: 'Check In' }, { id: 'checkout', icon: 'fa-sign-out-alt', text: 'Check Out' }, { id: 'pembayaran', icon: 'fa-file-invoice-dollar', text: 'Pembayaran' }, { type: 'divider' }, { id: 'laporan', icon: 'fa-chart-pie', text: 'Laporan' }, { id: 'pengaturan', icon: 'fa-cog', text: 'Pengaturan' } ];
+
+        function buildSidebarMenu(aksesStr) {
+            let sb = document.getElementById('sidebar-menu'); sb.innerHTML = '';
+            let allowed = aksesStr === 'Semua Akses' ? allMenus.map(m=>m.text) : String(aksesStr||'').split(', ');
+            let firstMenu = null;
+            allMenus.forEach(m => {
+                if(m.type === 'divider') { sb.innerHTML += `<div class="my-3 border-t border-gray-700/50"></div>`; }
+                else if (aksesStr === 'Semua Akses' || allowed.includes(m.text)) {
+                    if(!firstMenu) firstMenu = m.id;
+                    sb.innerHTML += `<a href="#" onclick="switchPage('${m.id}')" id="nav-${m.id}" class="menu-item flex items-center space-x-3 px-4 py-3 text-sm font-bold transition-all hover:pl-6"><i class="fa-solid ${m.icon} w-5 text-center text-blue-400"></i><span>${m.text}</span></a>`;
+                }
+            });
+            if(firstMenu) switchPage(firstMenu);
+        }
+
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('menu-active'));
+            if(document.getElementById(`page-${pageId}`)) document.getElementById(`page-${pageId}`).classList.add('active');
+            if(document.getElementById(`nav-${pageId}`)) document.getElementById(`nav-${pageId}`).classList.add('menu-active');
+            if(pageTitles[pageId]) { setElem('page-title', pageTitles[pageId].t); setElem('page-subtitle', pageTitles[pageId].s); }
+            if(pageId === 'checkin') { document.getElementById('ci_in').value = getTodayYMD(); document.getElementById('ci_out').value = getTodayYMD(); }
+            if(pageId === 'laporan') renderLaporanData();
+        }
+
+        async function fetchAPI(action) { try { let res = await fetch(`${API_URL}?action=${action}`); return await res.json(); } catch(e) { return { status: 'error', data: [] }; } }
+        async function postAPI(action, dataObj) {
+            Swal.fire({ title: 'Menyinkronkan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            try {
+                let res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: action, data: dataObj }) });
+                let result = await res.json();
+                if(result.status === 'success') { Swal.fire({icon:'success', title:'Sukses!', text:result.message, timer:1500, showConfirmButton:false}); return true; } 
+                else throw new Error(result.message);
+            } catch(e) { Swal.fire('Gagal', 'Terjadi kesalahan sistem/koneksi.', 'error'); return false; }
+        }
+
+        async function loadAllData() {
+            try {
+                let [rD, rK, rT, rR, rTr, rU, rP] = await Promise.all([ fetchAPI('getDashboard'), fetchAPI('getKamar'), fetchAPI('getTamu'), fetchAPI('getReservasi'), fetchAPI('getTransaksi'), fetchAPI('getUser'), fetchAPI('getPengaturan') ]);
+                globalKamar = Array.isArray(rK.data) ? rK.data : []; globalTamu = Array.isArray(rT.data) ? rT.data : []; globalReservasi = Array.isArray(rR.data) ? rR.data : []; globalTransaksi = Array.isArray(rTr.data) ? rTr.data : []; globalUsers = Array.isArray(rU.data) ? rU.data : [];
+                
+                let pengaturanData = Array.isArray(rP.data) ? rP.data : [];
+                pengaturanData.forEach(p => {
+                    if(p.Item === 'Nama Penginapan') setElem('set_hotel', p.Nilai, false, true);
+                    if(p.Item === 'Alamat Lengkap') setElem('set_alamat', p.Nilai, false, true);
+                    if(p.Item === 'Nomor Telepon') setElem('set_telp', p.Nilai, false, true);
+                });
+
+                try { updateDOMKamar(); } catch(e){} try { updateDOMTamu(); } catch(e){} try { updateDOMReservasi(); } catch(e){} try { updateDOMTransaksi(); } catch(e){} try { updateDOMUser(); } catch(e){}
+                try { if(rD.status === 'success' && rD.data) renderDashboardUI(rD.data); else renderDashboardUI({statistik:{}, statusKamar:globalKamar}); } catch(e){ console.error("Dash Error", e); }
+                try { renderLaporanData(); } catch(e){ console.error("Lap Error", e); }
+            } catch(e) { console.error("LoadData Master Crash:", e); }
+        }
+
+        // ================= DASHBOARD RENDER =================
+        function renderDashboardUI(dashData) {
+            try {
+                dashData = dashData || {}; let s = dashData.statistik || {};
+                let realTerisi = 0, realKosong = 0;
+                globalKamar.forEach(k => { let st = safeStr(k['Status']||'Kosong'); if(st === 'Terisi') realTerisi++; else if(st === 'Kosong') realKosong++; });
+
+                setElem('d_tot', parseInt(s.totalKamar) || globalKamar.length || 0); setElem('d_terisi', parseInt(s.terisi) || realTerisi); setElem('d_kosong', parseInt(s.kosong) || realKosong);
+                
+                let ciCount = 0, coCount = 0, revToday = 0, revTunai = 0, revTransfer = 0, revQris = 0, listCI = '', ciIndex = 1;
+                (globalTransaksi || []).forEach(t => {
+                    if(!t) return;
+                    let ti = safeStr(t['Tgl Check-in']); let to = safeStr(t['Tgl Check-out']); let st = safeStr(t['Status Transaksi']);
+                    
+                    let trRev = 0;
+                    if(st.includes('Selesai')) {
+                        let totalTagihan = parseRpToNum(t['Total Tagihan'] || t[16]);
+                        let dp = parseRpToNum(t['DP'] || t['Sudah Dibayar'] || 0);
+                        
+                        if(isToday(ti) && isToday(to)) { trRev = totalTagihan; } 
+                        else if (isToday(to)) { trRev = totalTagihan - dp; } 
+                        else if (isToday(ti)) { trRev = dp; } 
+                    } else if (st.includes('Aktif')) {
+                        let dp = parseRpToNum(t['DP'] || t['Sudah Dibayar'] || 0);
+                        if(isToday(ti)) { trRev = dp; } 
+                    }
+
+                    if(trRev > 0) {
+                        revToday += trRev; 
+                        let mb = safeStr(t['Metode Bayar']).toLowerCase();
+                        if(mb.includes('tunai')) revTunai += trRev;
+                        else if(mb.includes('qris') || mb.includes('e-wallet') || mb.includes('kredit')) revQris += trRev;
+                        else revTransfer += trRev;
+                    }
+
+                    if(isToday(ti)) { 
+                        ciCount++; 
+                        if(ciIndex <= 4) { listCI += `<tr class="hover:bg-blue-50"><td class="px-3 py-2 border-b text-gray-500">${ciIndex}</td><td class="px-3 py-2 border-b font-bold text-gray-800">${safeStr(t['Nama Tamu'])}</td><td class="px-3 py-2 border-b font-bold">${safeStr(t['No Kamar'])}</td><td class="px-3 py-2 border-b">${ti}</td><td class="px-3 py-2 border-b text-gray-500">${to}</td></tr>`; }
+                        ciIndex++;
+                    }
+                    if(st.includes('Selesai') && isToday(to)) coCount++;
+                });
+
+                setElem('d_ci', ciCount); setElem('d_co', coCount); setElem('d_rev', formatRp(revToday)); setElem('d_rev_big', formatRp(revToday)); setElem('d_rev_count', ciCount); setElem('d_rev_tunai', formatRp(revTunai)); setElem('d_rev_tf', formatRp(revTransfer)); setElem('d_rev_qris', formatRp(revQris));
+                setElem('tbl-dash-ci', listCI || '<tr><td colspan="5" class="text-center py-4 text-gray-400 italic">Belum ada check-in hari ini</td></tr>', true);
+
+                let htmlGrid = ''; let statusKamars = dashData.statusKamar || globalKamar || [];
+                if(!Array.isArray(statusKamars)) statusKamars = [];
+
+                if(statusKamars.length === 0) { htmlGrid = '<div class="col-span-full text-center py-6 text-gray-500 font-bold">Kamar masih kosong. Buka menu Data Kamar untuk menambah.</div>'; }
+                else {
+                    statusKamars.forEach(r => {
+                        if(!r) return; let noKmr = safeStr(r.noKamar || r['No Kamar']); if(!noKmr) return;
+                        let stKmr = safeStr(r.status || r['Status'] || 'Kosong'); 
+                        let bg, tc, ic; let safeTipe = safeStr(r.tipe || r['Tipe']); let safeHarga = parseRpToNum(r.harga || r['Harga']);
+                        if(stKmr === 'Terisi') { bg = 'bg-red-500'; tc = 'text-red-500'; ic = 'fa-bed'; } else if(stKmr === 'Booking') { bg = 'bg-yellow-400'; tc = 'text-yellow-600'; ic = 'fa-calendar'; } else if(stKmr === 'Cleaning' || stKmr === 'Maintenance') { bg = 'bg-orange-500'; tc = 'text-orange-500'; ic = 'fa-broom'; } else { stKmr='Kosong'; bg = 'bg-green-500'; tc = 'text-green-500'; ic = 'fa-door-open'; }
+                        
+                        let safeNo = noKmr.replace(/'/g, "\\'"); 
+                        htmlGrid += `<div onclick="klikKamarDashboard('${safeNo}', '${stKmr}', '${safeTipe}', '${safeHarga}')" class="border border-gray-100 rounded-xl p-4 flex flex-col items-center justify-center bg-white shadow-sm hover:shadow-md cursor-pointer transition"><p class="font-black text-gray-800 mb-2 text-xl">${noKmr}</p><div class="flex items-center space-x-2 bg-gray-50 px-3 py-1 rounded-full border border-gray-100"><div class="${bg} text-white w-5 h-5 rounded flex items-center justify-center text-[10px]"><i class="fa-solid ${ic}"></i></div><span class="${tc} text-xs font-black uppercase">${stKmr}</span></div></div>`;
+                    });
+                }
+                setElem('room-grid', htmlGrid, true);
+
+                let resvHT = '', rIndex = 1;
+                [...(globalReservasi||[])].reverse().slice(0,3).forEach(r => {
+                    if(!r) return; let stR = safeStr(r['Status Booking']); let stClass = stR==='Menunggu'?'bg-yellow-100 text-yellow-700':(stR==='Selesai'?'bg-green-100 text-green-700':'bg-gray-100 text-gray-700');
+                    resvHT += `<tr class="hover:bg-gray-50 border-b"><td class="px-3 py-2 text-gray-500">${rIndex++}</td><td class="px-3 py-2 font-bold">${safeStr(r['Nama Pemesan'])}</td><td class="px-3 py-2 font-bold">${safeStr(r['No Kamar'])}</td><td class="px-3 py-2">${safeStr(r['Tgl Check-in'])}</td><td class="px-3 py-2 text-center"><span class="${stClass} px-2 py-1 rounded text-xs font-bold">${stR}</span></td></tr>`;
+                });
+                setElem('tbl-dash-resv', resvHT || '<tr><td colspan="5" class="text-center py-4 text-gray-400 italic text-sm">Belum ada reservasi terbaru</td></tr>', true);
+
+            } catch(e) { console.error("Render Dash Crash", e); setElem('room-grid', `<div class="col-span-full p-4 bg-red-50 text-red-500 border border-red-200 rounded font-bold">Terjadi kesalahan format di Google Sheets.</div>`, true); }
+        }
+
+        function klikKamarDashboard(no, st, tipe, harga) {
+            if(st === 'Kosong') {
+                Swal.fire({ title: `Kamar ${no}`, html: `<div class="text-left bg-gray-50 p-4 border rounded"><p><b>Status:</b> Kosong</p><p><b>Tipe:</b> ${tipe}</p><p class="text-lg"><b>Harga:</b> ${formatRp(harga)}</p></div>`, showCancelButton:true, confirmButtonText:'<i class="fa-solid fa-sign-in-alt"></i> CHECK-IN', confirmButtonColor: '#2563eb' })
+                .then(r => { if(r.isConfirmed){ document.getElementById('ci_kamar').value = no; switchPage('checkin'); calcCheckin(); } });
+            } else if(st === 'Terisi') {
+                let trx = globalTransaksi.find(t => String(t['No Kamar']) === String(no) && String(t['Status Transaksi']).includes('Aktif'));
+                if(!trx) return Swal.fire('Error', 'Data transaksi aktif tidak ditemukan', 'error');
+                let inDate = new Date(); let outDate = new Date(parseDateStandard(trx['Tgl Check-out']));
+                let sisa = Math.max(0, Math.ceil((outDate - inDate)/(1000*60*60*24)));
+                Swal.fire({ title: `Kamar ${no}`, html: `<div class="text-left bg-red-50 p-4 border border-red-200 rounded"><p class="text-lg mb-2"><b>Tamu:</b> ${trx['Nama Tamu']}</p><p>Masuk: ${trx['Tgl Check-in']}</p><p>Keluar: ${trx['Tgl Check-out']}</p><p class="text-red-700 font-bold mt-2">Sisa Hari: ${sisa} Malam</p></div>`, showCancelButton: true, confirmButtonText: 'CHECK-OUT', confirmButtonColor: '#dc2626' })
+                .then(r => { if(r.isConfirmed) { document.getElementById('co_kamar').value = no; switchPage('checkout'); loadTagihanCheckout(); } });
+            } else {
+                Swal.fire({ title: `Kamar ${no} (${st})`, text: 'Pembersihan / perbaikan sudah selesai?', icon: 'question', showCancelButton: true, confirmButtonText: 'Tandai Kosong', confirmButtonColor: '#16a34a' })
+                .then(async r => { if(r.isConfirmed && await postAPI('updateStatusKamar', {noKamar:no, statusBaru:'Kosong'})) loadAllData(); });
+            }
+        }
+
+        // ================= KAMAR =================
+        function otomatisFasilitas() {
+            let t = document.getElementById('k_tipe').value;
+            document.getElementById('f_wifi').checked = true; document.getElementById('f_tv').checked = true;
+            document.getElementById('f_ac').checked = (t === 'Deluxe' || t === 'VIP'); document.getElementById('f_airpanas').checked = (t === 'VIP');
+        }
+        function tambahFasilitasManualInline() {
+            let val = document.getElementById('k_f_custom').value.trim();
+            if(val) { let fid = 'f_cust_' + Math.floor(Math.random()*1000); document.getElementById('fas_container').insertAdjacentHTML('beforeend', `<label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="${fid}" value="${val}" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><span>${val}</span></label>`); document.getElementById('k_f_custom').value = ''; }
+        }
+        async function submitKamar(e) {
+            e.preventDefault(); let fas = [];
+            document.querySelectorAll('#fas_container input[type="checkbox"]:checked').forEach(c => { if(c.id==='f_wifi') fas.push('Wifi'); else if(c.id==='f_tv') fas.push('TV'); else if(c.id==='f_ac') fas.push('AC'); else if(c.id==='f_airpanas') fas.push('Air Panas'); else fas.push(c.value); });
+            let arrData = [ document.getElementById('k_no').value, document.getElementById('k_tipe').value, getRawNum('k_harga'), document.getElementById('k_lantai').value, fas.join(", "), document.getElementById('k_ket').value, document.getElementById('k_status').value ];
+            if(editMode.active && editMode.type === 'kamar') { if(await postAPI('updateData', { sheetName: 'Data Kamar', searchColIndex: 1, searchValue: editMode.idVal, rowData: arrData })) { batalEdit('kamar'); loadAllData(); } } 
+            else { if(await postAPI('addKamar', arrData)) { e.target.reset(); setRawNum('k_harga', 0); loadAllData(); } }
+        }
+        function editRowKamar(no) {
+            let k = globalKamar.find(x => String(x['No Kamar']) === String(no)); if(!k) return;
+            document.getElementById('k_no').value = k['No Kamar']; document.getElementById('k_no').readOnly = true; document.getElementById('k_tipe').value = k['Tipe']; setRawNum('k_harga', parseRpToNum(k['Harga'])); document.getElementById('k_lantai').value = k['Lantai']; document.getElementById('k_ket').value = k['Keterangan']; document.getElementById('k_status').value = k['Status'];
+            let htmlF = ''; (String(k['Fasilitas']||'')).split(',').forEach(f => { f = f.trim(); if(!f) return; let id = 'f_'+f.replace(/\s+/g,'').toLowerCase(); htmlF += `<label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="${id}" value="${f}" checked class="w-4 h-4 text-blue-600 rounded"><span>${f}</span></label>`; }); document.getElementById('fas_container').innerHTML = htmlF || 'Tidak ada';
+            editMode = { active: true, type: 'kamar', idVal: no }; document.getElementById('btn_save_kamar').innerHTML = '<i class="fa-solid fa-save"></i> UPDATE DATA KAMAR'; document.getElementById('btn_cancel_kamar').classList.remove('hidden'); window.scrollTo(0,0);
+        }
+
+        // ================= TAMU =================
+        async function submitTamu(e) {
+            e.preventDefault(); let arrData = [ document.getElementById('t_nik').value, document.getElementById('t_nama').value, "-", "-", document.getElementById('t_hp').value, "-", document.getElementById('t_alamat').value, 0, 0 ];
+            if(editMode.active && editMode.type === 'tamu') { if(await postAPI('updateData', { sheetName: 'Data Tamu', searchColIndex: 1, searchValue: editMode.idVal, rowData: arrData })) { batalEdit('tamu'); loadAllData(); } } 
+            else { if(await postAPI('addTamu', arrData)) { e.target.reset(); loadAllData(); } }
+        }
+        function editRowTamu(nik) {
+            let t = globalTamu.find(x => String(x['NIK']) === String(nik)); if(!t) return;
+            document.getElementById('t_nik').value = t['NIK']; document.getElementById('t_nik').readOnly = true; document.getElementById('t_nama').value = t['Nama Lengkap']; document.getElementById('t_hp').value = t['No HP']; document.getElementById('t_alamat').value = t['Alamat'];
+            editMode = { active: true, type: 'tamu', idVal: nik }; document.getElementById('btn_save_tamu').innerText = 'Update Data Tamu'; document.getElementById('btn_cancel_tamu').classList.remove('hidden'); window.scrollTo(0,0);
+        }
+
+        // ================= RESERVASI =================
+        function calcReservasi() {
+            let inVal = document.getElementById('r_in').value;
+            let outVal = document.getElementById('r_out').value;
+            let nok = document.getElementById('r_kamar').value;
+            let infoBox = document.getElementById('r_info');
+
+            if(inVal && outVal && nok) {
+                let inD = new Date(inVal); 
+                let outD = new Date(outVal);
+                if(inD <= outD) {
+                    let days = Math.max(1, Math.ceil((outD - inD) / (1000 * 60 * 60 * 24)));
+                    let k = globalKamar.find(x => String(x['No Kamar']) === String(nok));
+                    if(k) { 
+                        let harga = parseRpToNum(k['Harga']);
+                        infoBox.value = `${days} Malam x ${formatRp(harga)} = ${formatRp(days * harga)}`;
+                    }
+                } else {
+                    infoBox.value = "Format tanggal tidak valid";
+                }
+            } else {
+                infoBox.value = "";
+            }
+        }
+
+        async function submitReservasi(e) {
+            e.preventDefault(); 
+            let nok = document.getElementById('r_kamar').value;
+            if(!nok) return Swal.fire('Error', 'Kamar wajib dipilih', 'error');
+            
+            let inD = new Date(document.getElementById('r_in').value);
+            let outD = new Date(document.getElementById('r_out').value);
+            let days = Math.max(1, Math.ceil((outD - inD) / (1000 * 60 * 60 * 24)));
+            let k = globalKamar.find(x => String(x['No Kamar']) === String(nok));
+            let totalHarga = k ? (days * parseRpToNum(k['Harga'])) : 0;
+
+            let arrData = [ 
+                (editMode.active ? editMode.idVal : "BK-"+Math.floor(Math.random()*10000)), 
+                document.getElementById('r_nama').value, 
+                document.getElementById('r_hp').value, 
+                nok, 
+                document.getElementById('r_in').value, 
+                document.getElementById('r_out').value, 
+                days, 
+                formatRp(totalHarga), 
+                formatRp(getRawNum('r_dp')), 
+                document.getElementById('r_metode').value, 
+                document.getElementById('r_catatan').value, 
+                "Menunggu" 
+            ];
+            
+            if(editMode.active && editMode.type === 'reservasi') { 
+                if(await postAPI('updateData', { sheetName: 'Reservasi', searchColIndex: 1, searchValue: editMode.idVal, rowData: arrData })) { batalEdit('reservasi'); loadAllData(); } 
+            } 
+            else { 
+                if(await postAPI('addReservasi', arrData)) { e.target.reset(); setRawNum('r_dp',0); document.getElementById('r_info').value=''; loadAllData(); } 
+            }
+        }
+        function editRowReservasi(kode) {
+            let r = globalReservasi.find(x => String(x['Kode Booking']) === String(kode)); if(!r) return;
+            document.getElementById('r_nama').value = r['Nama Pemesan']; document.getElementById('r_hp').value = r['No HP']; document.getElementById('r_kamar').value = r['No Kamar']; document.getElementById('r_in').value = parseDateStandard(r['Tgl Check-in']); document.getElementById('r_out').value = parseDateStandard(r['Tgl Check-out']); setRawNum('r_dp', parseRpToNum(r['DP'])); document.getElementById('r_metode').value = r['Metode Bayar']; document.getElementById('r_catatan').value = r['Catatan']; calcReservasi();
+            editMode = { active: true, type: 'reservasi', idVal: kode }; document.getElementById('btn_save_resv').innerHTML = '<i class="fa-solid fa-save"></i> UPDATE RESERVASI'; document.getElementById('btn_cancel_resv').classList.remove('hidden'); window.scrollTo(0,0);
+        }
+
+        function batalEdit(tipe) {
+            document.getElementById('form-'+tipe).reset(); editMode = { active: false, type: null, idVal: null };
+            if(tipe==='kamar') { document.getElementById('k_no').readOnly = false; setRawNum('k_harga',0); document.getElementById('btn_save_kamar').innerHTML = '<i class="fa-solid fa-save"></i> SIMPAN DATA KAMAR'; document.getElementById('btn_cancel_kamar').classList.add('hidden'); }
+            if(tipe==='tamu') { document.getElementById('t_nik').readOnly = false; document.getElementById('btn_save_tamu').innerHTML = '<i class="fa-solid fa-save"></i> Simpan Data Tamu'; document.getElementById('btn_cancel_tamu').classList.add('hidden'); }
+            if(tipe==='reservasi') { setRawNum('r_dp',0); document.getElementById('r_info').value=''; document.getElementById('btn_save_resv').innerHTML = '<i class="fa-solid fa-calendar-check mr-2"></i> SIMPAN RESERVASI SEKARANG'; document.getElementById('btn_cancel_resv').classList.add('hidden'); }
+        }
+        function hapusData(sheet, colIdx, valId) {
+            Swal.fire({ title:'Yakin hapus data?', text:'Aksi ini permanen!', icon:'warning', showCancelButton:true, confirmButtonColor:'#d33' }).then(async r => {
+                if(r.isConfirmed && await postAPI('deleteData', { sheetName: sheet, searchColIndex: colIdx, searchValue: valId })) loadAllData();
+            });
+        }
+
+        // ================= USER & HAK AKSES =================
+        function updateDOMUser() {
+            let ht = '';
+            globalUsers.forEach(u => {
+                if(!u || !u['Username']) return;
+                let st = u['Status']==='Aktif' ? 'text-green-600' : 'text-red-600';
+                ht += `<tr><td class="px-3 py-3 font-bold">${safeStr(u['Username'])}</td><td class="px-3 py-3"><span class="px-2 py-1 rounded text-xs font-bold bg-gray-200">${safeStr(u['Role'])}</span></td><td class="px-3 py-3 text-center font-bold ${st}">${safeStr(u['Status'])}</td><td class="px-3 py-3 text-right"><button onclick="hapusData('Data User', 1, '${safeStr(u['Username'])}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+            });
+            document.getElementById('tbl-users').innerHTML = ht || '<tr><td colspan="4" class="text-center py-4 text-gray-500">Belum ada user.</td></tr>';
+        }
+        
+        async function tambahUserBaru() {
+            let menuOpts = allMenus.filter(m=>m.type!=='divider').map(m => `<label class="flex items-center space-x-2"><input type="checkbox" value="${m.text}" class="menu-akses w-4 h-4 rounded"><span>${m.text}</span></label>`).join('');
+            
+            const { value: formValues } = await Swal.fire({
+                title: 'Tambah PIN Karyawan', html: `
+                <div class="space-y-4">
+                    <input id="swal-u" class="swal2-input !mt-0 !w-full" placeholder="Nama Karyawan (Cth: Budi)" required>
+                    <input id="swal-p" type="password" maxlength="6" inputmode="numeric" class="swal2-input !mt-0 !w-full" placeholder="Buat PIN 6 Angka (Cth: 123456)" required>
+                    <select id="swal-r" class="swal2-select !w-full" onchange="document.getElementById('swal-custom').classList.toggle('hidden', this.value !== 'Custom'); document.getElementById('akses-box').style.display = this.value==='Super Admin'?'none':'block';">
+                        <option value="Super Admin">Super Admin</option>
+                        <option value="Resepsionis">Resepsionis</option>
+                        <option value="Custom">+ Tambah Jabatan Baru...</option>
+                    </select>
+                    <input id="swal-custom" class="swal2-input hidden !w-full" placeholder="Ketik Jabatan (Misal: Dapur)">
+                    <div id="akses-box" class="text-left text-sm p-4 border rounded-xl bg-gray-50 hidden"><p class="font-bold mb-3 border-b pb-1">Hak Akses Menu:</p><div class="grid grid-cols-2 gap-3">${menuOpts}</div></div>
+                </div>`, 
+                focusConfirm: false, showCancelButton:true,
+                preConfirm: () => { 
+                    let u = document.getElementById('swal-u').value; let p = document.getElementById('swal-p').value; 
+                    let r = document.getElementById('swal-r').value; if(r==='Custom') r = document.getElementById('swal-custom').value;
+                    let akses = r === 'Super Admin' ? 'Semua Akses' : Array.from(document.querySelectorAll('.menu-akses:checked')).map(c=>c.value).join(', ');
+                    if(!u || !p || !r) return Swal.showValidationMessage('Semua data wajib diisi');
+                    if(p.length < 4) return Swal.showValidationMessage('PIN minimal 4 Angka');
+                    return [ u, p, r, akses ];
+                }
+            });
+            if (formValues && formValues[0]) {
+                if(await postAPI('addUser', [formValues[0], formValues[1], formValues[2], formValues[3], "Aktif"])) loadAllData();
+            }
+        }
+
+        // ================= PENGATURAN (SINKRON GSHEET) =================
+        async function simpanProfilPengaturan() {
+            let n = document.getElementById('set_hotel').value;
+            let a = document.getElementById('set_alamat').value;
+            let t = document.getElementById('set_telp').value;
+
+            let arrData = [
+                ["Profil Invoice", "Nama Penginapan", n, "Menyesuaikan Struk Invoice"],
+                ["Profil Invoice", "Alamat Lengkap", a, "Menyesuaikan Struk Invoice"],
+                ["Profil Invoice", "Nomor Telepon", t, "Menyesuaikan Struk Invoice"]
+            ];
+
+            if(await postAPI('savePengaturan', arrData)) {
+                Swal.fire({icon: 'success', title: 'Tersimpan!', text: 'Profil penginapan telah tersinkronisasi ke Google Sheets.', timer: 2000, showConfirmButton:false});
+            }
+        }
+
+        // ================= LAPORAN DETAIL =================
+        function renderLaporanData() {
+            try {
+                let cm = new Date().getMonth(); let cy = new Date().getFullYear();
+                let blnIniTot = 0, roomMap = {}; let tipeMap = { "Standard": {c:0, rev:0}, "Deluxe": {c:0, rev:0}, "VIP": {c:0, rev:0} };
+
+                globalTransaksi.forEach(t => {
+                    let tdStr = parseDateStandard(t['Tgl Check-in']);
+                    let toStr = parseDateStandard(t['Tgl Check-out']);
+                    if(!tdStr) return; 
+                    let td = new Date(tdStr);
+                    let toD = new Date(toStr);
+                    let st = safeStr(t['Status Transaksi']);
+                    
+                    let dp = parseRpToNum(t['DP'] || t['Sudah Dibayar'] || 0);
+                    let totalTagihan = parseRpToNum(t['Total Tagihan'] || 0);
+
+                    if(st.includes('Aktif')) {
+                        if(td.getMonth() === cm && td.getFullYear() === cy) blnIniTot += dp;
+                    } else if(st.includes('Selesai')) {
+                        let inBlnIni = (td.getMonth() === cm && td.getFullYear() === cy);
+                        let outBlnIni = (toD.getMonth() === cm && toD.getFullYear() === cy);
+                        
+                        if(inBlnIni && outBlnIni) blnIniTot += totalTagihan;
+                        else if(outBlnIni) blnIniTot += (totalTagihan - dp);
+                        else if(inBlnIni) blnIniTot += dp;
+                    }
+
+                    if(td.getMonth() === cm && td.getFullYear() === cy) {
+                        roomMap[t['No Kamar']] = (roomMap[t['No Kamar']] || 0) + 1;
+                        let kmrObj = globalKamar.find(x => String(x['No Kamar']) === String(t['No Kamar']));
+                        if(kmrObj) {
+                            let tipe = kmrObj['Tipe']; if(!tipeMap[tipe]) tipeMap[tipe] = {c:0, rev:0};
+                            tipeMap[tipe].c += 1; 
+                            tipeMap[tipe].rev += totalTagihan > 0 ? totalTagihan : dp;
+                        }
+                    }
+                });
+                let favR = "-", mxC = 0; for(let key in roomMap) { if(roomMap[key] > mxC) { mxC = roomMap[key]; favR = key; } }
+                let terisiVal = globalKamar.filter(k=>String(k.Status||'').trim()==='Terisi').length;
+                let okupansi = globalKamar.length > 0 ? Math.round((terisiVal / globalKamar.length) * 100) : 0;
+                
+                setElem('lap_pendapatan', formatRp(blnIniTot)); setElem('lap_okupansi', okupansi + "%"); setElem('lap_terlaris', mxC > 0 ? favR : "-");
+                let hTipe = ''; for(let key in tipeMap) { hTipe += `<tr><td class="py-3 px-4 font-bold border-r border-gray-200">${key}</td><td class="py-3 px-4 text-center border-r border-gray-200">${tipeMap[key].c} Kali</td><td class="py-3 px-4 text-right font-black text-green-600">${formatRp(tipeMap[key].rev)}</td></tr>`; }
+                setElem('tbl-lap-tipe', hTipe, true);
+            } catch(e) { console.error("Lap render err", e); }
+        }
+
+        // FUNGSI EXPORT EXCEL NYATA 
+        function exportTableToExcel(tableID, filename = ''){
+            let tableSelect = document.getElementById(tableID);
+            let tableHTML = tableSelect.outerHTML.replace(/<th[^>]*>Aksi<\/th>/gi, "").replace(/<th[^>]*>Cetak<\/th>/gi, "").replace(/<td[^>]*>.*?<\/td>/gi, function(m){ return m.includes('fa-') ? '' : m; });
+            let wb = XLSX.utils.table_to_book(document.createElement('div').innerHTML = tableHTML, {sheet:"Sheet1"});
+            XLSX.writeFile(wb, filename?filename+'.xlsx':'Export.xlsx');
+        }
+        function exportSemuaTransaksiExcel() {
+            if(globalTransaksi.length === 0) return Swal.fire('Kosong', 'Belum ada transaksi untuk di export.', 'info');
+            let ws = XLSX.utils.json_to_sheet(globalTransaksi); let wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Semua Transaksi"); XLSX.writeFile(wb, "Laporan_Semua_Transaksi.xlsx");
+            Swal.fire({icon:'success', title:'Berhasil', text:'File Laporan Transaksi (.xlsx) telah didownload.', timer:2000});
+        }
+
+        // ================= CHECK-IN / CHECK-OUT =================
+        function cariTamuCI() {
+            let key = document.getElementById('ci_cari_tamu').value.toLowerCase();
+            let t = globalTamu.find(x => String(x['NIK']).toLowerCase() === key || String(x['Nama Lengkap']).toLowerCase().includes(key));
+            if(t) { document.getElementById('ci_ktp').value = t['NIK']; document.getElementById('ci_nama').value = t['Nama Lengkap']; document.getElementById('ci_hp').value = t['No HP']; document.getElementById('ci_alamat').value = t['Alamat']; Swal.fire({icon:'success', title:'Ditemukan', text:'Form diisi otomatis.', toast:true, position:'top-end', timer:1500, showConfirmButton:false}); } else Swal.fire('Kosong', 'Data tidak ada.', 'info');
+        }
+        function cariReservasiCI() {
+            let key = document.getElementById('ci_cari_resv').value.toLowerCase();
+            let r = globalReservasi.find(x => String(x['Kode Booking']).toLowerCase() === key || String(x['Nama Pemesan']).toLowerCase().includes(key));
+            if(r && String(r['Status Booking']).trim() !== 'Selesai') {
+                document.getElementById('ci_nama').value = r['Nama Pemesan']; document.getElementById('ci_hp').value = r['No HP']; document.getElementById('ci_kamar').value = r['No Kamar']; document.getElementById('ci_in').value = parseDateStandard(r['Tgl Check-in']); document.getElementById('ci_out').value = parseDateStandard(r['Tgl Check-out']); setRawNum('ci_bayar', parseRpToNum(r['DP'])); document.getElementById('ci_kode_booking').value = r['Kode Booking']; calcCheckin();
+                Swal.fire({icon:'success', title:'Reservasi Ditarik', text:'Data Booking & Uang DP diload.'});
+            } else Swal.fire('Gagal', 'Reservasi tidak ditemukan / Kadaluarsa.', 'warning');
+        }
+
+        function calcCheckin() {
+            let inD = new Date(document.getElementById('ci_in').value); let outD = new Date(document.getElementById('ci_out').value);
+            let nok = document.getElementById('ci_kamar').value; let diskon = getRawNum('ci_diskon');
+            if(inD && outD && inD <= outD && nok) {
+                let days = Math.max(1, Math.ceil((outD - inD) / (1000 * 60 * 60 * 24)));
+                document.getElementById('ci_lbl_hari').innerText = days; let k = globalKamar.find(x => String(x['No Kamar']) === String(nok));
+                if(k) { let totalBersih = (days * parseRpToNum(k['Harga'])) - diskon; setRawNum('ci_biaya', totalBersih); }
+            } else { setRawNum('ci_biaya', 0); document.getElementById('ci_lbl_hari').innerText = "0"; }
+        }
+
+        async function submitCheckin(e) {
+            e.preventDefault(); if(!document.getElementById('ci_kamar').value || getRawNum('ci_biaya') < 0) return Swal.fire('Gagal', 'Kamar/Tanggal tidak valid!', 'error');
+            let inv = "INV-" + new Date().getTime().toString().slice(-6); let nok = document.getElementById('ci_kamar').value; let nik = document.getElementById('ci_ktp').value;
+            let kb = document.getElementById('ci_kode_booking').value;
+            let kamarObj = globalKamar.find(x => String(x['No Kamar']) === String(nok)); let biayaAsliFull = parseRpToNum(kamarObj['Harga']) * parseInt(document.getElementById('ci_lbl_hari').innerText);
+            let totalB = getRawNum('ci_biaya'); let dpIn = getRawNum('ci_bayar');
+
+            let trxData = [ inv, document.getElementById('ci_nama').value, nik, document.getElementById('ci_hp').value, document.getElementById('ci_alamat').value, nok, document.getElementById('ci_in').value, document.getElementById('ci_out').value, document.getElementById('ci_lbl_hari').innerText, formatRp(biayaAsliFull), 0, 0, 0, 0, formatRp(getRawNum('ci_diskon')), formatRp(dpIn), formatRp(totalB), formatRp(dpIn), formatRp(totalB - dpIn), document.getElementById('ci_metode').value, "Aktif (Check-in)" ];
+            
+            if(!globalTamu.find(t => String(t['NIK']) === String(nik))) postAPI('addTamu', [nik, document.getElementById('ci_nama').value, "-", "-", document.getElementById('ci_hp').value, "-", document.getElementById('ci_alamat').value, 0, 0]);
+
+            if(await postAPI('checkIn', { transaksiData: trxData, noKamar: nok, kodeBooking: kb })) {
+                triggerPrint('checkin', { inv: inv, nama: trxData[1], hp: trxData[3], alamat: trxData[4], kamar: nok, in: trxData[6], out: trxData[7], biayaKamar: biayaAsliFull, qty: trxData[8], diskon: getRawNum('ci_diskon'), dibayar: dpIn, metode: trxData[19] });
+                e.target.reset(); document.getElementById('ci_kode_booking').value = ''; setRawNum('ci_diskon',0); setRawNum('ci_biaya',0); setRawNum('ci_bayar',0); loadAllData(); switchPage('dashboard'); 
+            }
+        }
+
+        let actTrx = null;
+        function loadTagihanCheckout() {
+            let kr = document.getElementById('co_kamar').value; if(!kr) return Swal.fire('Kosong', 'Pilih kamar!', 'warning');
+            actTrx = globalTransaksi.find(t => String(t['No Kamar']) === kr && String(t['Status Transaksi']).includes('Aktif'));
+            if(actTrx) {
+                document.getElementById('co_area').classList.remove('hidden'); document.getElementById('lbl_co_inv').innerText = actTrx['No Invoice']; document.getElementById('lbl_co_nama').innerText = actTrx['Nama Tamu']; document.getElementById('lbl_co_nokamar').innerText = actTrx['No Kamar']; document.getElementById('lbl_co_hari').innerText = actTrx['Lama Menginap'] || 1; document.getElementById('lbl_co_in').innerText = actTrx['Tgl Check-in']; document.getElementById('lbl_co_biaya').innerText = formatRp(parseRpToNum(actTrx['Biaya Kamar'])); 
+                document.getElementById('lbl_co_diskon_awal').innerText = "- " + formatRp(parseRpToNum(actTrx['Diskon'])); 
+                document.getElementById('lbl_co_dp_awal').innerText = formatRp(parseRpToNum(actTrx['DP'] || actTrx['Sudah Dibayar'])); 
+                
+                // Reset kolom tambahan
+                setRawNum('co_laundry',0); setRawNum('co_makan',0); setRawNum('co_minibar',0); setRawNum('co_denda',0); setRawNum('co_diskon',0);
+                
+                hitungTotalCO();
+            } else Swal.fire('Error', 'Tagihan aktif tidak ditemukan.', 'error');
+        }
+        
+        function hitungTotalCO() {
+            if(!actTrx) return { tBaru:0, sisa:0, dk_total:0 };
+            let ba = parseRpToNum(actTrx['Biaya Kamar']); 
+            let dk_awal = parseRpToNum(actTrx['Diskon']); 
+            let dk_co = getRawNum('co_diskon'); 
+            let dp_awal = parseRpToNum(actTrx['DP'] || actTrx['Sudah Dibayar']);
+            
+            // LOGIKA RINCIAN BIAYA DI KOTAK MERAH
+            let sisaKamar = (ba - dk_awal) - dp_awal;
+            let tambahan = getRawNum('co_laundry') + getRawNum('co_makan') + getRawNum('co_minibar') + getRawNum('co_denda');
+            let tambahanBersih = tambahan - dk_co;
+            
+            let dk_total = dk_awal + dk_co; 
+            let tBaru = (ba + tambahan) - dk_total; 
+            let sisa = tBaru - dp_awal; 
+            
+            document.getElementById('lbl_co_sisa_kamar').innerText = formatRp(sisaKamar > 0 ? sisaKamar : 0);
+            document.getElementById('lbl_co_sisa_tambahan').innerText = formatRp(tambahanBersih > 0 ? tambahanBersih : 0);
+            document.getElementById('lbl_co_sisa').innerText = formatRp(sisa > 0 ? sisa : 0); 
+            return { tBaru, sisa, dk_total };
+        }
+        
+        async function submitCheckout() {
+            if(!actTrx) return; let calc = hitungTotalCO();
+            let dp_awal = parseRpToNum(actTrx['DP'] || actTrx['Sudah Dibayar']);
+            let pelunasanAkhir = calc.sisa > 0 ? calc.sisa : 0;
+
+            let upRow = [ actTrx['No Invoice'], actTrx['Nama Tamu'], actTrx['No KTP'], actTrx['No HP'], actTrx['Alamat'], actTrx['No Kamar'], actTrx['Tgl Check-in'], getTodayYMD(), actTrx['Lama Menginap'], formatRp(parseRpToNum(actTrx['Biaya Kamar'])), formatRp(getRawNum('co_laundry')), formatRp(getRawNum('co_makan')), formatRp(getRawNum('co_minibar')), formatRp(getRawNum('co_denda')), formatRp(calc.dk_total), formatRp(dp_awal), formatRp(calc.tBaru), formatRp(dp_awal + pelunasanAkhir), formatRp(0), actTrx['Metode Bayar'], "Selesai (Check-out)" ];
+            
+            if(await postAPI('checkOut', { noInvoice: actTrx['No Invoice'], updateTransaksiData: upRow, noKamar: actTrx['No Kamar'] })) {
+                triggerPrint('checkout', null); document.getElementById('co_area').classList.add('hidden'); setRawNum('co_laundry',0); setRawNum('co_makan',0); setRawNum('co_minibar',0); setRawNum('co_denda',0); setRawNum('co_diskon',0); loadAllData(); switchPage('dashboard');
+            }
+        }
+
+        // ================= CETAK INVOICE =================
+        function triggerPrint(mode, data = null) {
+            let tr = mode === 'checkin' ? data : (mode === 'riwayat' ? globalTransaksi.find(x => String(x['No Invoice']) === String(data)) : actTrx);
+            if(!tr) return Swal.fire('Error', 'Data invoice gagal diload', 'error');
+            
+            document.getElementById('pr_hotel_name').innerText = document.getElementById('set_hotel').value || "HOTEL PENGINAPAN";
+            document.getElementById('pr_hotel_address').innerText = document.getElementById('set_alamat').value || "Jl. Contoh Alamat No. 12, Kota";
+            document.getElementById('pr_hotel_tel').innerText = "Telp: " + (document.getElementById('set_telp').value || "0812-3456-7890");
+
+            if(mode === 'checkin') {
+                document.getElementById('pr_inv_no').innerText = tr.inv; document.getElementById('pr_guest_name').innerText = tr.nama; document.getElementById('pr_guest_phone').innerText = tr.hp; document.getElementById('pr_guest_address').innerText = tr.alamat || "-"; document.getElementById('pr_room_no').innerText = tr.kamar; document.getElementById('pr_checkin').innerText = parseDateStandard(tr.in); document.getElementById('pr_checkout').innerText = parseDateStandard(tr.out); document.getElementById('pr_room_qty').innerText = tr.qty; document.getElementById('pr_room_price').innerText = formatRp(tr.biayaKamar); document.getElementById('pr_laundry').innerText = "Rp 0"; document.getElementById('pr_fnb').innerText = "Rp 0"; document.getElementById('pr_minibar').innerText = "Rp 0"; document.getElementById('pr_denda').innerText = "Rp 0"; document.getElementById('pr_discount').innerText = "- " + formatRp(tr.diskon); document.getElementById('pr_subtotal').innerText = formatRp(tr.biayaKamar - tr.diskon); document.getElementById('pr_dp').innerText = formatRp(tr.dibayar); document.getElementById('pr_paid').innerText = "Rp 0"; document.getElementById('pr_balance').innerText = formatRp((tr.biayaKamar - tr.diskon) - tr.dibayar); document.getElementById('pr_payment_method').innerText = tr.metode;
+            } else {
+                document.getElementById('pr_inv_no').innerText = tr['No Invoice']; document.getElementById('pr_guest_name').innerText = tr['Nama Tamu']; document.getElementById('pr_guest_phone').innerText = tr['No HP']; document.getElementById('pr_guest_address').innerText = tr['Alamat'] || "-"; document.getElementById('pr_room_no').innerText = tr['No Kamar']; document.getElementById('pr_checkin').innerText = parseDateStandard(tr['Tgl Check-in']); document.getElementById('pr_checkout').innerText = parseDateStandard(tr['Tgl Check-out']); document.getElementById('pr_room_qty').innerText = tr['Lama Menginap'] || 1; document.getElementById('pr_room_price').innerText = formatRp(parseRpToNum(tr['Biaya Kamar']));
+                
+                let valMakan = mode === 'riwayat' ? parseRpToNum(tr['Makanan']) : getRawNum('co_makan');
+                let valMinibar = mode === 'riwayat' ? parseRpToNum(tr['Minibar']) : getRawNum('co_minibar');
+
+                document.getElementById('pr_laundry').innerText = formatRp(mode === 'riwayat' ? parseRpToNum(tr['Laundry']) : getRawNum('co_laundry')); 
+                document.getElementById('pr_fnb').innerText = formatRp(valMakan); 
+                document.getElementById('pr_minibar').innerText = formatRp(valMinibar); 
+                document.getElementById('pr_denda').innerText = formatRp(mode === 'riwayat' ? parseRpToNum(tr['Denda']) : getRawNum('co_denda')); 
+                
+                let dk_tot = mode === 'riwayat' ? parseRpToNum(tr['Diskon']) : hitungTotalCO().dk_total; document.getElementById('pr_discount').innerText = "- " + formatRp(dk_tot);
+                let tot = mode === 'riwayat' ? parseRpToNum(tr['Total Tagihan']) : hitungTotalCO().tBaru; 
+                let dp_awal = mode === 'riwayat' ? parseRpToNum(tr['DP']) : parseRpToNum(tr['DP'] || tr['Sudah Dibayar']);
+                let pelunasan = (mode === 'riwayat' ? parseRpToNum(tr['Sudah Dibayar']) : (dp_awal + hitungTotalCO().sisa)) - dp_awal;
+
+                document.getElementById('pr_subtotal').innerText = formatRp(tot); 
+                document.getElementById('pr_dp').innerText = formatRp(dp_awal);
+                document.getElementById('pr_paid').innerText = formatRp(pelunasan > 0 ? pelunasan : 0);
+                
+                let ss = tot - (dp_awal + pelunasan); 
+                document.getElementById('pr_balance').innerText = formatRp(ss > 0 ? ss : 0); document.getElementById('pr_payment_method').innerText = tr['Metode Bayar'];
+            }
+            
+            document.getElementById('pr_inv_date').innerText = new Date().toLocaleDateString('id-ID'); document.getElementById('pr_admin_name').innerText = localStorage.getItem('activeUser') || 'Admin';
+
+            document.getElementById('print-area').classList.remove('hidden');
+            setTimeout(() => { window.print(); document.getElementById('print-area').classList.add('hidden'); }, 300);
+        }
+
+        // ================= UPDATE DOM TABEL =================
+        function updateDOMKamar() {
+            let ht=''; let ok='<option value="">-- Pilih Kamar Kosong --</option>'; let ot='<option value="">-- Pilih Kamar Terisi --</option>';
+            globalKamar.forEach(k => {
+                if(!k || !k['No Kamar']) return;
+                let st = String(k['Status']||'Kosong').trim(); let stColor = st === 'Kosong' ? 'text-green-600' : (st === 'Terisi' ? 'text-red-600' : 'text-orange-600');
+                ht+=`<tr class="hover:bg-gray-50 border-b"><td class="px-4 py-4 font-bold">${safeStr(k['No Kamar'])}</td><td class="px-4 py-4">${safeStr(k['Tipe'])}</td><td class="px-4 py-4 font-bold text-gray-700">${formatRp(parseRpToNum(k['Harga']))}</td><td class="px-4 py-4 text-xs text-gray-500 w-1/4">${safeStr(k['Fasilitas'])}</td><td class="px-4 py-4 font-black uppercase text-[10px] ${stColor}"><span class="bg-gray-100 px-2 py-1 border rounded">${st}</span></td><td class="px-4 py-4 text-center"><button onclick="editRowKamar('${String(k['No Kamar']).replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700 mr-4"><i class="fa-solid fa-edit"></i></button><button onclick="hapusData('Data Kamar', 1, '${String(k['No Kamar']).replace(/'/g, "\\'")}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                if(st === 'Kosong' || st === 'Cleaning' || st === 'Maintenance') ok+=`<option value="${safeStr(k['No Kamar'])}">${safeStr(k['No Kamar'])} - ${safeStr(k['Tipe'])} (${formatRp(parseRpToNum(k['Harga']))})</option>`;
+                if(st === 'Terisi') ot+=`<option value="${safeStr(k['No Kamar'])}">${safeStr(k['No Kamar'])} - ${safeStr(k['Tipe'])}</option>`;
+            });
+            setElem('tbl-kamar', ht || '<tr><td colspan="6" class="text-center py-4">Data kosong</td></tr>', true); document.querySelectorAll('.option-kamar-kosong').forEach(e => e.innerHTML=ok); document.querySelectorAll('.option-kamar-terisi').forEach(e => e.innerHTML=ot);
+        }
+        function updateDOMTamu() { let ht=''; globalTamu.forEach(t => { if(!t || !t['NIK']) return; ht+=`<tr class="hover:bg-gray-50 border-b"><td class="px-4 py-4 font-bold text-gray-800">${safeStr(t['Nama Lengkap'])}</td><td class="px-4 py-4 text-gray-600">${safeStr(t['NIK'])}</td><td class="px-4 py-4">${safeStr(t['No HP'])}</td><td class="px-4 py-4 text-xs text-gray-500">${safeStr(t['Alamat'])}</td><td class="px-4 py-4 text-center"><button onclick="editRowTamu('${safeStr(t['NIK'])}')" class="text-blue-500 mr-4"><i class="fa-solid fa-edit"></i></button><button onclick="hapusData('Data Tamu', 1, '${safeStr(t['NIK'])}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td></tr>`; }); setElem('tbl-tamu', ht || '<tr><td colspan="5" class="text-center py-4">Data kosong</td></tr>', true); }
+        function updateDOMReservasi() { let ht=''; [...globalReservasi].reverse().forEach(r => { if(!r || !r['Kode Booking']) return; let st=String(r['Status Booking']||'').trim(); let stClass=st==='Menunggu'?'bg-yellow-100 text-yellow-700':(st==='Selesai'?'bg-green-100 text-green-700':'bg-gray-100 text-gray-700'); ht+=`<tr class="hover:bg-gray-50 border-b"><td class="px-4 py-4 font-mono text-xs text-gray-500">${safeStr(r['Kode Booking'])}</td><td class="px-4 py-4 font-bold text-gray-800">${safeStr(r['Nama Pemesan'])}</td><td class="px-4 py-4 font-bold">${safeStr(r['No Kamar'])}</td><td class="px-4 py-4">${parseDateStandard(r['Tgl Check-in'])} <span class="mx-1 text-gray-400"><i class="fa-solid fa-arrow-right"></i></span> ${parseDateStandard(r['Tgl Check-out'])}</td><td class="px-4 py-4 text-center"><span class="px-2 py-1 rounded text-[10px] font-black uppercase ${stClass} border">${st}</span></td><td class="px-4 py-4 text-center"><button onclick="editRowReservasi('${safeStr(r['Kode Booking'])}')" class="text-blue-500 mr-4"><i class="fa-solid fa-edit"></i></button><button onclick="hapusData('Reservasi', 1, '${safeStr(r['Kode Booking'])}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td></tr>`; }); setElem('tbl-reservasi', ht || '<tr><td colspan="6" class="text-center py-4">Data kosong</td></tr>', true); }
+        
+        // FUNGSI SEARCH FILTER
+        function cariRiwayatTransaksi() {
+            let input = document.getElementById("cari_riwayat").value.toLowerCase();
+            let table = document.getElementById("tbl-transaksi");
+            let tr = table.getElementsByTagName("tr");
+            for (let i = 0; i < tr.length; i++) {
+                let textContent = tr[i].textContent || tr[i].innerText;
+                if (textContent.toLowerCase().indexOf(input) > -1) { tr[i].style.display = ""; } else { tr[i].style.display = "none"; }
+            }
+        }
+
+        function updateDOMTransaksi() { let ht=''; [...globalTransaksi].reverse().forEach(t => { if(!t || !t['No Invoice']) return; ht+=`<tr class="hover:bg-gray-50 border-b"><td class="px-4 py-4 font-mono text-xs text-blue-600 font-bold">${safeStr(t['No Invoice'])}</td><td class="px-4 py-4 font-bold text-gray-800">${safeStr(t['Nama Tamu'])} <span class="text-[10px] text-gray-400 block mt-1">Kamar ${safeStr(t['No Kamar'])}</span></td><td class="px-4 py-4 text-gray-700 font-bold text-right">${formatRp(parseRpToNum(t['Total Tagihan']))}</td><td class="px-4 py-4 text-center text-[10px] uppercase font-black"><span class="${String(t['Status Transaksi']).includes('Aktif') ? 'text-red-500 bg-red-100 border-red-200' : 'text-green-600 bg-green-100 border-green-200'} px-2 py-1 rounded border">${safeStr(t['Status Transaksi'])}</span></td><td class="px-4 py-4 text-center"><button onclick="triggerPrint('riwayat', '${safeStr(t['No Invoice'])}')" class="bg-gray-800 text-white px-4 py-2 rounded-lg text-xs hover:bg-black shadow transition"><i class="fa-solid fa-print mr-1"></i> Cetak</button></td></tr>`; }); setElem('tbl-transaksi', ht || '<tr><td colspan="6" class="text-center py-4">Data kosong</td></tr>', true); }
+        
+        // PWA SERVICE WORKER
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(registration => { console.log('ServiceWorker sukses: ', registration.scope); })
+                .catch(err => { console.log('ServiceWorker gagal: ', err); });
+            });
+        }
+    </script>
+</body>
+</html>
