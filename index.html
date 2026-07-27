@@ -41,7 +41,7 @@
             @page { margin: 0.5cm; }
         }
 
-        /* ANIMASI CUSTOM */
+        /* ANIMASI CUSTOM LAYAR LOGIN */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
         @keyframes slideProgress { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
@@ -100,7 +100,13 @@
                 </div>
             </div>
             <table class="w-full mb-8 border-collapse border border-gray-300">
-                <thead><tr class="bg-gray-800 text-white"><th class="py-3 px-4 text-left border-r border-gray-600">Deskripsi Layanan</th><th class="py-3 px-4 text-center border-r border-gray-600">Qty (Hari)</th><th class="py-3 px-4 text-right">Total Tagihan</th></tr></thead>
+                <thead>
+                    <tr class="bg-gray-800 text-white">
+                        <th class="py-3 px-4 text-left border-r border-gray-600">Deskripsi Layanan</th>
+                        <th class="py-3 px-4 text-center border-r border-gray-600">Qty (Hari)</th>
+                        <th class="py-3 px-4 text-right">Total Tagihan</th>
+                    </tr>
+                </thead>
                 <tbody class="divide-y divide-gray-200 text-gray-800">
                     <tr><td class="py-4 px-4 font-semibold border-r">Biaya Kamar Utama</td><td class="py-4 px-4 text-center border-r font-bold" id="pr_room_qty">1</td><td class="py-4 px-4 text-right font-bold text-lg" id="pr_room_price">Rp 0</td></tr>
                     <tr><td class="py-4 px-4 border-r">Layanan Laundry</td><td class="py-4 px-4 text-center border-r">-</td><td class="py-4 px-4 text-right" id="pr_laundry">Rp 0</td></tr>
@@ -122,7 +128,7 @@
                 <div>
                     <p class="font-bold text-gray-700">Metode Pembayaran:</p>
                     <p id="pr_payment_method" class="text-xl text-blue-700 font-black mt-1">Tunai</p>
-                    <p class="mt-4 font-semibold italic text-gray-500">"Terima kasih telah menginap di tempat kami."</p>
+                    <p class="mt-4 font-semibold italic text-gray-500">"Terima kasih telah menginap bersama kami."</p>
                 </div>
                 <div class="text-center w-48">
                     <p class="mb-16 font-semibold">Hormat Kami,</p>
@@ -139,6 +145,7 @@
     <div id="login-screen" class="fixed inset-0 bg-gray-900/50 backdrop-blur-md flex justify-center items-center z-[100] transition-opacity duration-700 p-4">
         <div id="login-box" class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl flex overflow-hidden h-auto min-h-[400px] md:h-[500px] animate-bounce-in relative">
             
+            <!-- PANEL KIRI (BIRU ANIMASI) -->
             <div class="w-1/2 bg-blue-600 p-10 flex-col items-center justify-center relative hidden md:flex overflow-hidden">
                 <i class="fa-solid fa-key absolute text-blue-400 opacity-20 text-5xl animate-float" style="top: 15%; left: 15%;"></i>
                 <i class="fa-solid fa-star absolute text-blue-400 opacity-20 text-4xl animate-float" style="top: 25%; right: 15%; animation-delay: 1s;"></i>
@@ -163,6 +170,7 @@
                 </div>
             </div>
 
+            <!-- PANEL KANAN (KOTAK PIN) -->
             <div class="w-full md:w-1/2 p-6 md:p-10 flex flex-col items-center justify-center bg-white relative py-12 md:py-0">
                 <div class="w-14 h-14 md:w-16 md:h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xl md:text-2xl mb-4 md:mb-6 shadow-inner border border-blue-200">
                     <i class="fa-solid fa-lock"></i>
@@ -219,6 +227,7 @@
             </div>
         </aside>
 
+        <!-- KONTEN TENGAH -->
         <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-[#f8fafc] w-full">
             
             <header class="bg-white border-b border-gray-200 py-3 px-4 md:px-6 flex justify-between items-center shrink-0 shadow-sm z-10">
@@ -502,7 +511,6 @@
                                 <div class="bg-red-600 text-white p-5 md:p-6 rounded-xl text-center border-4 border-red-200 shadow-xl mt-4 md:mt-6 relative overflow-hidden">
                                     <div class="absolute top-0 right-0 -mr-6 -mt-6 w-24 h-24 rounded-full bg-white opacity-10"></div>
                                     
-                                    <!-- BREAKDOWN BIAYA CHECKOUT (SISA KAMAR + BIAYA TAMBAHAN) -->
                                     <div class="flex justify-between items-center border-b border-red-400 pb-3 md:pb-4 mb-3 md:mb-4 text-xs md:text-sm font-bold text-red-100">
                                         <div class="text-left">
                                             <p class="text-[9px] md:text-[10px] uppercase tracking-wider mb-1 opacity-80">Sisa Kamar (Blm Lunas)</p>
@@ -547,10 +555,9 @@
                     </div>
                 </section>
 
-                <!-- 8. LAPORAN (DENGAN FILTER TANGGAL) -->
+                <!-- 8. LAPORAN (FILTER TANGGAL) -->
                 <section id="page-laporan" class="page-section">
                     
-                    <!-- KOTAK FILTER TANGGAL (BARU) -->
                     <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
                         <div class="flex items-center text-blue-800 font-bold text-sm md:text-base">
                             <i class="fa-solid fa-filter mr-2"></i> Filter Laporan
@@ -617,7 +624,11 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyjAptPUXrwxBve2yA6Px0KmCnhm5muxOoevwIlV6VkuqPpRCqDLR671TDoI2ePny_t/exec";
         
-        let globalKamar=[], globalTamu=[], globalReservasi=[], globalTransaksi=[], globalUsers=[];
+        let globalKamar = [];
+        let globalTamu = [];
+        let globalReservasi = [];
+        let globalTransaksi = [];
+        let globalUsers = [];
         let editMode = { active: false, type: null, idVal: null };
 
         // ================= MOBILE SIDEBAR LOGIC =================
@@ -639,11 +650,18 @@
         // ================= SISTEM PIN & KEYBOARD =================
         function moveNext(elem, nextId, event) {
             if (event.key === 'Backspace') {
-                if (elem.value === '' && elem.previousElementSibling && elem.previousElementSibling.classList.contains('pin-box')) { elem.previousElementSibling.focus(); } return;
+                if (elem.value === '' && elem.previousElementSibling && elem.previousElementSibling.classList.contains('pin-box')) { 
+                    elem.previousElementSibling.focus(); 
+                } 
+                return;
             }
             elem.value = elem.value.replace(/[^0-9]/g, '');
             if (elem.value.length === 1) {
-                if (nextId) document.getElementById(nextId).focus(); else submitPinLogin();
+                if (nextId) {
+                    document.getElementById(nextId).focus(); 
+                } else {
+                    submitPinLogin();
+                }
             }
         }
 
@@ -654,7 +672,12 @@
             for(let i=0; i<boxes.length; i++) {
                 if(paste[i]) {
                     boxes[i].value = paste[i];
-                    if(i < boxes.length - 1) boxes[i+1].focus(); else { boxes[i].focus(); submitPinLogin(); }
+                    if(i < boxes.length - 1) {
+                        boxes[i+1].focus(); 
+                    } else { 
+                        boxes[i].focus(); 
+                        submitPinLogin(); 
+                    }
                 }
             }
         }
@@ -665,98 +688,233 @@
             Swal.fire({title: 'Memeriksa Akses...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
             
             try {
-                let res = await fetch(`${API_URL}?action=getUser`); let data = await res.json();
+                let res = await fetch(`${API_URL}?action=getUser`); 
+                let data = await res.json();
+                
                 if(data.status === 'success') {
                     let uVal = (data.data || []).find(x => String(x.Password) === String(pinVal) && String(x.Status) === "Aktif");
                     if(uVal || pinVal === '123456') { 
-                        localStorage.setItem('isLoggedIn', 'true'); localStorage.setItem('activeUser', uVal ? uVal.Username : 'Admin'); localStorage.setItem('activeRole', uVal ? uVal.Role : 'Super Admin'); localStorage.setItem('activeAkses', uVal ? uVal['Hak Akses'] : 'Semua Akses');
+                        localStorage.setItem('isLoggedIn', 'true'); 
+                        localStorage.setItem('activeUser', uVal ? uVal.Username : 'Admin'); 
+                        localStorage.setItem('activeRole', uVal ? uVal.Role : 'Super Admin'); 
+                        localStorage.setItem('activeAkses', uVal ? uVal['Hak Akses'] : 'Semua Akses');
+                        
                         Swal.close();
                         
-                        document.getElementById('login-box').classList.remove('animate-bounce-in'); document.getElementById('login-screen').classList.add('opacity-0');
+                        document.getElementById('login-box').classList.remove('animate-bounce-in'); 
+                        document.getElementById('login-screen').classList.add('opacity-0');
+                        
                         setTimeout(() => {
                             document.getElementById('login-screen').classList.add('hidden');
                             let appBox = document.getElementById('app-container');
-                            appBox.classList.remove('hidden'); appBox.classList.remove('opacity-0'); appBox.classList.add('animate-scale-in');
-                            setElem('top_user_name', localStorage.getItem('activeUser')); setElem('top_user_role', localStorage.getItem('activeRole')); buildSidebarMenu(localStorage.getItem('activeAkses')); loadAllData();
+                            appBox.classList.remove('hidden'); 
+                            appBox.classList.remove('opacity-0'); 
+                            appBox.classList.add('animate-scale-in');
+                            
+                            setElem('top_user_name', localStorage.getItem('activeUser')); 
+                            setElem('top_user_role', localStorage.getItem('activeRole')); 
+                            buildSidebarMenu(localStorage.getItem('activeAkses')); 
+                            loadAllData();
+                            
                             document.querySelectorAll('.pin-box').forEach(b => b.value = '');
                         }, 500);
                     } else {
                          Swal.fire('Ditolak', 'PIN Tidak Terdaftar / Nonaktif!', 'error');
-                         document.querySelectorAll('.pin-box').forEach(b => b.value = ''); document.getElementById('pin1').focus();
-                         let box = document.getElementById('login-box'); box.classList.add('shake-error'); setTimeout(()=>{ box.classList.remove('shake-error'); }, 400);
+                         document.querySelectorAll('.pin-box').forEach(b => b.value = ''); 
+                         document.getElementById('pin1').focus();
+                         let box = document.getElementById('login-box'); 
+                         box.classList.add('shake-error'); 
+                         setTimeout(()=>{ box.classList.remove('shake-error'); }, 400);
                     }
                 } else throw new Error();
             } catch(e) {
-                if(pinVal === '123456') { localStorage.setItem('isLoggedIn', 'true'); localStorage.setItem('activeUser', 'Admin'); localStorage.setItem('activeRole', 'Super Admin'); localStorage.setItem('activeAkses', 'Semua Akses'); window.location.reload(); } 
-                else { Swal.fire('Error API', 'Gagal menyambung ke Database. Gunakan PIN Master (123456).', 'error'); document.querySelectorAll('.pin-box').forEach(b => b.value = ''); document.getElementById('pin1').focus(); }
+                if(pinVal === '123456') { 
+                    localStorage.setItem('isLoggedIn', 'true'); 
+                    localStorage.setItem('activeUser', 'Admin'); 
+                    localStorage.setItem('activeRole', 'Super Admin'); 
+                    localStorage.setItem('activeAkses', 'Semua Akses'); 
+                    window.location.reload(); 
+                } else { 
+                    Swal.fire('Error API', 'Gagal menyambung ke Database. Gunakan PIN Master (123456).', 'error'); 
+                    document.querySelectorAll('.pin-box').forEach(b => b.value = ''); 
+                    document.getElementById('pin1').focus(); 
+                }
             }
         }
 
         function switchShift() {
-            Swal.fire({ title: 'Kunci Layar?', text: 'Aplikasi akan kembali ke mode PIN untuk keamanan.', icon: 'question', showCancelButton: true, confirmButtonColor: '#f97316', confirmButtonText: 'Ya, Kunci Layar' }).then((result) => {
+            Swal.fire({ 
+                title: 'Kunci Layar?', 
+                text: 'Aplikasi akan kembali ke mode PIN untuk keamanan.', 
+                icon: 'question', 
+                showCancelButton: true, 
+                confirmButtonColor: '#f97316', 
+                confirmButtonText: 'Ya, Kunci Layar' 
+            }).then((result) => {
                 if (result.isConfirmed) {
-                    if (window.innerWidth < 768) toggleSidebar(); // Tutup sidebar mobile kalau terbuka
-                    localStorage.removeItem('isLoggedIn'); document.getElementById('app-container').classList.add('opacity-0');
+                    if (window.innerWidth < 768) toggleSidebar();
+                    localStorage.removeItem('isLoggedIn'); 
+                    document.getElementById('app-container').classList.add('opacity-0');
+                    
                     setTimeout(() => {
-                        document.getElementById('app-container').classList.add('hidden'); let loginBox = document.getElementById('login-screen'); loginBox.classList.remove('hidden');
+                        document.getElementById('app-container').classList.add('hidden'); 
+                        let loginBox = document.getElementById('login-screen'); 
+                        loginBox.classList.remove('hidden');
+                        
                         setTimeout(() => {
-                            loginBox.classList.remove('opacity-0'); document.getElementById('login-box').classList.add('animate-bounce-in'); document.querySelectorAll('.pin-box').forEach(b => b.value = ''); document.getElementById('pin1').focus();
+                            loginBox.classList.remove('opacity-0'); 
+                            document.getElementById('login-box').classList.add('animate-bounce-in'); 
+                            document.querySelectorAll('.pin-box').forEach(b => b.value = ''); 
+                            document.getElementById('pin1').focus();
                         }, 50);
                     }, 500);
                 }
             })
         }
 
-        const pageTitles = { 'dashboard': { t: 'Dashboard', s: 'Ringkasan kondisi penginapan secara real-time' }, 'kamar': { t: 'Data Kamar', s: 'Manajemen fasilitas dan harga kamar' }, 'tamu': { t: 'Data Tamu', s: 'Database riwayat tamu pelanggan' }, 'reservasi': { t: 'Reservasi', s: 'Daftar jadwal pemesanan kamar' }, 'checkin': { t: 'Check In', s: 'Proses tamu masuk dan pembuatan tagihan' }, 'checkout': { t: 'Check Out', s: 'Proses tamu keluar dan penagihan akhir' }, 'pembayaran': { t: 'Pembayaran', s: 'Riwayat invoice dan transaksi' }, 'laporan': { t: 'Laporan', s: 'Statistik pendapatan dan cetak laporan' }, 'pengaturan': { t: 'Pengaturan Sistem', s: 'Konfigurasi profil dan manajemen user' } };
-        const setElem = (id, val, isHTML=false, isInput=false) => { let el = document.getElementById(id); if(el) { if(isInput) el.value = val; else if(isHTML) el.innerHTML = val; else el.innerText = val; } };
-        const safeStr = (str) => { if (str === null || str === undefined) return ''; return String(str).replace(/[\r\n'"\\]/g, ' ').trim(); };
-        const formatRp = (angka) => { let num = parseFloat(angka); if(isNaN(num)) num = 0; return 'Rp ' + num.toLocaleString('id-ID'); };
+        // ================= HELPERS & SETUP =================
+        const pageTitles = { 
+            'dashboard': { t: 'Dashboard', s: 'Ringkasan kondisi penginapan secara real-time' }, 
+            'kamar': { t: 'Data Kamar', s: 'Manajemen fasilitas dan harga kamar' }, 
+            'tamu': { t: 'Data Tamu', s: 'Database riwayat tamu pelanggan' }, 
+            'reservasi': { t: 'Reservasi', s: 'Daftar jadwal pemesanan kamar' }, 
+            'checkin': { t: 'Check In', s: 'Proses tamu masuk dan pembuatan tagihan' }, 
+            'checkout': { t: 'Check Out', s: 'Proses tamu keluar dan penagihan akhir' }, 
+            'pembayaran': { t: 'Pembayaran', s: 'Riwayat invoice dan transaksi' }, 
+            'laporan': { t: 'Laporan', s: 'Statistik pendapatan dan cetak laporan' }, 
+            'pengaturan': { t: 'Pengaturan Sistem', s: 'Konfigurasi profil dan manajemen user' } 
+        };
+        
+        const setElem = (id, val, isHTML=false, isInput=false) => { 
+            let el = document.getElementById(id); 
+            if(el) { 
+                if(isInput) el.value = val; 
+                else if(isHTML) el.innerHTML = val; 
+                else el.innerText = val; 
+            } 
+        };
+        
+        const safeStr = (str) => { 
+            if (str === null || str === undefined) return ''; 
+            return String(str).replace(/[\r\n'"\\]/g, ' ').trim(); 
+        };
+        
+        const formatRp = (angka) => { 
+            let num = parseFloat(angka); 
+            if(isNaN(num)) num = 0; 
+            return 'Rp ' + num.toLocaleString('id-ID'); 
+        };
         
         function formatInputUang(elem) {
             let val = elem.value.replace(/[^0-9]/g, ''); 
             if(val === '') { elem.value = ''; elem.dataset.raw = 0; return; }
-            elem.value = 'Rp ' + parseInt(val).toLocaleString('id-ID'); elem.dataset.raw = val;
+            elem.value = 'Rp ' + parseInt(val).toLocaleString('id-ID'); 
+            elem.dataset.raw = val;
             if(['co_laundry', 'co_makan', 'co_minibar', 'co_denda', 'co_diskon'].includes(elem.id)) hitungTotalCO();
             if(elem.id === 'ci_diskon') calcCheckin();
         }
-        function parseRpToNum(str) { if(typeof str === 'number') return str; if(!str) return 0; let parsed = parseFloat(String(str).replace(/[^0-9]/g, '')); return isNaN(parsed) ? 0 : parsed; }
-        function getRawNum(elemId) { return parseFloat(document.getElementById(elemId).dataset.raw || 0) || 0; }
-        function setRawNum(elemId, val) { let el = document.getElementById(elemId); if(el) { el.dataset.raw = val; el.value = formatRp(val); } }
+        
+        function parseRpToNum(str) { 
+            if(typeof str === 'number') return str; 
+            if(!str) return 0; 
+            let parsed = parseFloat(String(str).replace(/[^0-9]/g, '')); 
+            return isNaN(parsed) ? 0 : parsed; 
+        }
+        
+        function getRawNum(elemId) { 
+            return parseFloat(document.getElementById(elemId).dataset.raw || 0) || 0; 
+        }
+        
+        function setRawNum(elemId, val) { 
+            let el = document.getElementById(elemId); 
+            if(el) { 
+                el.dataset.raw = val; 
+                el.value = formatRp(val); 
+            } 
+        }
 
-        const getTodayYMD = () => { let d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+        const getTodayYMD = () => { 
+            let d = new Date(); 
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; 
+        };
+        
         function parseDateStandard(dStr) {
-           if(!dStr || typeof dStr !== 'string') return ""; let str = dStr.trim();
-           if(str.includes('/')) { let p = str.split('/'); if(p.length >= 3) { if(p[2].length === 4) return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`; if(p[0].length === 4) return `${p[0]}-${p[1].padStart(2,'0')}-${p[2].padStart(2,'0')}`; } }
+           if(!dStr || typeof dStr !== 'string') return ""; 
+           let str = dStr.trim();
+           if(str.includes('/')) { 
+               let p = str.split('/'); 
+               if(p.length >= 3) { 
+                   if(p[2].length === 4) return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`; 
+                   if(p[0].length === 4) return `${p[0]}-${p[1].padStart(2,'0')}-${p[2].padStart(2,'0')}`; 
+                } 
+            }
            return str.split('T')[0];
         }
+        
         function isToday(dStr) {
-            if(!dStr) return false; let str = String(dStr); let d = new Date(); let y = d.getFullYear(); let m = String(d.getMonth()+1).padStart(2,'0'); let m2 = String(d.getMonth()+1); let day = String(d.getDate()).padStart(2,'0'); let day2 = String(d.getDate());
+            if(!dStr) return false; 
+            let str = String(dStr); 
+            let d = new Date(); 
+            let y = d.getFullYear(); 
+            let m = String(d.getMonth()+1).padStart(2,'0'); 
+            let m2 = String(d.getMonth()+1); 
+            let day = String(d.getDate()).padStart(2,'0'); 
+            let day2 = String(d.getDate());
+            
             if (str.includes(`${y}-${m}-${day}`) || str.includes(`${y}/${m}/${day}`)) return true;
             if (str.includes(`${day}/${m}/${y}`) || str.includes(`${day2}/${m2}/${y}`)) return true;
             if (str.includes(`${m}/${day}/${y}`) || str.includes(`${m2}/${day2}/${y}`)) return true;
-            let mn = d.toLocaleString('id-ID', { month: 'long' }); if (str.toLowerCase().includes(`${day2} ${mn.toLowerCase()} ${y}`)) return true; 
+            let mn = d.toLocaleString('id-ID', { month: 'long' }); 
+            if (str.toLowerCase().includes(`${day2} ${mn.toLowerCase()} ${y}`)) return true; 
             return false;
         }
 
         window.onload = () => {
-            setInterval(() => { setElem('current-date', new Date().toLocaleString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' })); }, 1000);
+            setInterval(() => { 
+                setElem('current-date', new Date().toLocaleString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' })); 
+            }, 1000);
             
             if(localStorage.getItem('isLoggedIn') === 'true') {
-                document.getElementById('login-screen').classList.add('hidden'); let appBox = document.getElementById('app-container'); appBox.classList.remove('hidden'); appBox.classList.remove('opacity-0');
-                setElem('top_user_name', localStorage.getItem('activeUser') || 'Admin'); setElem('top_user_role', localStorage.getItem('activeRole') || 'Super Admin');
-                buildSidebarMenu(localStorage.getItem('activeAkses') || 'Semua Akses'); loadAllData();
-            } else { setTimeout(() => document.getElementById('pin1').focus(), 500); }
+                document.getElementById('login-screen').classList.add('hidden'); 
+                let appBox = document.getElementById('app-container'); 
+                appBox.classList.remove('hidden'); 
+                appBox.classList.remove('opacity-0');
+                
+                setElem('top_user_name', localStorage.getItem('activeUser') || 'Admin'); 
+                setElem('top_user_role', localStorage.getItem('activeRole') || 'Super Admin');
+                
+                buildSidebarMenu(localStorage.getItem('activeAkses') || 'Semua Akses'); 
+                loadAllData();
+            } else { 
+                setTimeout(() => document.getElementById('pin1').focus(), 500); 
+            }
         };
 
-        const allMenus = [ { id: 'dashboard', icon: 'fa-house', text: 'Dashboard' }, { type: 'divider' }, { id: 'kamar', icon: 'fa-bed', text: 'Data Kamar' }, { id: 'tamu', icon: 'fa-address-book', text: 'Data Tamu' }, { id: 'reservasi', icon: 'fa-calendar-check', text: 'Reservasi' }, { type: 'divider' }, { id: 'checkin', icon: 'fa-sign-in-alt', text: 'Check In' }, { id: 'checkout', icon: 'fa-sign-out-alt', text: 'Check Out' }, { id: 'pembayaran', icon: 'fa-file-invoice-dollar', text: 'Pembayaran' }, { type: 'divider' }, { id: 'laporan', icon: 'fa-chart-pie', text: 'Laporan' }, { id: 'pengaturan', icon: 'fa-cog', text: 'Pengaturan' } ];
+        const allMenus = [ 
+            { id: 'dashboard', icon: 'fa-house', text: 'Dashboard' }, 
+            { type: 'divider' }, 
+            { id: 'kamar', icon: 'fa-bed', text: 'Data Kamar' }, 
+            { id: 'tamu', icon: 'fa-address-book', text: 'Data Tamu' }, 
+            { id: 'reservasi', icon: 'fa-calendar-check', text: 'Reservasi' }, 
+            { type: 'divider' }, 
+            { id: 'checkin', icon: 'fa-sign-in-alt', text: 'Check In' }, 
+            { id: 'checkout', icon: 'fa-sign-out-alt', text: 'Check Out' }, 
+            { id: 'pembayaran', icon: 'fa-file-invoice-dollar', text: 'Pembayaran' }, 
+            { type: 'divider' }, 
+            { id: 'laporan', icon: 'fa-chart-pie', text: 'Laporan' }, 
+            { id: 'pengaturan', icon: 'fa-cog', text: 'Pengaturan' } 
+        ];
 
         function buildSidebarMenu(aksesStr) {
-            let sb = document.getElementById('sidebar-menu'); sb.innerHTML = '';
+            let sb = document.getElementById('sidebar-menu'); 
+            sb.innerHTML = '';
             let allowed = aksesStr === 'Semua Akses' ? allMenus.map(m=>m.text) : String(aksesStr||'').split(', ');
             let firstMenu = null;
+            
             allMenus.forEach(m => {
-                if(m.type === 'divider') { sb.innerHTML += `<div class="my-3 border-t border-gray-700/50"></div>`; }
-                else if (aksesStr === 'Semua Akses' || allowed.includes(m.text)) {
+                if(m.type === 'divider') { 
+                    sb.innerHTML += `<div class="my-3 border-t border-gray-700/50"></div>`; 
+                } else if (aksesStr === 'Semua Akses' || allowed.includes(m.text)) {
                     if(!firstMenu) firstMenu = m.id;
                     sb.innerHTML += `<a href="#" onclick="switchPage('${m.id}')" id="nav-${m.id}" class="menu-item flex items-center space-x-3 px-4 py-3 text-sm font-bold transition-all hover:pl-6"><i class="fa-solid ${m.icon} w-5 text-center text-blue-400"></i><span>${m.text}</span></a>`;
                 }
@@ -767,34 +925,74 @@
         function switchPage(pageId) {
             document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('menu-active'));
+            
             if(document.getElementById(`page-${pageId}`)) document.getElementById(`page-${pageId}`).classList.add('active');
             if(document.getElementById(`nav-${pageId}`)) document.getElementById(`nav-${pageId}`).classList.add('menu-active');
-            if(pageTitles[pageId]) { setElem('page-title', pageTitles[pageId].t); setElem('page-subtitle', pageTitles[pageId].s); }
-            if(pageId === 'checkin') { document.getElementById('ci_in').value = getTodayYMD(); document.getElementById('ci_out').value = getTodayYMD(); }
+            
+            if(pageTitles[pageId]) { 
+                setElem('page-title', pageTitles[pageId].t); 
+                setElem('page-subtitle', pageTitles[pageId].s); 
+            }
+            
+            if(pageId === 'checkin') { 
+                document.getElementById('ci_in').value = getTodayYMD(); 
+                document.getElementById('ci_out').value = getTodayYMD(); 
+            }
             if(pageId === 'laporan') renderLaporanData();
 
-            // Tutup sidebar otomatis di versi Mobile jika menu di klik
             if(window.innerWidth < 768) {
                 const sidebar = document.getElementById('sidebar');
                 if(!sidebar.classList.contains('-translate-x-full')) toggleSidebar();
             }
         }
 
-        async function fetchAPI(action) { try { let res = await fetch(`${API_URL}?action=${action}`); return await res.json(); } catch(e) { return { status: 'error', data: [] }; } }
+        async function fetchAPI(action) { 
+            try { 
+                let res = await fetch(`${API_URL}?action=${action}`); 
+                return await res.json(); 
+            } catch(e) { 
+                return { status: 'error', data: [] }; 
+            } 
+        }
+        
         async function postAPI(action, dataObj) {
             Swal.fire({ title: 'Menyinkronkan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             try {
-                let res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: action, data: dataObj }) });
+                let res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain' }, 
+                    body: JSON.stringify({ action: action, data: dataObj }) 
+                });
                 let result = await res.json();
-                if(result.status === 'success') { Swal.fire({icon:'success', title:'Sukses!', text:result.message, timer:1500, showConfirmButton:false}); return true; } 
-                else throw new Error(result.message);
-            } catch(e) { Swal.fire('Gagal', 'Terjadi kesalahan sistem/koneksi.', 'error'); return false; }
+                if(result.status === 'success') { 
+                    Swal.fire({icon:'success', title:'Sukses!', text:result.message, timer:1500, showConfirmButton:false}); 
+                    return true; 
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch(e) { 
+                Swal.fire('Gagal', 'Terjadi kesalahan sistem/koneksi.', 'error'); 
+                return false; 
+            }
         }
 
         async function loadAllData() {
             try {
-                let [rD, rK, rT, rR, rTr, rU, rP] = await Promise.all([ fetchAPI('getDashboard'), fetchAPI('getKamar'), fetchAPI('getTamu'), fetchAPI('getReservasi'), fetchAPI('getTransaksi'), fetchAPI('getUser'), fetchAPI('getPengaturan') ]);
-                globalKamar = Array.isArray(rK.data) ? rK.data : []; globalTamu = Array.isArray(rT.data) ? rT.data : []; globalReservasi = Array.isArray(rR.data) ? rR.data : []; globalTransaksi = Array.isArray(rTr.data) ? rTr.data : []; globalUsers = Array.isArray(rU.data) ? rU.data : [];
+                let [rD, rK, rT, rR, rTr, rU, rP] = await Promise.all([ 
+                    fetchAPI('getDashboard'), 
+                    fetchAPI('getKamar'), 
+                    fetchAPI('getTamu'), 
+                    fetchAPI('getReservasi'), 
+                    fetchAPI('getTransaksi'), 
+                    fetchAPI('getUser'), 
+                    fetchAPI('getPengaturan') 
+                ]);
+                
+                globalKamar = Array.isArray(rK.data) ? rK.data : []; 
+                globalTamu = Array.isArray(rT.data) ? rT.data : []; 
+                globalReservasi = Array.isArray(rR.data) ? rR.data : []; 
+                globalTransaksi = Array.isArray(rTr.data) ? rTr.data : []; 
+                globalUsers = Array.isArray(rU.data) ? rU.data : [];
                 
                 let pengaturanData = Array.isArray(rP.data) ? rP.data : [];
                 pengaturanData.forEach(p => {
@@ -803,25 +1001,48 @@
                     if(p.Item === 'Nomor Telepon') setElem('set_telp', p.Nilai, false, true);
                 });
 
-                try { updateDOMKamar(); } catch(e){} try { updateDOMTamu(); } catch(e){} try { updateDOMReservasi(); } catch(e){} try { updateDOMTransaksi(); } catch(e){} try { updateDOMUser(); } catch(e){}
-                try { if(rD.status === 'success' && rD.data) renderDashboardUI(rD.data); else renderDashboardUI({statistik:{}, statusKamar:globalKamar}); } catch(e){ console.error("Dash Error", e); }
+                try { updateDOMKamar(); } catch(e){} 
+                try { updateDOMTamu(); } catch(e){} 
+                try { updateDOMReservasi(); } catch(e){} 
+                try { updateDOMTransaksi(); } catch(e){} 
+                try { updateDOMUser(); } catch(e){}
+                
+                try { 
+                    if(rD.status === 'success' && rD.data) renderDashboardUI(rD.data); 
+                    else renderDashboardUI({statistik:{}, statusKamar:globalKamar}); 
+                } catch(e){ console.error("Dash Error", e); }
+                
                 try { renderLaporanData(); } catch(e){ console.error("Lap Error", e); }
-            } catch(e) { console.error("LoadData Master Crash:", e); }
+                
+            } catch(e) { 
+                console.error("LoadData Master Crash:", e); 
+            }
         }
 
         // ================= DASHBOARD RENDER =================
         function renderDashboardUI(dashData) {
             try {
-                dashData = dashData || {}; let s = dashData.statistik || {};
+                dashData = dashData || {}; 
+                let s = dashData.statistik || {};
                 let realTerisi = 0, realKosong = 0;
-                globalKamar.forEach(k => { let st = safeStr(k['Status']||'Kosong'); if(st === 'Terisi') realTerisi++; else if(st === 'Kosong') realKosong++; });
+                
+                globalKamar.forEach(k => { 
+                    let st = safeStr(k['Status']||'Kosong'); 
+                    if(st === 'Terisi') realTerisi++; 
+                    else if(st === 'Kosong') realKosong++; 
+                });
 
-                setElem('d_tot', parseInt(s.totalKamar) || globalKamar.length || 0); setElem('d_terisi', parseInt(s.terisi) || realTerisi); setElem('d_kosong', parseInt(s.kosong) || realKosong);
+                setElem('d_tot', parseInt(s.totalKamar) || globalKamar.length || 0); 
+                setElem('d_terisi', parseInt(s.terisi) || realTerisi); 
+                setElem('d_kosong', parseInt(s.kosong) || realKosong);
                 
                 let ciCount = 0, coCount = 0, revToday = 0, revTunai = 0, revTransfer = 0, revQris = 0, listCI = '', ciIndex = 1;
+                
                 (globalTransaksi || []).forEach(t => {
                     if(!t) return;
-                    let ti = safeStr(t['Tgl Check-in']); let to = safeStr(t['Tgl Check-out']); let st = safeStr(t['Status Transaksi']);
+                    let ti = safeStr(t['Tgl Check-in']); 
+                    let to = safeStr(t['Tgl Check-out']); 
+                    let st = safeStr(t['Status Transaksi']);
                     
                     let trRev = 0;
                     if(st.includes('Selesai')) {
@@ -846,25 +1067,45 @@
 
                     if(isToday(ti)) { 
                         ciCount++; 
-                        if(ciIndex <= 4) { listCI += `<tr class="hover:bg-blue-50"><td class="px-3 py-2 border-b text-gray-500">${ciIndex}</td><td class="px-3 py-2 border-b font-bold text-gray-800">${safeStr(t['Nama Tamu'])}</td><td class="px-3 py-2 border-b font-bold">${safeStr(t['No Kamar'])}</td><td class="px-3 py-2 border-b">${ti}</td><td class="px-3 py-2 border-b text-gray-500">${to}</td></tr>`; }
+                        if(ciIndex <= 4) { 
+                            listCI += `<tr class="hover:bg-blue-50"><td class="px-3 py-2 border-b text-gray-500">${ciIndex}</td><td class="px-3 py-2 border-b font-bold text-gray-800">${safeStr(t['Nama Tamu'])}</td><td class="px-3 py-2 border-b font-bold">${safeStr(t['No Kamar'])}</td><td class="px-3 py-2 border-b">${ti}</td><td class="px-3 py-2 border-b text-gray-500">${to}</td></tr>`; 
+                        }
                         ciIndex++;
                     }
                     if(st.includes('Selesai') && isToday(to)) coCount++;
                 });
 
-                setElem('d_ci', ciCount); setElem('d_co', coCount); setElem('d_rev', formatRp(revToday)); setElem('d_rev_big', formatRp(revToday)); setElem('d_rev_count', ciCount); setElem('d_rev_tunai', formatRp(revTunai)); setElem('d_rev_tf', formatRp(revTransfer)); setElem('d_rev_qris', formatRp(revQris));
+                setElem('d_ci', ciCount); 
+                setElem('d_co', coCount); 
+                setElem('d_rev', formatRp(revToday)); 
+                setElem('d_rev_big', formatRp(revToday)); 
+                setElem('d_rev_count', ciCount); 
+                setElem('d_rev_tunai', formatRp(revTunai)); 
+                setElem('d_rev_tf', formatRp(revTransfer)); 
+                setElem('d_rev_qris', formatRp(revQris));
                 setElem('tbl-dash-ci', listCI || '<tr><td colspan="5" class="text-center py-4 text-gray-400 italic">Belum ada check-in hari ini</td></tr>', true);
 
-                let htmlGrid = ''; let statusKamars = dashData.statusKamar || globalKamar || [];
+                let htmlGrid = ''; 
+                let statusKamars = dashData.statusKamar || globalKamar || [];
                 if(!Array.isArray(statusKamars)) statusKamars = [];
 
-                if(statusKamars.length === 0) { htmlGrid = '<div class="col-span-full text-center py-6 text-gray-500 font-bold">Kamar masih kosong. Buka menu Data Kamar untuk menambah.</div>'; }
-                else {
+                if(statusKamars.length === 0) { 
+                    htmlGrid = '<div class="col-span-full text-center py-6 text-gray-500 font-bold">Kamar masih kosong. Buka menu Data Kamar untuk menambah.</div>'; 
+                } else {
                     statusKamars.forEach(r => {
-                        if(!r) return; let noKmr = safeStr(r.noKamar || r['No Kamar']); if(!noKmr) return;
+                        if(!r) return; 
+                        let noKmr = safeStr(r.noKamar || r['No Kamar']); 
+                        if(!noKmr) return;
+                        
                         let stKmr = safeStr(r.status || r['Status'] || 'Kosong'); 
-                        let bg, tc, ic; let safeTipe = safeStr(r.tipe || r['Tipe']); let safeHarga = parseRpToNum(r.harga || r['Harga']);
-                        if(stKmr === 'Terisi') { bg = 'bg-red-500'; tc = 'text-red-500'; ic = 'fa-bed'; } else if(stKmr === 'Booking') { bg = 'bg-yellow-400'; tc = 'text-yellow-600'; ic = 'fa-calendar'; } else if(stKmr === 'Cleaning' || stKmr === 'Maintenance') { bg = 'bg-orange-500'; tc = 'text-orange-500'; ic = 'fa-broom'; } else { stKmr='Kosong'; bg = 'bg-green-500'; tc = 'text-green-500'; ic = 'fa-door-open'; }
+                        let bg, tc, ic; 
+                        let safeTipe = safeStr(r.tipe || r['Tipe']); 
+                        let safeHarga = parseRpToNum(r.harga || r['Harga']);
+                        
+                        if(stKmr === 'Terisi') { bg = 'bg-red-500'; tc = 'text-red-500'; ic = 'fa-bed'; } 
+                        else if(stKmr === 'Booking') { bg = 'bg-yellow-400'; tc = 'text-yellow-600'; ic = 'fa-calendar'; } 
+                        else if(stKmr === 'Cleaning' || stKmr === 'Maintenance') { bg = 'bg-orange-500'; tc = 'text-orange-500'; ic = 'fa-broom'; } 
+                        else { stKmr='Kosong'; bg = 'bg-green-500'; tc = 'text-green-500'; ic = 'fa-door-open'; }
                         
                         let safeNo = noKmr.replace(/'/g, "\\'"); 
                         htmlGrid += `<div onclick="klikKamarDashboard('${safeNo}', '${stKmr}', '${safeTipe}', '${safeHarga}')" class="border border-gray-100 rounded-xl p-4 flex flex-col items-center justify-center bg-white shadow-sm hover:shadow-md cursor-pointer transition"><p class="font-black text-gray-800 mb-2 text-xl">${noKmr}</p><div class="flex items-center space-x-2 bg-gray-50 px-3 py-1 rounded-full border border-gray-100"><div class="${bg} text-white w-5 h-5 rounded flex items-center justify-center text-[10px]"><i class="fa-solid ${ic}"></i></div><span class="${tc} text-[10px] md:text-xs font-black uppercase">${stKmr}</span></div></div>`;
@@ -874,65 +1115,183 @@
 
                 let resvHT = '', rIndex = 1;
                 [...(globalReservasi||[])].reverse().slice(0,3).forEach(r => {
-                    if(!r) return; let stR = safeStr(r['Status Booking']); let stClass = stR==='Menunggu'?'bg-yellow-100 text-yellow-700':(stR==='Selesai'?'bg-green-100 text-green-700':'bg-gray-100 text-gray-700');
+                    if(!r) return; 
+                    let stR = safeStr(r['Status Booking']); 
+                    let stClass = stR==='Menunggu'?'bg-yellow-100 text-yellow-700':(stR==='Selesai'?'bg-green-100 text-green-700':'bg-gray-100 text-gray-700');
+                    
                     resvHT += `<tr class="hover:bg-gray-50 border-b"><td class="px-3 py-2 text-gray-500">${rIndex++}</td><td class="px-3 py-2 font-bold">${safeStr(r['Nama Pemesan'])}</td><td class="px-3 py-2 font-bold">${safeStr(r['No Kamar'])}</td><td class="px-3 py-2">${safeStr(r['Tgl Check-in'])}</td><td class="px-3 py-2 text-center"><span class="${stClass} px-2 py-1 rounded text-xs font-bold">${stR}</span></td></tr>`;
                 });
                 setElem('tbl-dash-resv', resvHT || '<tr><td colspan="5" class="text-center py-4 text-gray-400 italic text-sm">Belum ada reservasi terbaru</td></tr>', true);
 
-            } catch(e) { console.error("Render Dash Crash", e); setElem('room-grid', `<div class="col-span-full p-4 bg-red-50 text-red-500 border border-red-200 rounded font-bold">Terjadi kesalahan format di Google Sheets.</div>`, true); }
+            } catch(e) { 
+                console.error("Render Dash Crash", e); 
+                setElem('room-grid', `<div class="col-span-full p-4 bg-red-50 text-red-500 border border-red-200 rounded font-bold">Terjadi kesalahan format di Google Sheets. Pastikan 21 Kolom Headernya Sesuai.</div>`, true); 
+            }
         }
 
         function klikKamarDashboard(no, st, tipe, harga) {
             if(st === 'Kosong') {
-                Swal.fire({ title: `Kamar ${no}`, html: `<div class="text-left bg-gray-50 p-4 border rounded"><p><b>Status:</b> Kosong</p><p><b>Tipe:</b> ${tipe}</p><p class="text-lg"><b>Harga:</b> ${formatRp(harga)}</p></div>`, showCancelButton:true, confirmButtonText:'<i class="fa-solid fa-sign-in-alt"></i> CHECK-IN', confirmButtonColor: '#2563eb' })
-                .then(r => { if(r.isConfirmed){ document.getElementById('ci_kamar').value = no; switchPage('checkin'); calcCheckin(); } });
+                Swal.fire({ 
+                    title: `Kamar ${no}`, 
+                    html: `<div class="text-left bg-gray-50 p-4 border rounded"><p><b>Status:</b> Kosong</p><p><b>Tipe:</b> ${tipe}</p><p class="text-lg"><b>Harga:</b> ${formatRp(harga)}</p></div>`, 
+                    showCancelButton:true, 
+                    confirmButtonText:'<i class="fa-solid fa-sign-in-alt"></i> CHECK-IN', 
+                    confirmButtonColor: '#2563eb' 
+                }).then(r => { 
+                    if(r.isConfirmed){ 
+                        document.getElementById('ci_kamar').value = no; 
+                        switchPage('checkin'); 
+                        calcCheckin(); 
+                    } 
+                });
             } else if(st === 'Terisi') {
                 let trx = globalTransaksi.find(t => String(t['No Kamar']) === String(no) && String(t['Status Transaksi']).includes('Aktif'));
                 if(!trx) return Swal.fire('Error', 'Data transaksi aktif tidak ditemukan', 'error');
-                let inDate = new Date(); let outDate = new Date(parseDateStandard(trx['Tgl Check-out']));
+                
+                let inDate = new Date(); 
+                let outDate = new Date(parseDateStandard(trx['Tgl Check-out']));
                 let sisa = Math.max(0, Math.ceil((outDate - inDate)/(1000*60*60*24)));
-                Swal.fire({ title: `Kamar ${no}`, html: `<div class="text-left bg-red-50 p-4 border border-red-200 rounded"><p class="text-lg mb-2"><b>Tamu:</b> ${trx['Nama Tamu']}</p><p>Masuk: ${trx['Tgl Check-in']}</p><p>Keluar: ${trx['Tgl Check-out']}</p><p class="text-red-700 font-bold mt-2">Sisa Hari: ${sisa} Malam</p></div>`, showCancelButton: true, confirmButtonText: 'CHECK-OUT', confirmButtonColor: '#dc2626' })
-                .then(r => { if(r.isConfirmed) { document.getElementById('co_kamar').value = no; switchPage('checkout'); loadTagihanCheckout(); } });
+                
+                Swal.fire({ 
+                    title: `Kamar ${no}`, 
+                    html: `<div class="text-left bg-red-50 p-4 border border-red-200 rounded"><p class="text-lg mb-2"><b>Tamu:</b> ${trx['Nama Tamu']}</p><p>Masuk: ${trx['Tgl Check-in']}</p><p>Keluar: ${trx['Tgl Check-out']}</p><p class="text-red-700 font-bold mt-2">Sisa Hari: ${sisa} Malam</p></div>`, 
+                    showCancelButton: true, 
+                    confirmButtonText: 'CHECK-OUT', 
+                    confirmButtonColor: '#dc2626' 
+                }).then(r => { 
+                    if(r.isConfirmed) { 
+                        document.getElementById('co_kamar').value = no; 
+                        switchPage('checkout'); 
+                        loadTagihanCheckout(); 
+                    } 
+                });
             } else {
-                Swal.fire({ title: `Kamar ${no} (${st})`, text: 'Pembersihan / perbaikan sudah selesai?', icon: 'question', showCancelButton: true, confirmButtonText: 'Tandai Kosong', confirmButtonColor: '#16a34a' })
-                .then(async r => { if(r.isConfirmed && await postAPI('updateStatusKamar', {noKamar:no, statusBaru:'Kosong'})) loadAllData(); });
+                Swal.fire({ 
+                    title: `Kamar ${no} (${st})`, 
+                    text: 'Pembersihan / perbaikan sudah selesai?', 
+                    icon: 'question', 
+                    showCancelButton: true, 
+                    confirmButtonText: 'Tandai Kosong', 
+                    confirmButtonColor: '#16a34a' 
+                }).then(async r => { 
+                    if(r.isConfirmed && await postAPI('updateStatusKamar', {noKamar:no, statusBaru:'Kosong'})) loadAllData(); 
+                });
             }
         }
 
         // ================= KAMAR =================
         function otomatisFasilitas() {
             let t = document.getElementById('k_tipe').value;
-            document.getElementById('f_wifi').checked = true; document.getElementById('f_tv').checked = true;
-            document.getElementById('f_ac').checked = (t === 'Deluxe' || t === 'VIP'); document.getElementById('f_airpanas').checked = (t === 'VIP');
+            document.getElementById('f_wifi').checked = true; 
+            document.getElementById('f_tv').checked = true;
+            document.getElementById('f_ac').checked = (t === 'Deluxe' || t === 'VIP'); 
+            document.getElementById('f_airpanas').checked = (t === 'VIP');
         }
+        
         function tambahFasilitasManualInline() {
             let val = document.getElementById('k_f_custom').value.trim();
-            if(val) { let fid = 'f_cust_' + Math.floor(Math.random()*1000); document.getElementById('fas_container').insertAdjacentHTML('beforeend', `<label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="${fid}" value="${val}" checked class="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600 rounded focus:ring-blue-500"><span>${val}</span></label>`); document.getElementById('k_f_custom').value = ''; }
+            if(val) { 
+                let fid = 'f_cust_' + Math.floor(Math.random()*1000); 
+                document.getElementById('fas_container').insertAdjacentHTML('beforeend', `<label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="${fid}" value="${val}" checked class="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600 rounded focus:ring-blue-500"><span>${val}</span></label>`); 
+                document.getElementById('k_f_custom').value = ''; 
+            }
         }
+        
         async function submitKamar(e) {
-            e.preventDefault(); let fas = [];
-            document.querySelectorAll('#fas_container input[type="checkbox"]:checked').forEach(c => { if(c.id==='f_wifi') fas.push('Wifi'); else if(c.id==='f_tv') fas.push('TV'); else if(c.id==='f_ac') fas.push('AC'); else if(c.id==='f_airpanas') fas.push('Air Panas'); else fas.push(c.value); });
-            let arrData = [ document.getElementById('k_no').value, document.getElementById('k_tipe').value, getRawNum('k_harga'), document.getElementById('k_lantai').value, fas.join(", "), document.getElementById('k_ket').value, document.getElementById('k_status').value ];
-            if(editMode.active && editMode.type === 'kamar') { if(await postAPI('updateData', { sheetName: 'Data Kamar', searchColIndex: 1, searchValue: editMode.idVal, rowData: arrData })) { batalEdit('kamar'); loadAllData(); } } 
-            else { if(await postAPI('addKamar', arrData)) { e.target.reset(); setRawNum('k_harga', 0); loadAllData(); } }
+            e.preventDefault(); 
+            let fas = [];
+            document.querySelectorAll('#fas_container input[type="checkbox"]:checked').forEach(c => { 
+                if(c.id==='f_wifi') fas.push('Wifi'); 
+                else if(c.id==='f_tv') fas.push('TV'); 
+                else if(c.id==='f_ac') fas.push('AC'); 
+                else if(c.id==='f_airpanas') fas.push('Air Panas'); 
+                else fas.push(c.value); 
+            });
+            
+            let arrData = [ 
+                document.getElementById('k_no').value, 
+                document.getElementById('k_tipe').value, 
+                getRawNum('k_harga'), 
+                document.getElementById('k_lantai').value, 
+                fas.join(", "), 
+                document.getElementById('k_ket').value, 
+                document.getElementById('k_status').value 
+            ];
+            
+            if(editMode.active && editMode.type === 'kamar') { 
+                if(await postAPI('updateData', { sheetName: 'Data Kamar', searchColIndex: 1, searchValue: editMode.idVal, rowData: arrData })) { 
+                    batalEdit('kamar'); loadAllData(); 
+                } 
+            } else { 
+                if(await postAPI('addKamar', arrData)) { 
+                    e.target.reset(); setRawNum('k_harga', 0); loadAllData(); 
+                } 
+            }
         }
+        
         function editRowKamar(no) {
-            let k = globalKamar.find(x => String(x['No Kamar']) === String(no)); if(!k) return;
-            document.getElementById('k_no').value = k['No Kamar']; document.getElementById('k_no').readOnly = true; document.getElementById('k_tipe').value = k['Tipe']; setRawNum('k_harga', parseRpToNum(k['Harga'])); document.getElementById('k_lantai').value = k['Lantai']; document.getElementById('k_ket').value = k['Keterangan']; document.getElementById('k_status').value = k['Status'];
-            let htmlF = ''; (String(k['Fasilitas']||'')).split(',').forEach(f => { f = f.trim(); if(!f) return; let id = 'f_'+f.replace(/\s+/g,'').toLowerCase(); htmlF += `<label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="${id}" value="${f}" checked class="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600 rounded"><span>${f}</span></label>`; }); document.getElementById('fas_container').innerHTML = htmlF || 'Tidak ada';
-            editMode = { active: true, type: 'kamar', idVal: no }; document.getElementById('btn_save_kamar').innerHTML = '<i class="fa-solid fa-save"></i> UPDATE DATA KAMAR'; document.getElementById('btn_cancel_kamar').classList.remove('hidden'); window.scrollTo(0,0);
+            let k = globalKamar.find(x => String(x['No Kamar']) === String(no)); 
+            if(!k) return;
+            
+            document.getElementById('k_no').value = k['No Kamar']; 
+            document.getElementById('k_no').readOnly = true; 
+            document.getElementById('k_tipe').value = k['Tipe']; 
+            setRawNum('k_harga', parseRpToNum(k['Harga'])); 
+            document.getElementById('k_lantai').value = k['Lantai']; 
+            document.getElementById('k_ket').value = k['Keterangan']; 
+            document.getElementById('k_status').value = k['Status'];
+            
+            let htmlF = ''; 
+            (String(k['Fasilitas']||'')).split(',').forEach(f => { 
+                f = f.trim(); if(!f) return; 
+                let id = 'f_'+f.replace(/\s+/g,'').toLowerCase(); 
+                htmlF += `<label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="${id}" value="${f}" checked class="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600 rounded"><span>${f}</span></label>`; 
+            }); 
+            document.getElementById('fas_container').innerHTML = htmlF || 'Tidak ada';
+            
+            editMode = { active: true, type: 'kamar', idVal: no }; 
+            document.getElementById('btn_save_kamar').innerHTML = '<i class="fa-solid fa-save"></i> UPDATE DATA KAMAR'; 
+            document.getElementById('btn_cancel_kamar').classList.remove('hidden'); 
+            window.scrollTo(0,0);
         }
 
         // ================= TAMU =================
         async function submitTamu(e) {
-            e.preventDefault(); let arrData = [ document.getElementById('t_nik').value, document.getElementById('t_nama').value, "-", "-", document.getElementById('t_hp').value, "-", document.getElementById('t_alamat').value, 0, 0 ];
-            if(editMode.active && editMode.type === 'tamu') { if(await postAPI('updateData', { sheetName: 'Data Tamu', searchColIndex: 1, searchValue: editMode.idVal, rowData: arrData })) { batalEdit('tamu'); loadAllData(); } } 
-            else { if(await postAPI('addTamu', arrData)) { e.target.reset(); loadAllData(); } }
+            e.preventDefault(); 
+            let arrData = [ 
+                document.getElementById('t_nik').value, 
+                document.getElementById('t_nama').value, 
+                "-", "-", 
+                document.getElementById('t_hp').value, 
+                "-", 
+                document.getElementById('t_alamat').value, 
+                0, 0 
+            ];
+            if(editMode.active && editMode.type === 'tamu') { 
+                if(await postAPI('updateData', { sheetName: 'Data Tamu', searchColIndex: 1, searchValue: editMode.idVal, rowData: arrData })) { 
+                    batalEdit('tamu'); loadAllData(); 
+                } 
+            } else { 
+                if(await postAPI('addTamu', arrData)) { 
+                    e.target.reset(); loadAllData(); 
+                } 
+            }
         }
+        
         function editRowTamu(nik) {
-            let t = globalTamu.find(x => String(x['NIK']) === String(nik)); if(!t) return;
-            document.getElementById('t_nik').value = t['NIK']; document.getElementById('t_nik').readOnly = true; document.getElementById('t_nama').value = t['Nama Lengkap']; document.getElementById('t_hp').value = t['No HP']; document.getElementById('t_alamat').value = t['Alamat'];
-            editMode = { active: true, type: 'tamu', idVal: nik }; document.getElementById('btn_save_tamu').innerText = 'Update Data Tamu'; document.getElementById('btn_cancel_tamu').classList.remove('hidden'); window.scrollTo(0,0);
+            let t = globalTamu.find(x => String(x['NIK']) === String(nik)); 
+            if(!t) return;
+            
+            document.getElementById('t_nik').value = t['NIK']; 
+            document.getElementById('t_nik').readOnly = true; 
+            document.getElementById('t_nama').value = t['Nama Lengkap']; 
+            document.getElementById('t_hp').value = t['No HP']; 
+            document.getElementById('t_alamat').value = t['Alamat'];
+            
+            editMode = { active: true, type: 'tamu', idVal: nik }; 
+            document.getElementById('btn_save_tamu').innerText = 'Update Data Tamu'; 
+            document.getElementById('btn_cancel_tamu').classList.remove('hidden'); 
+            window.scrollTo(0,0);
         }
 
         // ================= RESERVASI =================
@@ -987,26 +1346,67 @@
             ];
             
             if(editMode.active && editMode.type === 'reservasi') { 
-                if(await postAPI('updateData', { sheetName: 'Reservasi', searchColIndex: 1, searchValue: editMode.idVal, rowData: arrData })) { batalEdit('reservasi'); loadAllData(); } 
-            } 
-            else { 
-                if(await postAPI('addReservasi', arrData)) { e.target.reset(); setRawNum('r_dp',0); document.getElementById('r_info').value=''; loadAllData(); } 
+                if(await postAPI('updateData', { sheetName: 'Reservasi', searchColIndex: 1, searchValue: editMode.idVal, rowData: arrData })) { 
+                    batalEdit('reservasi'); loadAllData(); 
+                } 
+            } else { 
+                if(await postAPI('addReservasi', arrData)) { 
+                    e.target.reset(); setRawNum('r_dp',0); document.getElementById('r_info').value=''; loadAllData(); 
+                } 
             }
         }
+        
         function editRowReservasi(kode) {
-            let r = globalReservasi.find(x => String(x['Kode Booking']) === String(kode)); if(!r) return;
-            document.getElementById('r_nama').value = r['Nama Pemesan']; document.getElementById('r_hp').value = r['No HP']; document.getElementById('r_kamar').value = r['No Kamar']; document.getElementById('r_in').value = parseDateStandard(r['Tgl Check-in']); document.getElementById('r_out').value = parseDateStandard(r['Tgl Check-out']); setRawNum('r_dp', parseRpToNum(r['DP'])); document.getElementById('r_metode').value = r['Metode Bayar']; document.getElementById('r_catatan').value = r['Catatan']; calcReservasi();
-            editMode = { active: true, type: 'reservasi', idVal: kode }; document.getElementById('btn_save_resv').innerHTML = '<i class="fa-solid fa-save"></i> UPDATE RESERVASI'; document.getElementById('btn_cancel_resv').classList.remove('hidden'); window.scrollTo(0,0);
+            let r = globalReservasi.find(x => String(x['Kode Booking']) === String(kode)); 
+            if(!r) return;
+            
+            document.getElementById('r_nama').value = r['Nama Pemesan']; 
+            document.getElementById('r_hp').value = r['No HP']; 
+            document.getElementById('r_kamar').value = r['No Kamar']; 
+            document.getElementById('r_in').value = parseDateStandard(r['Tgl Check-in']); 
+            document.getElementById('r_out').value = parseDateStandard(r['Tgl Check-out']); 
+            setRawNum('r_dp', parseRpToNum(r['DP'])); 
+            document.getElementById('r_metode').value = r['Metode Bayar']; 
+            document.getElementById('r_catatan').value = r['Catatan']; 
+            calcReservasi();
+            
+            editMode = { active: true, type: 'reservasi', idVal: kode }; 
+            document.getElementById('btn_save_resv').innerHTML = '<i class="fa-solid fa-save"></i> UPDATE RESERVASI'; 
+            document.getElementById('btn_cancel_resv').classList.remove('hidden'); 
+            window.scrollTo(0,0);
         }
 
         function batalEdit(tipe) {
-            document.getElementById('form-'+tipe).reset(); editMode = { active: false, type: null, idVal: null };
-            if(tipe==='kamar') { document.getElementById('k_no').readOnly = false; setRawNum('k_harga',0); document.getElementById('btn_save_kamar').innerHTML = '<i class="fa-solid fa-save"></i> SIMPAN DATA KAMAR'; document.getElementById('btn_cancel_kamar').classList.add('hidden'); }
-            if(tipe==='tamu') { document.getElementById('t_nik').readOnly = false; document.getElementById('btn_save_tamu').innerHTML = '<i class="fa-solid fa-save"></i> Simpan Data Tamu'; document.getElementById('btn_cancel_tamu').classList.add('hidden'); }
-            if(tipe==='reservasi') { setRawNum('r_dp',0); document.getElementById('r_info').value=''; document.getElementById('btn_save_resv').innerHTML = '<i class="fa-solid fa-calendar-check mr-2"></i> SIMPAN RESERVASI SEKARANG'; document.getElementById('btn_cancel_resv').classList.add('hidden'); }
+            document.getElementById('form-'+tipe).reset(); 
+            editMode = { active: false, type: null, idVal: null };
+            
+            if(tipe==='kamar') { 
+                document.getElementById('k_no').readOnly = false; 
+                setRawNum('k_harga',0); 
+                document.getElementById('btn_save_kamar').innerHTML = '<i class="fa-solid fa-save"></i> SIMPAN DATA KAMAR'; 
+                document.getElementById('btn_cancel_kamar').classList.add('hidden'); 
+            }
+            if(tipe==='tamu') { 
+                document.getElementById('t_nik').readOnly = false; 
+                document.getElementById('btn_save_tamu').innerHTML = '<i class="fa-solid fa-save"></i> Simpan Data Tamu'; 
+                document.getElementById('btn_cancel_tamu').classList.add('hidden'); 
+            }
+            if(tipe==='reservasi') { 
+                setRawNum('r_dp',0); 
+                document.getElementById('r_info').value=''; 
+                document.getElementById('btn_save_resv').innerHTML = '<i class="fa-solid fa-calendar-check mr-2"></i> SIMPAN RESERVASI SEKARANG'; 
+                document.getElementById('btn_cancel_resv').classList.add('hidden'); 
+            }
         }
+
         function hapusData(sheet, colIdx, valId) {
-            Swal.fire({ title:'Yakin hapus data?', text:'Aksi ini permanen!', icon:'warning', showCancelButton:true, confirmButtonColor:'#d33' }).then(async r => {
+            Swal.fire({ 
+                title:'Yakin hapus data?', 
+                text:'Aksi ini permanen!', 
+                icon:'warning', 
+                showCancelButton:true, 
+                confirmButtonColor:'#d33' 
+            }).then(async r => {
                 if(r.isConfirmed && await postAPI('deleteData', { sheetName: sheet, searchColIndex: colIdx, searchValue: valId })) loadAllData();
             });
         }
@@ -1017,7 +1417,14 @@
             globalUsers.forEach(u => {
                 if(!u || !u['Username']) return;
                 let st = u['Status']==='Aktif' ? 'text-green-600' : 'text-red-600';
-                ht += `<tr><td class="px-2 md:px-3 py-2 md:py-3 font-bold">${safeStr(u['Username'])}</td><td class="px-2 md:px-3 py-2 md:py-3"><span class="px-2 py-1 rounded text-[10px] md:text-xs font-bold bg-gray-200">${safeStr(u['Role'])}</span></td><td class="px-2 md:px-3 py-2 md:py-3 text-center font-bold ${st}">${safeStr(u['Status'])}</td><td class="px-2 md:px-3 py-2 md:py-3 text-right"><button onclick="hapusData('Data User', 1, '${safeStr(u['Username'])}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                ht += `<tr>
+                    <td class="px-2 md:px-3 py-2 md:py-3 font-bold">${safeStr(u['Username'])}</td>
+                    <td class="px-2 md:px-3 py-2 md:py-3"><span class="px-2 py-1 rounded text-[10px] md:text-xs font-bold bg-gray-200">${safeStr(u['Role'])}</span></td>
+                    <td class="px-2 md:px-3 py-2 md:py-3 text-center font-bold ${st}">${safeStr(u['Status'])}</td>
+                    <td class="px-2 md:px-3 py-2 md:py-3 text-right">
+                        <button onclick="hapusData('Data User', 1, '${safeStr(u['Username'])}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`;
             });
             document.getElementById('tbl-users').innerHTML = ht || '<tr><td colspan="4" class="text-center py-4 text-gray-500">Belum ada user.</td></tr>';
         }
@@ -1040,8 +1447,10 @@
                 </div>`, 
                 focusConfirm: false, showCancelButton:true,
                 preConfirm: () => { 
-                    let u = document.getElementById('swal-u').value; let p = document.getElementById('swal-p').value; 
-                    let r = document.getElementById('swal-r').value; if(r==='Custom') r = document.getElementById('swal-custom').value;
+                    let u = document.getElementById('swal-u').value; 
+                    let p = document.getElementById('swal-p').value; 
+                    let r = document.getElementById('swal-r').value; 
+                    if(r==='Custom') r = document.getElementById('swal-custom').value;
                     let akses = r === 'Super Admin' ? 'Semua Akses' : Array.from(document.querySelectorAll('.menu-akses:checked')).map(c=>c.value).join(', ');
                     if(!u || !p || !r) return Swal.showValidationMessage('Semua data wajib diisi');
                     if(p.length < 4) return Swal.showValidationMessage('PIN minimal 4 Angka');
@@ -1053,23 +1462,6 @@
             }
         }
 
-        // ================= PENGATURAN (SINKRON GSHEET) =================
-        async function simpanProfilPengaturan() {
-            let n = document.getElementById('set_hotel').value;
-            let a = document.getElementById('set_alamat').value;
-            let t = document.getElementById('set_telp').value;
-
-            let arrData = [
-                ["Profil Invoice", "Nama Penginapan", n, "Menyesuaikan Struk Invoice"],
-                ["Profil Invoice", "Alamat Lengkap", a, "Menyesuaikan Struk Invoice"],
-                ["Profil Invoice", "Nomor Telepon", t, "Menyesuaikan Struk Invoice"]
-            ];
-
-            if(await postAPI('savePengaturan', arrData)) {
-                Swal.fire({icon: 'success', title: 'Tersimpan!', text: 'Profil penginapan telah tersinkronisasi ke Google Sheets.', timer: 2000, showConfirmButton:false});
-            }
-        }
-
         // ================= LAPORAN (FILTER TANGGAL) =================
         function renderLaporanData() {
             try {
@@ -1077,17 +1469,19 @@
                 let isFilterHarian = filterDate !== "";
                 let targetDate = isFilterHarian ? new Date(filterDate) : new Date();
                 
-                // Normalisasi ke zona waktu lokal untuk membandingkan
                 let cm = targetDate.getMonth();
                 let cy = targetDate.getFullYear();
                 let cd = targetDate.getDate();
 
-                let blnIniTot = 0, roomMap = {}; let tipeMap = { "Standard": {c:0, rev:0}, "Deluxe": {c:0, rev:0}, "VIP": {c:0, rev:0} };
+                let blnIniTot = 0;
+                let roomMap = {}; 
+                let tipeMap = { "Standard": {c:0, rev:0}, "Deluxe": {c:0, rev:0}, "VIP": {c:0, rev:0} };
 
                 globalTransaksi.forEach(t => {
                     let tdStr = parseDateStandard(t['Tgl Check-in']);
                     let toStr = parseDateStandard(t['Tgl Check-out']);
                     if(!tdStr) return; 
+                    
                     let td = new Date(tdStr);
                     let toD = new Date(toStr);
                     let st = safeStr(t['Status Transaksi']);
@@ -1095,7 +1489,6 @@
                     let dp = parseRpToNum(t['DP'] || t['Sudah Dibayar'] || 0);
                     let totalTagihan = parseRpToNum(t['Total Tagihan'] || 0);
 
-                    // Pengecekan kecocokan tanggal (Harian vs Bulanan)
                     let isMatchIn = isFilterHarian ? (td.getDate() === cd && td.getMonth() === cm && td.getFullYear() === cy) : (td.getMonth() === cm && td.getFullYear() === cy);
                     let isMatchOut = isFilterHarian ? (toD.getDate() === cd && toD.getMonth() === cm && toD.getFullYear() === cy) : (toD.getMonth() === cm && toD.getFullYear() === cy);
 
@@ -1115,26 +1508,39 @@
                         roomMap[t['No Kamar']] = (roomMap[t['No Kamar']] || 0) + 1;
                         let kmrObj = globalKamar.find(x => String(x['No Kamar']) === String(t['No Kamar']));
                         if(kmrObj) {
-                            let tipe = kmrObj['Tipe']; if(!tipeMap[tipe]) tipeMap[tipe] = {c:0, rev:0};
+                            let tipe = kmrObj['Tipe']; 
+                            if(!tipeMap[tipe]) tipeMap[tipe] = {c:0, rev:0};
                             tipeMap[tipe].c += 1; 
                             tipeMap[tipe].rev += addedRev;
                         }
                     }
                 });
                 
-                let favR = "-", mxC = 0; for(let key in roomMap) { if(roomMap[key] > mxC) { mxC = roomMap[key]; favR = key; } }
+                let favR = "-", mxC = 0; 
+                for(let key in roomMap) { 
+                    if(roomMap[key] > mxC) { mxC = roomMap[key]; favR = key; } 
+                }
                 
                 let terisiVal = globalKamar.filter(k=>String(k.Status||'').trim()==='Terisi').length;
                 let okupansi = globalKamar.length > 0 ? Math.round((terisiVal / globalKamar.length) * 100) : 0;
                 
-                // Update Label Judul Laporan
                 let labelText = isFilterHarian ? `Tgl ${targetDate.toLocaleDateString('id-ID')}` : "(Bulan Ini)";
                 document.getElementById('lbl_lap_title_1').innerText = `Total Pendapatan ${labelText}`;
                 document.getElementById('lbl_lap_title_2').innerText = `Terlaris ${labelText}`;
                 document.getElementById('lbl_lap_title_3').innerText = `Kinerja Tipe Kamar ${labelText}`;
 
-                setElem('lap_pendapatan', formatRp(blnIniTot)); setElem('lap_okupansi', okupansi + "%"); setElem('lap_terlaris', mxC > 0 ? favR : "-");
-                let hTipe = ''; for(let key in tipeMap) { hTipe += `<tr><td class="py-2 md:py-3 px-3 md:px-4 font-bold border-r border-gray-200">${key}</td><td class="py-2 md:py-3 px-3 md:px-4 text-center border-r border-gray-200">${tipeMap[key].c} Kali</td><td class="py-2 md:py-3 px-3 md:px-4 text-right font-black text-green-600">${formatRp(tipeMap[key].rev)}</td></tr>`; }
+                setElem('lap_pendapatan', formatRp(blnIniTot)); 
+                setElem('lap_okupansi', okupansi + "%"); 
+                setElem('lap_terlaris', mxC > 0 ? favR : "-");
+                
+                let hTipe = ''; 
+                for(let key in tipeMap) { 
+                    hTipe += `<tr>
+                        <td class="py-2 md:py-3 px-3 md:px-4 font-bold border-r border-gray-200">${key}</td>
+                        <td class="py-2 md:py-3 px-3 md:px-4 text-center border-r border-gray-200">${tipeMap[key].c} Kali</td>
+                        <td class="py-2 md:py-3 px-3 md:px-4 text-right font-black text-green-600">${formatRp(tipeMap[key].rev)}</td>
+                    </tr>`; 
+                }
                 setElem('tbl-lap-tipe', hTipe || '<tr><td colspan="3" class="text-center py-4 text-gray-500">Belum ada transaksi</td></tr>', true);
             } catch(e) { console.error("Lap render err", e); }
         }
@@ -1148,7 +1554,10 @@
         }
         function exportSemuaTransaksiExcel() {
             if(globalTransaksi.length === 0) return Swal.fire('Kosong', 'Belum ada transaksi untuk di export.', 'info');
-            let ws = XLSX.utils.json_to_sheet(globalTransaksi); let wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Semua Transaksi"); XLSX.writeFile(wb, "Laporan_Semua_Transaksi.xlsx");
+            let ws = XLSX.utils.json_to_sheet(globalTransaksi); 
+            let wb = XLSX.utils.book_new(); 
+            XLSX.utils.book_append_sheet(wb, ws, "Semua Transaksi"); 
+            XLSX.writeFile(wb, "Laporan_Semua_Transaksi.xlsx");
             Swal.fire({icon:'success', title:'Berhasil', text:'File Laporan Transaksi (.xlsx) telah didownload.', timer:2000});
         }
 
@@ -1156,58 +1565,136 @@
         function cariTamuCI() {
             let key = document.getElementById('ci_cari_tamu').value.toLowerCase();
             let t = globalTamu.find(x => String(x['NIK']).toLowerCase() === key || String(x['Nama Lengkap']).toLowerCase().includes(key));
-            if(t) { document.getElementById('ci_ktp').value = t['NIK']; document.getElementById('ci_nama').value = t['Nama Lengkap']; document.getElementById('ci_hp').value = t['No HP']; document.getElementById('ci_alamat').value = t['Alamat']; Swal.fire({icon:'success', title:'Ditemukan', text:'Form diisi otomatis.', toast:true, position:'top-end', timer:1500, showConfirmButton:false}); } else Swal.fire('Kosong', 'Data tidak ada.', 'info');
+            if(t) { 
+                document.getElementById('ci_ktp').value = t['NIK']; 
+                document.getElementById('ci_nama').value = t['Nama Lengkap']; 
+                document.getElementById('ci_hp').value = t['No HP']; 
+                document.getElementById('ci_alamat').value = t['Alamat']; 
+                Swal.fire({icon:'success', title:'Ditemukan', text:'Form diisi otomatis.', toast:true, position:'top-end', timer:1500, showConfirmButton:false}); 
+            } else {
+                Swal.fire('Kosong', 'Data tidak ada.', 'info');
+            }
         }
+
         function cariReservasiCI() {
             let key = document.getElementById('ci_cari_resv').value.toLowerCase();
             let r = globalReservasi.find(x => String(x['Kode Booking']).toLowerCase() === key || String(x['Nama Pemesan']).toLowerCase().includes(key));
             if(r && String(r['Status Booking']).trim() !== 'Selesai') {
-                document.getElementById('ci_nama').value = r['Nama Pemesan']; document.getElementById('ci_hp').value = r['No HP']; document.getElementById('ci_kamar').value = r['No Kamar']; document.getElementById('ci_in').value = parseDateStandard(r['Tgl Check-in']); document.getElementById('ci_out').value = parseDateStandard(r['Tgl Check-out']); setRawNum('ci_bayar', parseRpToNum(r['DP'])); document.getElementById('ci_kode_booking').value = r['Kode Booking']; calcCheckin();
+                document.getElementById('ci_nama').value = r['Nama Pemesan']; 
+                document.getElementById('ci_hp').value = r['No HP']; 
+                document.getElementById('ci_kamar').value = r['No Kamar']; 
+                document.getElementById('ci_in').value = parseDateStandard(r['Tgl Check-in']); 
+                document.getElementById('ci_out').value = parseDateStandard(r['Tgl Check-out']); 
+                setRawNum('ci_bayar', parseRpToNum(r['DP'])); 
+                document.getElementById('ci_kode_booking').value = r['Kode Booking']; 
+                calcCheckin();
                 Swal.fire({icon:'success', title:'Reservasi Ditarik', text:'Data Booking & Uang DP diload.'});
-            } else Swal.fire('Gagal', 'Reservasi tidak ditemukan / Kadaluarsa.', 'warning');
+            } else {
+                Swal.fire('Gagal', 'Reservasi tidak ditemukan / Kadaluarsa.', 'warning');
+            }
         }
 
         function calcCheckin() {
-            let inD = new Date(document.getElementById('ci_in').value); let outD = new Date(document.getElementById('ci_out').value);
-            let nok = document.getElementById('ci_kamar').value; let diskon = getRawNum('ci_diskon');
-            if(inD && outD && inD <= outD && nok) {
-                let days = Math.max(1, Math.ceil((outD - inD) / (1000 * 60 * 60 * 24)));
-                document.getElementById('ci_lbl_hari').innerText = days; let k = globalKamar.find(x => String(x['No Kamar']) === String(nok));
-                if(k) { let totalBersih = (days * parseRpToNum(k['Harga'])) - diskon; setRawNum('ci_biaya', totalBersih); }
-            } else { setRawNum('ci_biaya', 0); document.getElementById('ci_lbl_hari').innerText = "0"; }
+            let inVal = document.getElementById('ci_in').value;
+            let outVal = document.getElementById('ci_out').value;
+            let nok = document.getElementById('ci_kamar').value; 
+            let diskon = getRawNum('ci_diskon');
+            
+            if(inVal && outVal && nok) {
+                let inD = new Date(inVal); 
+                let outD = new Date(outVal);
+                if(inD <= outD) {
+                    let days = Math.max(1, Math.ceil((outD - inD) / (1000 * 60 * 60 * 24)));
+                    document.getElementById('ci_lbl_hari').innerText = days; 
+                    let k = globalKamar.find(x => String(x['No Kamar']) === String(nok));
+                    if(k) { 
+                        let totalBersih = (days * parseRpToNum(k['Harga'])) - diskon; 
+                        setRawNum('ci_biaya', totalBersih); 
+                    }
+                }
+            } else { 
+                setRawNum('ci_biaya', 0); 
+                document.getElementById('ci_lbl_hari').innerText = "0"; 
+            }
         }
 
         async function submitCheckin(e) {
-            e.preventDefault(); if(!document.getElementById('ci_kamar').value || getRawNum('ci_biaya') < 0) return Swal.fire('Gagal', 'Kamar/Tanggal tidak valid!', 'error');
-            let inv = "INV-" + new Date().getTime().toString().slice(-6); let nok = document.getElementById('ci_kamar').value; let nik = document.getElementById('ci_ktp').value;
-            let kb = document.getElementById('ci_kode_booking').value;
-            let kamarObj = globalKamar.find(x => String(x['No Kamar']) === String(nok)); let biayaAsliFull = parseRpToNum(kamarObj['Harga']) * parseInt(document.getElementById('ci_lbl_hari').innerText);
-            let totalB = getRawNum('ci_biaya'); let dpIn = getRawNum('ci_bayar');
-
-            let trxData = [ inv, document.getElementById('ci_nama').value, nik, document.getElementById('ci_hp').value, document.getElementById('ci_alamat').value, nok, document.getElementById('ci_in').value, document.getElementById('ci_out').value, document.getElementById('ci_lbl_hari').innerText, formatRp(biayaAsliFull), 0, 0, 0, 0, formatRp(getRawNum('ci_diskon')), formatRp(dpIn), formatRp(totalB), formatRp(dpIn), formatRp(totalB - dpIn), document.getElementById('ci_metode').value, "Aktif (Check-in)" ];
+            e.preventDefault(); 
+            if(!document.getElementById('ci_kamar').value || getRawNum('ci_biaya') < 0) return Swal.fire('Gagal', 'Kamar/Tanggal tidak valid!', 'error');
             
-            if(!globalTamu.find(t => String(t['NIK']) === String(nik))) postAPI('addTamu', [nik, document.getElementById('ci_nama').value, "-", "-", document.getElementById('ci_hp').value, "-", document.getElementById('ci_alamat').value, 0, 0]);
+            let inv = "INV-" + new Date().getTime().toString().slice(-6); 
+            let nok = document.getElementById('ci_kamar').value; 
+            let nik = document.getElementById('ci_ktp').value;
+            let kb = document.getElementById('ci_kode_booking').value;
+            
+            let kamarObj = globalKamar.find(x => String(x['No Kamar']) === String(nok)); 
+            let biayaAsliFull = parseRpToNum(kamarObj['Harga']) * parseInt(document.getElementById('ci_lbl_hari').innerText);
+            
+            let totalB = getRawNum('ci_biaya'); 
+            let dpIn = getRawNum('ci_bayar');
+
+            let trxData = [ 
+                inv, 
+                document.getElementById('ci_nama').value, 
+                nik, 
+                document.getElementById('ci_hp').value, 
+                document.getElementById('ci_alamat').value, 
+                nok, 
+                document.getElementById('ci_in').value, 
+                document.getElementById('ci_out').value, 
+                document.getElementById('ci_lbl_hari').innerText, 
+                formatRp(biayaAsliFull), 
+                0, 
+                0, 
+                0, 
+                0, 
+                formatRp(getRawNum('ci_diskon')), 
+                formatRp(dpIn), 
+                formatRp(totalB), 
+                formatRp(dpIn), 
+                formatRp(totalB - dpIn), 
+                document.getElementById('ci_metode').value, 
+                "Aktif (Check-in)" 
+            ];
+            
+            if(!globalTamu.find(t => String(t['NIK']) === String(nik))) {
+                postAPI('addTamu', [nik, document.getElementById('ci_nama').value, "-", "-", document.getElementById('ci_hp').value, "-", document.getElementById('ci_alamat').value, 0, 0]);
+            }
 
             if(await postAPI('checkIn', { transaksiData: trxData, noKamar: nok, kodeBooking: kb })) {
                 triggerPrint('checkin', { inv: inv, nama: trxData[1], hp: trxData[3], alamat: trxData[4], kamar: nok, in: trxData[6], out: trxData[7], biayaKamar: biayaAsliFull, qty: trxData[8], diskon: getRawNum('ci_diskon'), dibayar: dpIn, metode: trxData[19] });
-                e.target.reset(); document.getElementById('ci_kode_booking').value = ''; setRawNum('ci_diskon',0); setRawNum('ci_biaya',0); setRawNum('ci_bayar',0); loadAllData(); switchPage('dashboard'); 
+                e.target.reset(); 
+                document.getElementById('ci_kode_booking').value = ''; 
+                setRawNum('ci_diskon',0); setRawNum('ci_biaya',0); setRawNum('ci_bayar',0); 
+                loadAllData(); 
+                switchPage('dashboard'); 
             }
         }
 
         let actTrx = null;
         function loadTagihanCheckout() {
-            let kr = document.getElementById('co_kamar').value; if(!kr) return Swal.fire('Kosong', 'Pilih kamar!', 'warning');
+            let kr = document.getElementById('co_kamar').value; 
+            if(!kr) return Swal.fire('Kosong', 'Pilih kamar!', 'warning');
+            
             actTrx = globalTransaksi.find(t => String(t['No Kamar']) === kr && String(t['Status Transaksi']).includes('Aktif'));
+            
             if(actTrx) {
-                document.getElementById('co_area').classList.remove('hidden'); document.getElementById('lbl_co_inv').innerText = actTrx['No Invoice']; document.getElementById('lbl_co_nama').innerText = actTrx['Nama Tamu']; document.getElementById('lbl_co_nokamar').innerText = actTrx['No Kamar']; document.getElementById('lbl_co_hari').innerText = actTrx['Lama Menginap'] || 1; document.getElementById('lbl_co_in').innerText = actTrx['Tgl Check-in']; document.getElementById('lbl_co_biaya').innerText = formatRp(parseRpToNum(actTrx['Biaya Kamar'])); 
+                document.getElementById('co_area').classList.remove('hidden'); 
+                document.getElementById('lbl_co_inv').innerText = actTrx['No Invoice']; 
+                document.getElementById('lbl_co_nama').innerText = actTrx['Nama Tamu']; 
+                document.getElementById('lbl_co_nokamar').innerText = actTrx['No Kamar']; 
+                document.getElementById('lbl_co_hari').innerText = actTrx['Lama Menginap'] || 1; 
+                document.getElementById('lbl_co_in').innerText = actTrx['Tgl Check-in']; 
+                document.getElementById('lbl_co_biaya').innerText = formatRp(parseRpToNum(actTrx['Biaya Kamar'])); 
                 document.getElementById('lbl_co_diskon_awal').innerText = "- " + formatRp(parseRpToNum(actTrx['Diskon'])); 
                 document.getElementById('lbl_co_dp_awal').innerText = formatRp(parseRpToNum(actTrx['DP'] || actTrx['Sudah Dibayar'])); 
                 
-                // Reset kolom tambahan
                 setRawNum('co_laundry',0); setRawNum('co_makan',0); setRawNum('co_minibar',0); setRawNum('co_denda',0); setRawNum('co_diskon',0);
                 
                 hitungTotalCO();
-            } else Swal.fire('Error', 'Tagihan aktif tidak ditemukan.', 'error');
+            } else {
+                Swal.fire('Error', 'Tagihan aktif tidak ditemukan.', 'error');
+            }
         }
         
         function hitungTotalCO() {
@@ -1217,7 +1704,6 @@
             let dk_co = getRawNum('co_diskon'); 
             let dp_awal = parseRpToNum(actTrx['DP'] || actTrx['Sudah Dibayar']);
             
-            // LOGIKA RINCIAN BIAYA DI KOTAK MERAH
             let sisaKamar = (ba - dk_awal) - dp_awal;
             let tambahan = getRawNum('co_laundry') + getRawNum('co_makan') + getRawNum('co_minibar') + getRawNum('co_denda');
             let tambahanBersih = tambahan - dk_co;
@@ -1233,14 +1719,41 @@
         }
         
         async function submitCheckout() {
-            if(!actTrx) return; let calc = hitungTotalCO();
+            if(!actTrx) return; 
+            let calc = hitungTotalCO();
             let dp_awal = parseRpToNum(actTrx['DP'] || actTrx['Sudah Dibayar']);
             let pelunasanAkhir = calc.sisa > 0 ? calc.sisa : 0;
 
-            let upRow = [ actTrx['No Invoice'], actTrx['Nama Tamu'], actTrx['No KTP'], actTrx['No HP'], actTrx['Alamat'], actTrx['No Kamar'], actTrx['Tgl Check-in'], getTodayYMD(), actTrx['Lama Menginap'], formatRp(parseRpToNum(actTrx['Biaya Kamar'])), formatRp(getRawNum('co_laundry')), formatRp(getRawNum('co_makan')), formatRp(getRawNum('co_minibar')), formatRp(getRawNum('co_denda')), formatRp(calc.dk_total), formatRp(dp_awal), formatRp(calc.tBaru), formatRp(dp_awal + pelunasanAkhir), formatRp(0), actTrx['Metode Bayar'], "Selesai (Check-out)" ];
+            let upRow = [ 
+                actTrx['No Invoice'], 
+                actTrx['Nama Tamu'], 
+                actTrx['No KTP'], 
+                actTrx['No HP'], 
+                actTrx['Alamat'], 
+                actTrx['No Kamar'], 
+                actTrx['Tgl Check-in'], 
+                getTodayYMD(), 
+                actTrx['Lama Menginap'], 
+                formatRp(parseRpToNum(actTrx['Biaya Kamar'])), 
+                formatRp(getRawNum('co_laundry')), 
+                formatRp(getRawNum('co_makan')), 
+                formatRp(getRawNum('co_minibar')), 
+                formatRp(getRawNum('co_denda')), 
+                formatRp(calc.dk_total), 
+                formatRp(dp_awal), 
+                formatRp(calc.tBaru), 
+                formatRp(dp_awal + pelunasanAkhir), 
+                formatRp(0), 
+                actTrx['Metode Bayar'], 
+                "Selesai (Check-out)" 
+            ];
             
             if(await postAPI('checkOut', { noInvoice: actTrx['No Invoice'], updateTransaksiData: upRow, noKamar: actTrx['No Kamar'] })) {
-                triggerPrint('checkout', null); document.getElementById('co_area').classList.add('hidden'); setRawNum('co_laundry',0); setRawNum('co_makan',0); setRawNum('co_minibar',0); setRawNum('co_denda',0); setRawNum('co_diskon',0); loadAllData(); switchPage('dashboard');
+                triggerPrint('checkout', null); 
+                document.getElementById('co_area').classList.add('hidden'); 
+                setRawNum('co_laundry',0); setRawNum('co_makan',0); setRawNum('co_minibar',0); setRawNum('co_denda',0); setRawNum('co_diskon',0); 
+                loadAllData(); 
+                switchPage('dashboard');
             }
         }
 
@@ -1254,9 +1767,35 @@
             document.getElementById('pr_hotel_tel').innerText = "Telp: " + (document.getElementById('set_telp').value || "0812-3456-7890");
 
             if(mode === 'checkin') {
-                document.getElementById('pr_inv_no').innerText = tr.inv; document.getElementById('pr_guest_name').innerText = tr.nama; document.getElementById('pr_guest_phone').innerText = tr.hp; document.getElementById('pr_guest_address').innerText = tr.alamat || "-"; document.getElementById('pr_room_no').innerText = tr.kamar; document.getElementById('pr_checkin').innerText = parseDateStandard(tr.in); document.getElementById('pr_checkout').innerText = parseDateStandard(tr.out); document.getElementById('pr_room_qty').innerText = tr.qty; document.getElementById('pr_room_price').innerText = formatRp(tr.biayaKamar); document.getElementById('pr_laundry').innerText = "Rp 0"; document.getElementById('pr_fnb').innerText = "Rp 0"; document.getElementById('pr_minibar').innerText = "Rp 0"; document.getElementById('pr_denda').innerText = "Rp 0"; document.getElementById('pr_discount').innerText = "- " + formatRp(tr.diskon); document.getElementById('pr_subtotal').innerText = formatRp(tr.biayaKamar - tr.diskon); document.getElementById('pr_dp').innerText = formatRp(tr.dibayar); document.getElementById('pr_paid').innerText = "Rp 0"; document.getElementById('pr_balance').innerText = formatRp((tr.biayaKamar - tr.diskon) - tr.dibayar); document.getElementById('pr_payment_method').innerText = tr.metode;
+                document.getElementById('pr_inv_no').innerText = tr.inv; 
+                document.getElementById('pr_guest_name').innerText = tr.nama; 
+                document.getElementById('pr_guest_phone').innerText = tr.hp; 
+                document.getElementById('pr_guest_address').innerText = tr.alamat || "-"; 
+                document.getElementById('pr_room_no').innerText = tr.kamar; 
+                document.getElementById('pr_checkin').innerText = parseDateStandard(tr.in); 
+                document.getElementById('pr_checkout').innerText = parseDateStandard(tr.out); 
+                document.getElementById('pr_room_qty').innerText = tr.qty; 
+                document.getElementById('pr_room_price').innerText = formatRp(tr.biayaKamar); 
+                document.getElementById('pr_laundry').innerText = "Rp 0"; 
+                document.getElementById('pr_fnb').innerText = "Rp 0"; 
+                document.getElementById('pr_minibar').innerText = "Rp 0"; 
+                document.getElementById('pr_denda').innerText = "Rp 0"; 
+                document.getElementById('pr_discount').innerText = "- " + formatRp(tr.diskon); 
+                document.getElementById('pr_subtotal').innerText = formatRp(tr.biayaKamar - tr.diskon); 
+                document.getElementById('pr_dp').innerText = formatRp(tr.dibayar); 
+                document.getElementById('pr_paid').innerText = "Rp 0"; 
+                document.getElementById('pr_balance').innerText = formatRp((tr.biayaKamar - tr.diskon) - tr.dibayar); 
+                document.getElementById('pr_payment_method').innerText = tr.metode;
             } else {
-                document.getElementById('pr_inv_no').innerText = tr['No Invoice']; document.getElementById('pr_guest_name').innerText = tr['Nama Tamu']; document.getElementById('pr_guest_phone').innerText = tr['No HP']; document.getElementById('pr_guest_address').innerText = tr['Alamat'] || "-"; document.getElementById('pr_room_no').innerText = tr['No Kamar']; document.getElementById('pr_checkin').innerText = parseDateStandard(tr['Tgl Check-in']); document.getElementById('pr_checkout').innerText = parseDateStandard(tr['Tgl Check-out']); document.getElementById('pr_room_qty').innerText = tr['Lama Menginap'] || 1; document.getElementById('pr_room_price').innerText = formatRp(parseRpToNum(tr['Biaya Kamar']));
+                document.getElementById('pr_inv_no').innerText = tr['No Invoice']; 
+                document.getElementById('pr_guest_name').innerText = tr['Nama Tamu']; 
+                document.getElementById('pr_guest_phone').innerText = tr['No HP']; 
+                document.getElementById('pr_guest_address').innerText = tr['Alamat'] || "-"; 
+                document.getElementById('pr_room_no').innerText = tr['No Kamar']; 
+                document.getElementById('pr_checkin').innerText = parseDateStandard(tr['Tgl Check-in']); 
+                document.getElementById('pr_checkout').innerText = parseDateStandard(tr['Tgl Check-out']); 
+                document.getElementById('pr_room_qty').innerText = tr['Lama Menginap'] || 1; 
+                document.getElementById('pr_room_price').innerText = formatRp(parseRpToNum(tr['Biaya Kamar']));
                 
                 let valMakan = mode === 'riwayat' ? parseRpToNum(tr['Makanan']) : getRawNum('co_makan');
                 let valMinibar = mode === 'riwayat' ? parseRpToNum(tr['Minibar']) : getRawNum('co_minibar');
@@ -1266,7 +1805,9 @@
                 document.getElementById('pr_minibar').innerText = formatRp(valMinibar); 
                 document.getElementById('pr_denda').innerText = formatRp(mode === 'riwayat' ? parseRpToNum(tr['Denda']) : getRawNum('co_denda')); 
                 
-                let dk_tot = mode === 'riwayat' ? parseRpToNum(tr['Diskon']) : hitungTotalCO().dk_total; document.getElementById('pr_discount').innerText = "- " + formatRp(dk_tot);
+                let dk_tot = mode === 'riwayat' ? parseRpToNum(tr['Diskon']) : hitungTotalCO().dk_total; 
+                document.getElementById('pr_discount').innerText = "- " + formatRp(dk_tot);
+                
                 let tot = mode === 'riwayat' ? parseRpToNum(tr['Total Tagihan']) : hitungTotalCO().tBaru; 
                 let dp_awal = mode === 'riwayat' ? parseRpToNum(tr['DP']) : parseRpToNum(tr['DP'] || tr['Sudah Dibayar']);
                 let pelunasan = (mode === 'riwayat' ? parseRpToNum(tr['Sudah Dibayar']) : (dp_awal + hitungTotalCO().sisa)) - dp_awal;
@@ -1276,15 +1817,97 @@
                 document.getElementById('pr_paid').innerText = formatRp(pelunasan > 0 ? pelunasan : 0);
                 
                 let ss = tot - (dp_awal + pelunasan); 
-                document.getElementById('pr_balance').innerText = formatRp(ss > 0 ? ss : 0); document.getElementById('pr_payment_method').innerText = tr['Metode Bayar'];
+                document.getElementById('pr_balance').innerText = formatRp(ss > 0 ? ss : 0); 
+                document.getElementById('pr_payment_method').innerText = tr['Metode Bayar'];
             }
             
-            document.getElementById('pr_inv_date').innerText = new Date().toLocaleDateString('id-ID'); document.getElementById('pr_admin_name').innerText = localStorage.getItem('activeUser') || 'Admin';
+            document.getElementById('pr_inv_date').innerText = new Date().toLocaleDateString('id-ID'); 
+            document.getElementById('pr_admin_name').innerText = localStorage.getItem('activeUser') || 'Admin';
 
             document.getElementById('print-area').classList.remove('hidden');
-            setTimeout(() => { window.print(); document.getElementById('print-area').classList.add('hidden'); }, 300);
+            setTimeout(() => { 
+                window.print(); 
+                document.getElementById('print-area').classList.add('hidden'); 
+            }, 300);
         }
 
+        // FUNGSI UPDATE TABEL
+        function updateDOMKamar() {
+            let ht=''; 
+            let ok='<option value="">-- Pilih Kamar Kosong --</option>'; 
+            let ot='<option value="">-- Pilih Kamar Terisi --</option>';
+            
+            globalKamar.forEach(k => {
+                if(!k || !k['No Kamar']) return;
+                let st = String(k['Status']||'Kosong').trim(); 
+                let stColor = st === 'Kosong' ? 'text-green-600' : (st === 'Terisi' ? 'text-red-600' : 'text-orange-600');
+                
+                let safeNo = String(k['No Kamar']).replace(/'/g, "\\'");
+                
+                ht+=`<tr class="hover:bg-gray-50 border-b">
+                    <td class="px-4 py-3 md:py-4 font-bold">${safeStr(k['No Kamar'])}</td>
+                    <td class="px-4 py-3 md:py-4">${safeStr(k['Tipe'])}</td>
+                    <td class="px-4 py-3 md:py-4 font-bold text-gray-700">${formatRp(parseRpToNum(k['Harga']))}</td>
+                    <td class="px-4 py-3 md:py-4 text-xs text-gray-500 w-1/4">${safeStr(k['Fasilitas'])}</td>
+                    <td class="px-4 py-3 md:py-4 font-black uppercase text-[10px] ${stColor}"><span class="bg-gray-100 px-2 py-1 border rounded">${st}</span></td>
+                    <td class="px-4 py-3 md:py-4 text-center">
+                        <button onclick="editRowKamar('${safeNo}')" class="text-blue-500 hover:text-blue-700 mr-4"><i class="fa-solid fa-edit"></i></button>
+                        <button onclick="hapusData('Data Kamar', 1, '${safeNo}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`;
+                
+                if(st === 'Kosong' || st === 'Cleaning' || st === 'Maintenance') {
+                    ok+=`<option value="${safeStr(k['No Kamar'])}">${safeStr(k['No Kamar'])} - ${safeStr(k['Tipe'])} (${formatRp(parseRpToNum(k['Harga']))})</option>`;
+                }
+                if(st === 'Terisi') {
+                    ot+=`<option value="${safeStr(k['No Kamar'])}">${safeStr(k['No Kamar'])} - ${safeStr(k['Tipe'])}</option>`;
+                }
+            });
+            
+            setElem('tbl-kamar', ht || '<tr><td colspan="6" class="text-center py-4">Data kosong</td></tr>', true); 
+            document.querySelectorAll('.option-kamar-kosong').forEach(e => e.innerHTML=ok); 
+            document.querySelectorAll('.option-kamar-terisi').forEach(e => e.innerHTML=ot);
+        }
+
+        function updateDOMTamu() { 
+            let ht=''; 
+            globalTamu.forEach(t => { 
+                if(!t || !t['NIK']) return; 
+                ht+=`<tr class="hover:bg-gray-50 border-b">
+                    <td class="px-4 py-3 md:py-4 font-bold text-gray-800">${safeStr(t['Nama Lengkap'])}</td>
+                    <td class="px-4 py-3 md:py-4 text-gray-600">${safeStr(t['NIK'])}</td>
+                    <td class="px-4 py-3 md:py-4">${safeStr(t['No HP'])}</td>
+                    <td class="px-4 py-3 md:py-4 text-xs text-gray-500">${safeStr(t['Alamat'])}</td>
+                    <td class="px-4 py-3 md:py-4 text-center">
+                        <button onclick="editRowTamu('${safeStr(t['NIK'])}')" class="text-blue-500 mr-4"><i class="fa-solid fa-edit"></i></button>
+                        <button onclick="hapusData('Data Tamu', 1, '${safeStr(t['NIK'])}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`; 
+            }); 
+            setElem('tbl-tamu', ht || '<tr><td colspan="5" class="text-center py-4">Data kosong</td></tr>', true); 
+        }
+
+        function updateDOMReservasi() { 
+            let ht=''; 
+            [...globalReservasi].reverse().forEach(r => { 
+                if(!r || !r['Kode Booking']) return; 
+                let st=String(r['Status Booking']||'').trim(); 
+                let stClass=st==='Menunggu'?'bg-yellow-100 text-yellow-700':(st==='Selesai'?'bg-green-100 text-green-700':'bg-gray-100 text-gray-700'); 
+                ht+=`<tr class="hover:bg-gray-50 border-b">
+                    <td class="px-4 py-3 md:py-4 font-mono text-xs text-gray-500">${safeStr(r['Kode Booking'])}</td>
+                    <td class="px-4 py-3 md:py-4 font-bold text-gray-800">${safeStr(r['Nama Pemesan'])}</td>
+                    <td class="px-4 py-3 md:py-4 font-bold">${safeStr(r['No Kamar'])}</td>
+                    <td class="px-4 py-3 md:py-4">${parseDateStandard(r['Tgl Check-in'])} <span class="mx-1 text-gray-400"><i class="fa-solid fa-arrow-right"></i></span> ${parseDateStandard(r['Tgl Check-out'])}</td>
+                    <td class="px-4 py-3 md:py-4 text-center"><span class="px-2 py-1 rounded text-[10px] font-black uppercase ${stClass} border">${st}</span></td>
+                    <td class="px-4 py-3 md:py-4 text-center">
+                        <button onclick="editRowReservasi('${safeStr(r['Kode Booking'])}')" class="text-blue-500 mr-4"><i class="fa-solid fa-edit"></i></button>
+                        <button onclick="hapusData('Reservasi', 1, '${safeStr(r['Kode Booking'])}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`; 
+            }); 
+            setElem('tbl-reservasi', ht || '<tr><td colspan="6" class="text-center py-4">Data kosong</td></tr>', true); 
+        }
+        
         // FUNGSI SEARCH FILTER
         function cariRiwayatTransaksi() {
             let input = document.getElementById("cari_riwayat").value.toLowerCase();
@@ -1292,11 +1915,32 @@
             let tr = table.getElementsByTagName("tr");
             for (let i = 0; i < tr.length; i++) {
                 let textContent = tr[i].textContent || tr[i].innerText;
-                if (textContent.toLowerCase().indexOf(input) > -1) { tr[i].style.display = ""; } else { tr[i].style.display = "none"; }
+                if (textContent.toLowerCase().indexOf(input) > -1) { 
+                    tr[i].style.display = ""; 
+                } else { 
+                    tr[i].style.display = "none"; 
+                }
             }
         }
 
-        function updateDOMTransaksi() { let ht=''; [...globalTransaksi].reverse().forEach(t => { if(!t || !t['No Invoice']) return; ht+=`<tr class="hover:bg-gray-50 border-b"><td class="px-4 py-3 md:py-4 font-mono text-xs text-blue-600 font-bold">${safeStr(t['No Invoice'])}</td><td class="px-4 py-3 md:py-4 font-bold text-gray-800">${safeStr(t['Nama Tamu'])} <span class="text-[10px] text-gray-400 block mt-1">Kamar ${safeStr(t['No Kamar'])}</span></td><td class="px-4 py-3 md:py-4 text-gray-700 font-bold text-right">${formatRp(parseRpToNum(t['Total Tagihan']))}</td><td class="px-4 py-3 md:py-4 text-center text-[10px] uppercase font-black"><span class="${String(t['Status Transaksi']).includes('Aktif') ? 'text-red-500 bg-red-100 border-red-200' : 'text-green-600 bg-green-100 border-green-200'} px-2 py-1 rounded border">${safeStr(t['Status Transaksi'])}</span></td><td class="px-4 py-3 md:py-4 text-center"><button onclick="triggerPrint('riwayat', '${safeStr(t['No Invoice'])}')" class="bg-gray-800 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs hover:bg-black shadow transition"><i class="fa-solid fa-print md:mr-1"></i> <span class="hidden md:inline">Cetak</span></button></td></tr>`; }); setElem('tbl-transaksi', ht || '<tr><td colspan="6" class="text-center py-4">Data kosong</td></tr>', true); }
+        function updateDOMTransaksi() { 
+            let ht=''; 
+            [...globalTransaksi].reverse().forEach(t => { 
+                if(!t || !t['No Invoice']) return; 
+                ht+=`<tr class="hover:bg-gray-50 border-b">
+                    <td class="px-4 py-3 md:py-4 font-mono text-xs text-blue-600 font-bold">${safeStr(t['No Invoice'])}</td>
+                    <td class="px-4 py-3 md:py-4 font-bold text-gray-800">${safeStr(t['Nama Tamu'])} <span class="text-[10px] text-gray-400 block mt-1">Kamar ${safeStr(t['No Kamar'])}</span></td>
+                    <td class="px-4 py-3 md:py-4 text-gray-700 font-bold text-right">${formatRp(parseRpToNum(t['Total Tagihan']))}</td>
+                    <td class="px-4 py-3 md:py-4 text-center text-[10px] uppercase font-black">
+                        <span class="${String(t['Status Transaksi']).includes('Aktif') ? 'text-red-500 bg-red-100 border-red-200' : 'text-green-600 bg-green-100 border-green-200'} px-2 py-1 rounded border">${safeStr(t['Status Transaksi'])}</span>
+                    </td>
+                    <td class="px-4 py-3 md:py-4 text-center">
+                        <button onclick="triggerPrint('riwayat', '${safeStr(t['No Invoice'])}')" class="bg-gray-800 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs hover:bg-black shadow transition"><i class="fa-solid fa-print md:mr-1"></i> <span class="hidden md:inline">Cetak</span></button>
+                    </td>
+                </tr>`; 
+            }); 
+            setElem('tbl-transaksi', ht || '<tr><td colspan="6" class="text-center py-4">Data kosong</td></tr>', true); 
+        }
         
         // PWA SERVICE WORKER
         if ('serviceWorker' in navigator) {
