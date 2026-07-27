@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanstech Sistem</title>
+    <title>Sanstech Penginapan</title>
     
     <!-- Konfigurasi PWA (Progressive Web App) -->
     <link rel="manifest" href="manifest.json">
@@ -122,7 +122,7 @@
                 <div>
                     <p class="font-bold text-gray-700">Metode Pembayaran:</p>
                     <p id="pr_payment_method" class="text-xl text-blue-700 font-black mt-1">Tunai</p>
-                    <p class="mt-4 font-semibold italic text-gray-500">"Terima kasih telah menginap bersama kami."</p>
+                    <p class="mt-4 font-semibold italic text-gray-500">"Terima kasih telah menginap di tempat kami."</p>
                 </div>
                 <div class="text-center w-48">
                     <p class="mb-16 font-semibold">Hormat Kami,</p>
@@ -196,13 +196,12 @@
         <!-- OVERLAY BACKDROP UNTUK MOBILE SIDEBAR -->
         <div id="sidebar-overlay" class="fixed inset-0 bg-gray-900/60 z-40 hidden transition-opacity opacity-0 md:hidden" onclick="toggleSidebar()"></div>
 
-        <!-- SIDEBAR (Fixed di Mobile, Static di Desktop) -->
         <aside id="sidebar" class="sidebar fixed md:relative z-50 w-64 h-full text-gray-300 flex flex-col justify-between shrink-0 shadow-2xl md:shadow-lg transition-transform transform -translate-x-full md:translate-x-0 duration-300">
             <div>
                 <div class="p-6 flex items-center justify-between text-white mb-2 border-b border-gray-700">
                     <div class="flex items-center space-x-3">
                         <div class="bg-blue-600 p-2 rounded-lg"><i class="fa-solid fa-hotel text-xl"></i></div>
-                        <div><h1 class="text-sm font-bold tracking-wider">SANSTECH PENGINAPAN</h1><p class="text-[10px] text-blue-300 font-semibold">SISTEM MANAJEMEN</p></div>
+                        <div><h1 class="text-sm font-bold tracking-wider">PENGINAPAN</h1><p class="text-[10px] text-blue-300 font-semibold">SISTEM MANAJEMEN</p></div>
                     </div>
                     <!-- Tombol Silang (Close) Khusus HP -->
                     <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white text-xl focus:outline-none"><i class="fa-solid fa-times"></i></button>
@@ -220,10 +219,8 @@
             </div>
         </aside>
 
-        <!-- KONTEN TENGAH -->
         <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-[#f8fafc] w-full">
             
-            <!-- HEADER BISA MUNCULIN MENU HAMBURGER -->
             <header class="bg-white border-b border-gray-200 py-3 px-4 md:px-6 flex justify-between items-center shrink-0 shadow-sm z-10">
                 <div class="flex items-center">
                     <button onclick="toggleSidebar()" class="md:hidden mr-3 md:mr-4 text-gray-600 hover:text-blue-600 focus:outline-none text-xl transition">
@@ -402,7 +399,6 @@
 
                 <!-- 5. CHECK IN -->
                 <section id="page-checkin" class="page-section">
-                    <!-- RESPONSIVE SEARCH BARS (STACK ON MOBILE) -->
                     <div class="bg-white p-4 md:p-5 rounded-xl shadow-sm border mb-5 flex flex-col md:flex-row gap-4 items-end bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
                         <div class="w-full md:w-1/2"><label class="text-xs font-bold text-blue-800 mb-1 block"><i class="fa-solid fa-search mr-1"></i> Tarik Data Tamu Lama</label><div class="flex shadow-sm"><input type="text" id="ci_cari_tamu" placeholder="Ketik Nama / NIK..." class="p-2.5 md:p-3 w-full text-sm border border-r-0 rounded-l-lg outline-none focus:border-blue-400"><button onclick="cariTamuCI()" type="button" class="bg-blue-600 text-white px-4 md:px-6 font-bold text-xs md:text-sm rounded-r-lg hover:bg-blue-700 transition">CARI</button></div></div>
                         <div class="w-full md:w-1/2"><label class="text-xs font-bold text-yellow-800 mb-1 block"><i class="fa-solid fa-calendar-arrow-down mr-1"></i> Tarik Reservasi & DP Booking</label><div class="flex shadow-sm"><input type="text" id="ci_cari_resv" placeholder="Ketik Kode Booking..." class="p-2.5 md:p-3 w-full text-sm border border-r-0 rounded-l-lg outline-none border-yellow-300 focus:border-yellow-400 bg-yellow-50/50"><button onclick="cariReservasiCI()" type="button" class="bg-yellow-500 text-white px-4 md:px-6 font-bold text-xs md:text-sm rounded-r-lg hover:bg-yellow-600 transition">TARIK</button></div></div>
@@ -551,17 +547,29 @@
                     </div>
                 </section>
 
-                <!-- 8. LAPORAN -->
+                <!-- 8. LAPORAN (DENGAN FILTER TANGGAL) -->
                 <section id="page-laporan" class="page-section">
+                    
+                    <!-- KOTAK FILTER TANGGAL (BARU) -->
+                    <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center text-blue-800 font-bold text-sm md:text-base">
+                            <i class="fa-solid fa-filter mr-2"></i> Filter Laporan
+                        </div>
+                        <div class="flex items-center space-x-3 w-full md:w-auto">
+                            <input type="date" id="filter_lap_tgl" onchange="renderLaporanData()" class="w-full md:w-auto border-2 border-gray-200 p-2 md:p-2.5 rounded-lg outline-none focus:border-blue-500 font-bold text-gray-700 text-xs md:text-sm transition">
+                            <button onclick="document.getElementById('filter_lap_tgl').value=''; renderLaporanData();" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold transition whitespace-nowrap"><i class="fa-solid fa-rotate-right mr-1"></i> Bulan Ini</button>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-                        <div class="bg-white p-6 md:p-8 rounded-2xl border border-blue-100 shadow-sm border-t-8 border-t-blue-500 text-center transition hover:shadow-md"><p class="text-xs md:text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide">Pendapatan (Bulan Ini)</p><h3 class="text-2xl md:text-4xl font-black text-blue-600 drop-shadow-sm" id="lap_pendapatan">Rp 0</h3></div>
+                        <div class="bg-white p-6 md:p-8 rounded-2xl border border-blue-100 shadow-sm border-t-8 border-t-blue-500 text-center transition hover:shadow-md"><p class="text-xs md:text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide" id="lbl_lap_title_1">Total Pendapatan (Bulan Ini)</p><h3 class="text-2xl md:text-4xl font-black text-blue-600 drop-shadow-sm" id="lap_pendapatan">Rp 0</h3></div>
                         <div class="bg-white p-6 md:p-8 rounded-2xl border border-green-100 shadow-sm border-t-8 border-t-green-500 text-center transition hover:shadow-md"><p class="text-xs md:text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide">Okupansi Saat Ini</p><h3 class="text-2xl md:text-4xl font-black text-green-600 drop-shadow-sm" id="lap_okupansi">0%</h3></div>
-                        <div class="bg-white p-6 md:p-8 rounded-2xl border border-purple-100 shadow-sm border-t-8 border-t-purple-500 text-center transition hover:shadow-md"><p class="text-xs md:text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide">Terlaris (Bulan Ini)</p><h3 class="text-2xl md:text-4xl font-black text-purple-600 drop-shadow-sm" id="lap_terlaris">-</h3></div>
+                        <div class="bg-white p-6 md:p-8 rounded-2xl border border-purple-100 shadow-sm border-t-8 border-t-purple-500 text-center transition hover:shadow-md"><p class="text-xs md:text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide" id="lbl_lap_title_2">Terlaris (Bulan Ini)</p><h3 class="text-2xl md:text-4xl font-black text-purple-600 drop-shadow-sm" id="lap_terlaris">-</h3></div>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-6">
                         <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border overflow-x-auto">
-                            <h3 class="text-base md:text-lg font-black mb-4 md:mb-6 border-b-2 border-gray-200 pb-2 md:pb-3 text-gray-800"><i class="fa-solid fa-chart-line text-blue-500 mr-2"></i>Kinerja Tipe Kamar</h3>
+                            <h3 class="text-base md:text-lg font-black mb-4 md:mb-6 border-b-2 border-gray-200 pb-2 md:pb-3 text-gray-800"><i class="fa-solid fa-chart-line text-blue-500 mr-2"></i><span id="lbl_lap_title_3">Kinerja Tipe Kamar</span></h3>
                             <table class="w-full text-xs md:text-sm text-left whitespace-nowrap"><thead class="bg-gray-100 text-gray-600"><tr><th class="py-2 md:py-3 px-3 md:px-4 rounded-l-lg">Tipe Kamar</th><th class="py-2 md:py-3 px-3 md:px-4 text-center">Disewa</th><th class="py-2 md:py-3 px-3 md:px-4 text-right rounded-r-lg">Total Pendapatan</th></tr></thead><tbody id="tbl-lap-tipe" class="divide-y text-gray-800"></tbody></table>
                         </div>
                         <div class="bg-gradient-to-br from-green-50 to-white p-6 md:p-8 rounded-2xl shadow-sm border border-green-100 text-center flex flex-col justify-center items-center">
@@ -1045,10 +1053,35 @@
             }
         }
 
-        // ================= LAPORAN DETAIL =================
+        // ================= PENGATURAN (SINKRON GSHEET) =================
+        async function simpanProfilPengaturan() {
+            let n = document.getElementById('set_hotel').value;
+            let a = document.getElementById('set_alamat').value;
+            let t = document.getElementById('set_telp').value;
+
+            let arrData = [
+                ["Profil Invoice", "Nama Penginapan", n, "Menyesuaikan Struk Invoice"],
+                ["Profil Invoice", "Alamat Lengkap", a, "Menyesuaikan Struk Invoice"],
+                ["Profil Invoice", "Nomor Telepon", t, "Menyesuaikan Struk Invoice"]
+            ];
+
+            if(await postAPI('savePengaturan', arrData)) {
+                Swal.fire({icon: 'success', title: 'Tersimpan!', text: 'Profil penginapan telah tersinkronisasi ke Google Sheets.', timer: 2000, showConfirmButton:false});
+            }
+        }
+
+        // ================= LAPORAN (FILTER TANGGAL) =================
         function renderLaporanData() {
             try {
-                let cm = new Date().getMonth(); let cy = new Date().getFullYear();
+                let filterDate = document.getElementById('filter_lap_tgl').value;
+                let isFilterHarian = filterDate !== "";
+                let targetDate = isFilterHarian ? new Date(filterDate) : new Date();
+                
+                // Normalisasi ke zona waktu lokal untuk membandingkan
+                let cm = targetDate.getMonth();
+                let cy = targetDate.getFullYear();
+                let cd = targetDate.getDate();
+
                 let blnIniTot = 0, roomMap = {}; let tipeMap = { "Standard": {c:0, rev:0}, "Deluxe": {c:0, rev:0}, "VIP": {c:0, rev:0} };
 
                 globalTransaksi.forEach(t => {
@@ -1062,37 +1095,51 @@
                     let dp = parseRpToNum(t['DP'] || t['Sudah Dibayar'] || 0);
                     let totalTagihan = parseRpToNum(t['Total Tagihan'] || 0);
 
+                    // Pengecekan kecocokan tanggal (Harian vs Bulanan)
+                    let isMatchIn = isFilterHarian ? (td.getDate() === cd && td.getMonth() === cm && td.getFullYear() === cy) : (td.getMonth() === cm && td.getFullYear() === cy);
+                    let isMatchOut = isFilterHarian ? (toD.getDate() === cd && toD.getMonth() === cm && toD.getFullYear() === cy) : (toD.getMonth() === cm && toD.getFullYear() === cy);
+
+                    let addedRev = 0;
+                    let addedCount = false;
+
                     if(st.includes('Aktif')) {
-                        if(td.getMonth() === cm && td.getFullYear() === cy) blnIniTot += dp;
+                        if(isMatchIn) { addedRev += dp; addedCount = true; }
                     } else if(st.includes('Selesai')) {
-                        let inBlnIni = (td.getMonth() === cm && td.getFullYear() === cy);
-                        let outBlnIni = (toD.getMonth() === cm && toD.getFullYear() === cy);
-                        
-                        if(inBlnIni && outBlnIni) blnIniTot += totalTagihan;
-                        else if(outBlnIni) blnIniTot += (totalTagihan - dp);
-                        else if(inBlnIni) blnIniTot += dp;
+                        if(isMatchIn && isMatchOut) { addedRev += totalTagihan; addedCount = true; }
+                        else if(isMatchOut) { addedRev += (totalTagihan - dp); addedCount = true; }
+                        else if(isMatchIn) { addedRev += dp; addedCount = true; }
                     }
 
-                    if(td.getMonth() === cm && td.getFullYear() === cy) {
+                    if(addedCount) {
+                        blnIniTot += addedRev;
                         roomMap[t['No Kamar']] = (roomMap[t['No Kamar']] || 0) + 1;
                         let kmrObj = globalKamar.find(x => String(x['No Kamar']) === String(t['No Kamar']));
                         if(kmrObj) {
                             let tipe = kmrObj['Tipe']; if(!tipeMap[tipe]) tipeMap[tipe] = {c:0, rev:0};
                             tipeMap[tipe].c += 1; 
-                            tipeMap[tipe].rev += totalTagihan > 0 ? totalTagihan : dp;
+                            tipeMap[tipe].rev += addedRev;
                         }
                     }
                 });
+                
                 let favR = "-", mxC = 0; for(let key in roomMap) { if(roomMap[key] > mxC) { mxC = roomMap[key]; favR = key; } }
+                
                 let terisiVal = globalKamar.filter(k=>String(k.Status||'').trim()==='Terisi').length;
                 let okupansi = globalKamar.length > 0 ? Math.round((terisiVal / globalKamar.length) * 100) : 0;
                 
+                // Update Label Judul Laporan
+                let labelText = isFilterHarian ? `Tgl ${targetDate.toLocaleDateString('id-ID')}` : "(Bulan Ini)";
+                document.getElementById('lbl_lap_title_1').innerText = `Total Pendapatan ${labelText}`;
+                document.getElementById('lbl_lap_title_2').innerText = `Terlaris ${labelText}`;
+                document.getElementById('lbl_lap_title_3').innerText = `Kinerja Tipe Kamar ${labelText}`;
+
                 setElem('lap_pendapatan', formatRp(blnIniTot)); setElem('lap_okupansi', okupansi + "%"); setElem('lap_terlaris', mxC > 0 ? favR : "-");
                 let hTipe = ''; for(let key in tipeMap) { hTipe += `<tr><td class="py-2 md:py-3 px-3 md:px-4 font-bold border-r border-gray-200">${key}</td><td class="py-2 md:py-3 px-3 md:px-4 text-center border-r border-gray-200">${tipeMap[key].c} Kali</td><td class="py-2 md:py-3 px-3 md:px-4 text-right font-black text-green-600">${formatRp(tipeMap[key].rev)}</td></tr>`; }
-                setElem('tbl-lap-tipe', hTipe, true);
+                setElem('tbl-lap-tipe', hTipe || '<tr><td colspan="3" class="text-center py-4 text-gray-500">Belum ada transaksi</td></tr>', true);
             } catch(e) { console.error("Lap render err", e); }
         }
 
+        // FUNGSI EXPORT EXCEL NYATA 
         function exportTableToExcel(tableID, filename = ''){
             let tableSelect = document.getElementById(tableID);
             let tableHTML = tableSelect.outerHTML.replace(/<th[^>]*>Aksi<\/th>/gi, "").replace(/<th[^>]*>Cetak<\/th>/gi, "").replace(/<td[^>]*>.*?<\/td>/gi, function(m){ return m.includes('fa-') ? '' : m; });
