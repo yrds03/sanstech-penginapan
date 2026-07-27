@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SANSTECH PENGINAPAN</title>
+    <title>Sanstech Sistem</title>
     
     <!-- Konfigurasi PWA (Progressive Web App) -->
     <link rel="manifest" href="manifest.json">
@@ -26,7 +26,8 @@
         .menu-item:hover:not(.menu-active) { background-color: #173656; border-radius: 0.5rem; }
         .page-section { display: none; opacity: 0; transition: opacity 0.4s ease-in-out; }
         .page-section.active { display: block; opacity: 1; animation: fadeIn 0.5s ease-out forwards; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        @media (min-width: 768px) { ::-webkit-scrollbar { width: 6px; height: 6px; } }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .swal2-html-container { font-family: 'Inter', sans-serif; text-align: left; }
@@ -40,36 +41,29 @@
             @page { margin: 0.5cm; }
         }
 
-        /* ANIMASI CUSTOM LAYAR LOGIN */
+        /* ANIMASI CUSTOM */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
         @keyframes slideProgress { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes bounceIn { 0% { transform: scale(0.7); opacity: 0; } 60% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shakeError { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
         
         .animate-float { animation: float 3s ease-in-out infinite; }
         .progress-bar-slide { animation: slideProgress 2s ease-in-out infinite; }
         .animate-scale-in { animation: scaleIn 0.5s ease-out forwards; }
-
-        @keyframes bounceIn {
-            0% { transform: scale(0.7); opacity: 0; }
-            60% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
-        }
         .animate-bounce-in { animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; }
-
-        @keyframes shakeError {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-10px); }
-            40%, 80% { transform: translateX(10px); }
-        }
         .shake-error { animation: shakeError 0.4s; }
         
-        /* KOTAK INPUT PIN ASLI */
+        /* KOTAK INPUT PIN RESPONSIVE */
         .pin-box {
-            width: 3.5rem; height: 4.5rem; text-align: center; font-size: 2rem; font-weight: 800; color: #1e3a8a;
-            border: 2px solid #cbd5e1; border-radius: 0.75rem; background-color: #f8fafc; outline: none; transition: all 0.2s;
+            width: 2.5rem; height: 3.5rem; text-align: center; font-size: 1.5rem; font-weight: 800; color: #1e3a8a;
+            border: 2px solid #cbd5e1; border-radius: 0.5rem; background-color: #f8fafc; outline: none; transition: all 0.2s;
         }
         .pin-box:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); transform: translateY(-2px); background-color: white; }
+        @media (min-width: 768px) {
+            .pin-box { width: 3.5rem; height: 4.5rem; font-size: 2rem; border-radius: 0.75rem; }
+        }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-gray-800 bg-[#e2e8f0]">
@@ -142,8 +136,8 @@
     <!-- ============================================== -->
     <!-- LOGIN SCREEN (SISTEM KOTAK PIN ANIMASI)        -->
     <!-- ============================================== -->
-    <div id="login-screen" class="fixed inset-0 bg-gray-900/50 backdrop-blur-md flex justify-center items-center z-[100] transition-opacity duration-700">
-        <div id="login-box" class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl flex overflow-hidden h-[500px] animate-bounce-in">
+    <div id="login-screen" class="fixed inset-0 bg-gray-900/50 backdrop-blur-md flex justify-center items-center z-[100] transition-opacity duration-700 p-4">
+        <div id="login-box" class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl flex overflow-hidden h-auto min-h-[400px] md:h-[500px] animate-bounce-in relative">
             
             <div class="w-1/2 bg-blue-600 p-10 flex-col items-center justify-center relative hidden md:flex overflow-hidden">
                 <i class="fa-solid fa-key absolute text-blue-400 opacity-20 text-5xl animate-float" style="top: 15%; left: 15%;"></i>
@@ -154,7 +148,7 @@
                     <div class="bg-white/20 p-6 rounded-full shadow-lg backdrop-blur-sm border border-white/30 mb-6 animate-bounce">
                         <i class="fa-solid fa-bed text-7xl text-white drop-shadow-md"></i>
                     </div>
-                    <h2 class="text-3xl font-black text-white tracking-widest text-center drop-shadow-sm">HOTEL PENGINAPAN</h2>
+                    <h2 class="text-3xl font-black text-white tracking-widest text-center drop-shadow-sm">SANSTECH PENGINAPAN</h2>
                     <p class="text-blue-100 mt-2 font-semibold tracking-wide">Sanstech Sistem</p>
                 </div>
 
@@ -169,14 +163,14 @@
                 </div>
             </div>
 
-            <div class="w-full md:w-1/2 p-10 flex flex-col items-center justify-center bg-white relative">
-                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-2xl mb-6 shadow-inner border border-blue-200">
+            <div class="w-full md:w-1/2 p-6 md:p-10 flex flex-col items-center justify-center bg-white relative py-12 md:py-0">
+                <div class="w-14 h-14 md:w-16 md:h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xl md:text-2xl mb-4 md:mb-6 shadow-inner border border-blue-200">
                     <i class="fa-solid fa-lock"></i>
                 </div>
-                <h3 class="text-2xl font-black text-gray-800 mb-1">Masuk ke Sistem</h3>
-                <p class="text-sm font-semibold text-gray-500 mb-8">Ketik 6 Digit PIN Akses Anda</p>
+                <h3 class="text-xl md:text-2xl font-black text-gray-800 mb-1">Masuk ke Sistem</h3>
+                <p class="text-xs md:text-sm font-semibold text-gray-500 mb-6 md:mb-8 text-center">Ketik 6 Digit PIN Akses Anda</p>
 
-                <div class="flex space-x-2 md:space-x-3 mb-8" id="pin-container">
+                <div class="flex space-x-1 md:space-x-2 mb-6 md:mb-8" id="pin-container">
                     <input type="password" maxlength="1" class="pin-box focus:border-blue-500" onkeyup="moveNext(this, 'pin2', event)" onpaste="handlePaste(event)" id="pin1" autofocus>
                     <input type="password" maxlength="1" class="pin-box focus:border-blue-500" onkeyup="moveNext(this, 'pin3', event)" id="pin2">
                     <input type="password" maxlength="1" class="pin-box focus:border-blue-500" onkeyup="moveNext(this, 'pin4', event)" id="pin3">
@@ -186,26 +180,36 @@
                 </div>
 
                 <div class="text-center mt-auto w-full">
-                    <button onclick="submitPinLogin()" class="w-full max-w-xs mx-auto bg-blue-600 text-white font-black tracking-widest py-4 rounded-xl shadow-lg hover:bg-blue-700 transition transform hover:-translate-y-1 text-lg mb-6 flex items-center justify-center"><i class="fa-solid fa-arrow-right-to-bracket mr-2"></i> MASUK SISTEM</button>
-                    <p class="text-xs font-bold text-gray-400 flex items-center justify-center"><i class="fa-solid fa-shield-halved mr-1 text-green-500"></i> Dilindungi Enkripsi PIN</p>
-                    <p class="text-[10px] text-gray-300 mt-1">Ingat PIN Default Anda</p>
+                    <button onclick="submitPinLogin()" class="w-full max-w-xs mx-auto bg-blue-600 text-white font-black tracking-widest py-3 md:py-4 rounded-xl shadow-lg hover:bg-blue-700 transition transform hover:-translate-y-1 text-sm md:text-lg mb-4 md:mb-6 flex items-center justify-center"><i class="fa-solid fa-arrow-right-to-bracket mr-2"></i> MASUK SISTEM</button>
+                    <p class="text-[10px] md:text-xs font-bold text-gray-400 flex items-center justify-center"><i class="fa-solid fa-shield-halved mr-1 text-green-500"></i> Dilindungi Enkripsi PIN</p>
+                    <p class="text-[9px] md:text-[10px] text-gray-300 mt-1">Ingat PIN Default Anda</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ============================================== -->
-    <!-- MAIN APP & SIDEBAR                             -->
+    <!-- MAIN APP & SIDEBAR MOBILE RESPONSIVE           -->
     <!-- ============================================== -->
-    <div id="app-container" class="flex w-full h-full hidden opacity-0 transition-opacity duration-700">
+    <div id="app-container" class="flex w-full h-full hidden opacity-0 transition-opacity duration-700 relative">
         
-        <aside class="sidebar w-64 h-full text-gray-300 flex flex-col justify-between shrink-0 shadow-lg z-10">
+        <!-- OVERLAY BACKDROP UNTUK MOBILE SIDEBAR -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-gray-900/60 z-40 hidden transition-opacity opacity-0 md:hidden" onclick="toggleSidebar()"></div>
+
+        <!-- SIDEBAR (Fixed di Mobile, Static di Desktop) -->
+        <aside id="sidebar" class="sidebar fixed md:relative z-50 w-64 h-full text-gray-300 flex flex-col justify-between shrink-0 shadow-2xl md:shadow-lg transition-transform transform -translate-x-full md:translate-x-0 duration-300">
             <div>
-                <div class="p-6 flex items-center space-x-3 text-white mb-2 border-b border-gray-700">
-                    <div class="bg-blue-600 p-2 rounded-lg"><i class="fa-solid fa-hotel text-xl"></i></div>
-                    <div><h1 class="text-sm font-bold tracking-wider">PENGINAPAN</h1><p class="text-xs text-blue-300 font-semibold">SANSTECH SISTEM</p></div>
+                <div class="p-6 flex items-center justify-between text-white mb-2 border-b border-gray-700">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-blue-600 p-2 rounded-lg"><i class="fa-solid fa-hotel text-xl"></i></div>
+                        <div><h1 class="text-sm font-bold tracking-wider">SANSTECH PENGINAPAN</h1><p class="text-[10px] text-blue-300 font-semibold">SISTEM MANAJEMEN</p></div>
+                    </div>
+                    <!-- Tombol Silang (Close) Khusus HP -->
+                    <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white text-xl focus:outline-none"><i class="fa-solid fa-times"></i></button>
                 </div>
-                <nav class="px-4 py-4 space-y-1 overflow-y-auto max-h-[75vh]" id="sidebar-menu"></nav>
+                <nav class="px-4 py-4 space-y-1 overflow-y-auto max-h-[75vh]" id="sidebar-menu">
+                    <!-- Dinamis Render Menu via JS -->
+                </nav>
             </div>
             
             <div class="p-5 border-t border-gray-700 cursor-pointer hover:bg-gray-800 transition group" onclick="switchShift()">
@@ -216,75 +220,84 @@
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-[#f8fafc]">
-            <header class="bg-white border-b border-gray-200 py-3 px-6 flex justify-between items-center shrink-0 shadow-sm z-10">
-                <div>
-                    <h2 id="page-title" class="text-2xl font-black text-gray-800 tracking-tight transition-all">Dashboard</h2>
-                    <p id="page-subtitle" class="text-sm text-gray-500 font-medium">Ringkasan kondisi penginapan secara real-time</p>
+        <!-- KONTEN TENGAH -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-[#f8fafc] w-full">
+            
+            <!-- HEADER BISA MUNCULIN MENU HAMBURGER -->
+            <header class="bg-white border-b border-gray-200 py-3 px-4 md:px-6 flex justify-between items-center shrink-0 shadow-sm z-10">
+                <div class="flex items-center">
+                    <button onclick="toggleSidebar()" class="md:hidden mr-3 md:mr-4 text-gray-600 hover:text-blue-600 focus:outline-none text-xl transition">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div>
+                        <h2 id="page-title" class="text-xl md:text-2xl font-black text-gray-800 tracking-tight transition-all">Dashboard</h2>
+                        <p id="page-subtitle" class="text-[10px] md:text-sm text-gray-500 font-medium hidden sm:block">Ringkasan kondisi penginapan secara real-time</p>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-6">
-                    <div class="text-right hidden md:block"><p class="text-sm font-bold text-gray-700"><i class="fa-regular fa-clock mr-1 text-blue-500"></i> <span id="current-date">...</span></p></div>
-                    <div class="flex items-center space-x-4 border-l-2 pl-6 border-gray-200">
-                        <div class="text-right">
+                <div class="flex items-center space-x-3 md:space-x-6">
+                    <div class="text-right hidden lg:block"><p class="text-sm font-bold text-gray-700"><i class="fa-regular fa-clock mr-1 text-blue-500"></i> <span id="current-date">...</span></p></div>
+                    
+                    <div class="flex items-center space-x-3 md:space-x-4 border-l-0 lg:border-l-2 pl-0 lg:pl-6 border-gray-200">
+                        <div class="text-right hidden sm:block">
                             <p class="text-sm font-bold text-blue-700 uppercase" id="top_user_name">Admin</p>
                             <p class="text-[10px] font-bold text-white bg-blue-500 px-2 py-0.5 rounded-full inline-block mt-0.5 uppercase tracking-wider shadow-sm" id="top_user_role">Super Admin</p>
                         </div>
-                        <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-md border-2 border-white ring-2 ring-blue-100">
+                        <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 text-white w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-sm md:text-lg shadow-md border-2 border-white ring-2 ring-blue-100">
                             <i class="fa-solid fa-user-tie"></i>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 scroll-smooth">
                 
                 <!-- 1. DASHBOARD -->
                 <section id="page-dashboard" class="page-section active">
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-                        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center space-x-4 transition hover:shadow-md"><div class="bg-blue-500 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-bed"></i></div><div><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">TOTAL KAMAR</p><p class="text-2xl font-black text-gray-800"><span id="d_tot">0</span> <span class="text-xs font-semibold text-gray-400">Kamar</span></p></div></div>
-                        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center space-x-4 transition hover:shadow-md"><div class="bg-red-500 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-user-check"></i></div><div><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">TERISI</p><p class="text-2xl font-black text-gray-800"><span id="d_terisi">0</span> <span class="text-xs font-semibold text-gray-400">Kamar</span></p></div></div>
-                        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center space-x-4 transition hover:shadow-md"><div class="bg-green-500 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-door-open"></i></div><div><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">KOSONG</p><p class="text-2xl font-black text-gray-800"><span id="d_kosong">0</span> <span class="text-xs font-semibold text-gray-400">Kamar</span></p></div></div>
-                        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center space-x-4 transition hover:shadow-md"><div class="bg-orange-400 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-regular fa-calendar-plus"></i></div><div><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">CHECK-IN HR INI</p><p class="text-2xl font-black text-gray-800"><span id="d_ci">0</span> <span class="text-xs font-semibold text-gray-400">Tamu</span></p></div></div>
-                        <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center space-x-4 transition hover:shadow-md"><div class="bg-purple-600 text-white w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-wallet"></i></div><div><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">PENDAPATAN HR INI</p><p class="text-lg font-black text-gray-800" id="d_rev">Rp 0</p></div></div>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-6">
+                        <div class="bg-white rounded-xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center space-x-3 md:space-x-4 transition hover:shadow-md"><div class="bg-blue-500 text-white w-10 h-10 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-lg md:text-2xl shadow-inner"><i class="fa-solid fa-bed"></i></div><div><p class="text-[9px] md:text-[10px] font-bold text-gray-500 uppercase tracking-widest">TOTAL KAMAR</p><p class="text-lg md:text-2xl font-black text-gray-800"><span id="d_tot">0</span> <span class="text-[10px] md:text-xs font-semibold text-gray-400">Kamar</span></p></div></div>
+                        <div class="bg-white rounded-xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center space-x-3 md:space-x-4 transition hover:shadow-md"><div class="bg-red-500 text-white w-10 h-10 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-lg md:text-2xl shadow-inner"><i class="fa-solid fa-user-check"></i></div><div><p class="text-[9px] md:text-[10px] font-bold text-gray-500 uppercase tracking-widest">TERISI</p><p class="text-lg md:text-2xl font-black text-gray-800"><span id="d_terisi">0</span> <span class="text-[10px] md:text-xs font-semibold text-gray-400">Kamar</span></p></div></div>
+                        <div class="bg-white rounded-xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center space-x-3 md:space-x-4 transition hover:shadow-md"><div class="bg-green-500 text-white w-10 h-10 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-lg md:text-2xl shadow-inner"><i class="fa-solid fa-door-open"></i></div><div><p class="text-[9px] md:text-[10px] font-bold text-gray-500 uppercase tracking-widest">KOSONG</p><p class="text-lg md:text-2xl font-black text-gray-800"><span id="d_kosong">0</span> <span class="text-[10px] md:text-xs font-semibold text-gray-400">Kamar</span></p></div></div>
+                        <div class="bg-white rounded-xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center space-x-3 md:space-x-4 transition hover:shadow-md"><div class="bg-orange-400 text-white w-10 h-10 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-lg md:text-2xl shadow-inner"><i class="fa-regular fa-calendar-plus"></i></div><div><p class="text-[9px] md:text-[10px] font-bold text-gray-500 uppercase tracking-widest">IN HR INI</p><p class="text-lg md:text-2xl font-black text-gray-800"><span id="d_ci">0</span> <span class="text-[10px] md:text-xs font-semibold text-gray-400">Tamu</span></p></div></div>
+                        <div class="bg-white rounded-xl p-4 md:p-5 shadow-sm border border-gray-100 flex items-center space-x-3 md:space-x-4 transition hover:shadow-md col-span-2 md:col-span-1"><div class="bg-purple-600 text-white w-10 h-10 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-lg md:text-2xl shadow-inner"><i class="fa-solid fa-wallet"></i></div><div><p class="text-[9px] md:text-[10px] font-bold text-gray-500 uppercase tracking-widest">PENDAPATAN</p><p class="text-base md:text-lg font-black text-gray-800" id="d_rev">Rp 0</p></div></div>
                     </div>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                         <div class="lg:col-span-2 space-y-6">
-                            <div class="bg-white rounded-xl p-5 shadow-sm border h-full">
-                                <h3 class="text-sm font-bold uppercase tracking-wider mb-4 border-b pb-2"><i class="fa-solid fa-border-all text-blue-500 mr-1"></i> STATUS KAMAR REAL-TIME</h3>
-                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4" id="room-grid">
+                            <div class="bg-white rounded-xl p-4 md:p-5 shadow-sm border h-full">
+                                <h3 class="text-xs md:text-sm font-bold uppercase tracking-wider mb-4 border-b pb-2"><i class="fa-solid fa-border-all text-blue-500 mr-1"></i> STATUS KAMAR REAL-TIME</h3>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4" id="room-grid">
                                     <div class="col-span-full py-10 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin text-3xl mb-2 text-blue-400"></i><p>Memuat Data Kamar...</p></div>
                                 </div>
                             </div>
                             
-                            <div class="bg-white rounded-xl p-5 shadow-sm border">
-                                <h3 class="text-sm font-bold uppercase mb-4 border-b pb-2"><i class="fa-solid fa-calendar-alt text-yellow-500 mr-1"></i> RESERVASI TERBARU</h3>
-                                <div class="overflow-x-auto"><table class="w-full text-xs text-left"><thead class="text-blue-600 bg-blue-50 border-b"><tr><th class="px-3 py-2">No</th><th class="px-3 py-2">Nama Tamu</th><th class="px-3 py-2">Kamar</th><th class="px-3 py-2">Tgl Masuk</th><th class="px-3 py-2 text-center">Status</th></tr></thead><tbody id="tbl-dash-resv" class="divide-y text-gray-600"></tbody></table></div>
+                            <div class="bg-white rounded-xl p-4 md:p-5 shadow-sm border">
+                                <h3 class="text-xs md:text-sm font-bold uppercase mb-4 border-b pb-2"><i class="fa-solid fa-calendar-alt text-yellow-500 mr-1"></i> RESERVASI TERBARU</h3>
+                                <div class="overflow-x-auto"><table class="w-full text-xs text-left whitespace-nowrap"><thead class="text-blue-600 bg-blue-50 border-b"><tr><th class="px-3 py-2">No</th><th class="px-3 py-2">Nama Tamu</th><th class="px-3 py-2">Kamar</th><th class="px-3 py-2">Tgl Masuk</th><th class="px-3 py-2 text-center">Status</th></tr></thead><tbody id="tbl-dash-resv" class="divide-y text-gray-600"></tbody></table></div>
                                 <button onclick="switchPage('reservasi')" class="w-full mt-4 bg-blue-50 text-blue-600 font-bold py-2 rounded-lg text-xs hover:bg-blue-100 transition">Lihat Semua Reservasi <i class="fa-solid fa-chevron-right ml-1"></i></button>
                             </div>
                         </div>
                         
                         <div class="space-y-6">
-                            <div class="bg-white rounded-xl p-5 shadow-sm border">
-                                <h3 class="text-sm font-bold uppercase mb-4 border-b pb-2"><i class="fa-solid fa-sign-in-alt text-green-500 mr-1"></i> CHECK-IN HARI INI</h3>
-                                <div class="overflow-x-auto"><table class="w-full text-xs text-left"><thead class="text-blue-600 bg-blue-50 border-b"><tr><th class="px-3 py-2">No</th><th class="px-3 py-2">Nama Tamu</th><th class="px-3 py-2">Kmr</th><th class="px-3 py-2">Check-in</th><th class="px-3 py-2">Check-out</th></tr></thead><tbody id="tbl-dash-ci" class="divide-y text-gray-600"></tbody></table></div>
+                            <div class="bg-white rounded-xl p-4 md:p-5 shadow-sm border">
+                                <h3 class="text-xs md:text-sm font-bold uppercase mb-4 border-b pb-2"><i class="fa-solid fa-sign-in-alt text-green-500 mr-1"></i> CHECK-IN HARI INI</h3>
+                                <div class="overflow-x-auto"><table class="w-full text-xs text-left whitespace-nowrap"><thead class="text-blue-600 bg-blue-50 border-b"><tr><th class="px-3 py-2">No</th><th class="px-3 py-2">Nama Tamu</th><th class="px-3 py-2">Kmr</th><th class="px-3 py-2">Check-in</th><th class="px-3 py-2">Check-out</th></tr></thead><tbody id="tbl-dash-ci" class="divide-y text-gray-600"></tbody></table></div>
                                 <button onclick="switchPage('checkin')" class="w-full mt-4 bg-blue-50 text-blue-600 font-bold py-2 rounded-lg text-xs hover:bg-blue-100 transition">Ke Menu Check-In <i class="fa-solid fa-chevron-right ml-1"></i></button>
                             </div>
                             
-                            <div class="bg-white rounded-xl p-5 shadow-sm border">
-                                <h3 class="text-sm font-bold uppercase mb-4 border-b pb-2"><i class="fa-solid fa-sack-dollar text-green-600 mr-1"></i> RINGKASAN PENDAPATAN</h3>
-                                <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-5 flex items-center space-x-4 mb-4 border border-green-200 shadow-inner">
-                                    <div class="bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-md"><i class="fa-solid fa-rupiah-sign"></i></div>
-                                    <div>
-                                        <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Total Hari Ini</p>
-                                        <p class="text-2xl font-black text-green-700 mt-1 drop-shadow-sm" id="d_rev_big">Rp 0</p>
-                                        <p class="text-[10px] font-semibold text-gray-500 mt-1">Dari <span id="d_rev_count" class="font-bold text-gray-800">0</span> Transaksi</p>
+                            <div class="bg-white rounded-xl p-4 md:p-5 shadow-sm border">
+                                <h3 class="text-xs md:text-sm font-bold uppercase mb-4 border-b pb-2"><i class="fa-solid fa-sack-dollar text-green-600 mr-1"></i> RINGKASAN PENDAPATAN</h3>
+                                <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 md:p-5 flex items-center space-x-4 mb-4 border border-green-200 shadow-inner">
+                                    <div class="bg-green-500 text-white w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl md:text-2xl shadow-md flex-shrink-0"><i class="fa-solid fa-rupiah-sign"></i></div>
+                                    <div class="overflow-hidden">
+                                        <p class="text-[9px] md:text-[10px] font-bold text-gray-600 uppercase tracking-widest">Total Hari Ini</p>
+                                        <p class="text-xl md:text-2xl font-black text-green-700 mt-1 drop-shadow-sm truncate" id="d_rev_big">Rp 0</p>
+                                        <p class="text-[9px] md:text-[10px] font-semibold text-gray-500 mt-1">Dari <span id="d_rev_count" class="font-bold text-gray-800">0</span> Transaksi</p>
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-3 gap-2 text-center pt-2 border-t border-gray-100 mt-2">
-                                    <div class="bg-gray-50 p-2 rounded"><p class="text-[10px] font-semibold text-gray-500 mb-1">Tunai</p><p class="font-bold text-green-600 text-xs" id="d_rev_tunai">Rp 0</p></div>
-                                    <div class="bg-gray-50 p-2 rounded"><p class="text-[10px] font-semibold text-gray-500 mb-1">Transfer</p><p class="font-bold text-blue-600 text-xs" id="d_rev_tf">Rp 0</p></div>
-                                    <div class="bg-gray-50 p-2 rounded"><p class="text-[10px] font-semibold text-gray-500 mb-1">QRIS / EDC</p><p class="font-bold text-purple-600 text-xs" id="d_rev_qris">Rp 0</p></div>
+                                    <div class="bg-gray-50 p-2 rounded overflow-hidden"><p class="text-[9px] md:text-[10px] font-semibold text-gray-500 mb-1">Tunai</p><p class="font-bold text-green-600 text-[10px] md:text-xs truncate" id="d_rev_tunai">Rp 0</p></div>
+                                    <div class="bg-gray-50 p-2 rounded overflow-hidden"><p class="text-[9px] md:text-[10px] font-semibold text-gray-500 mb-1">Transfer</p><p class="font-bold text-blue-600 text-[10px] md:text-xs truncate" id="d_rev_tf">Rp 0</p></div>
+                                    <div class="bg-gray-50 p-2 rounded overflow-hidden"><p class="text-[9px] md:text-[10px] font-semibold text-gray-500 mb-1">QRIS / EDC</p><p class="font-bold text-purple-600 text-[10px] md:text-xs truncate" id="d_rev_qris">Rp 0</p></div>
                                 </div>
                             </div>
                         </div>
@@ -293,156 +306,157 @@
 
                 <!-- 2. DATA KAMAR -->
                 <section id="page-kamar" class="page-section">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
-                        <h3 class="text-lg font-bold mb-4 border-b pb-2">Form Tambah / Edit Kamar</h3>
+                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border mb-6">
+                        <h3 class="text-base md:text-lg font-bold mb-4 border-b pb-2">Form Tambah / Edit Kamar</h3>
                         <form id="form-kamar" onsubmit="submitKamar(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div><label class="text-xs font-bold text-gray-600">Nomor Kamar</label><input type="text" id="k_no" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" required></div>
-                            <div><label class="text-xs font-bold text-gray-600">Tipe Kamar</label><select id="k_tipe" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500" onchange="otomatisFasilitas()"><option>Standard</option><option>Deluxe</option><option>VIP</option></select></div>
-                            <div><label class="text-xs font-bold text-gray-600">Harga (Rp)</label><input type="text" id="k_harga" data-raw="0" oninput="formatInputUang(this)" class="w-full border p-2.5 rounded-lg mt-1 font-bold text-green-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition" placeholder="Rp 0" required></div>
-                            <div><label class="text-xs font-bold text-gray-600">Lantai</label><input type="text" id="k_lantai" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500" value="Lantai 1"></div>
+                            <div><label class="text-xs font-bold text-gray-600">Nomor Kamar</label><input type="text" id="k_no" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" required></div>
+                            <div><label class="text-xs font-bold text-gray-600">Tipe Kamar</label><select id="k_tipe" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500" onchange="otomatisFasilitas()"><option>Standard</option><option>Deluxe</option><option>VIP</option></select></div>
+                            <div><label class="text-xs font-bold text-gray-600">Harga (Rp)</label><input type="text" id="k_harga" data-raw="0" oninput="formatInputUang(this)" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 font-bold text-green-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition" placeholder="Rp 0" required></div>
+                            <div><label class="text-xs font-bold text-gray-600">Lantai</label><input type="text" id="k_lantai" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500" value="Lantai 1"></div>
                             
-                            <div class="col-span-2 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
+                            <div class="md:col-span-2 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
                                 <label class="text-xs font-bold text-gray-600 block mb-2">Fasilitas Kamar (Centang & Tambah)</label>
-                                <div id="fas_container" class="flex flex-wrap gap-4 text-sm font-semibold text-gray-700 mb-3">
-                                    <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="f_wifi" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><span>Wifi</span></label>
-                                    <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="f_tv" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><span>TV</span></label>
-                                    <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="f_ac" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><span>AC</span></label>
-                                    <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="f_airpanas" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><span>Air Panas</span></label>
+                                <div id="fas_container" class="flex flex-wrap gap-3 md:gap-4 text-xs md:text-sm font-semibold text-gray-700 mb-3">
+                                    <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="f_wifi" checked class="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600 rounded focus:ring-blue-500"><span>Wifi</span></label>
+                                    <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="f_tv" checked class="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600 rounded focus:ring-blue-500"><span>TV</span></label>
+                                    <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="f_ac" class="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600 rounded focus:ring-blue-500"><span>AC</span></label>
+                                    <label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="f_airpanas" class="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600 rounded focus:ring-blue-500"><span>Air Panas</span></label>
                                 </div>
                                 <div class="flex items-center space-x-2 border-t border-blue-200 pt-3">
-                                    <input type="text" id="k_f_custom" placeholder="Ketik fasilitas baru (misal: Kulkas)..." class="border p-2 text-sm rounded-lg outline-none w-full focus:border-blue-400 transition">
-                                    <button type="button" onclick="tambahFasilitasManualInline()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow hover:bg-blue-700 transition whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i> Tambah</button>
+                                    <input type="text" id="k_f_custom" placeholder="Ketik fasilitas (Kulkas)..." class="border p-2 text-xs md:text-sm rounded-lg outline-none w-full focus:border-blue-400 transition">
+                                    <button type="button" onclick="tambahFasilitasManualInline()" class="bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg text-xs font-bold shadow hover:bg-blue-700 transition whitespace-nowrap"><i class="fa-solid fa-plus md:mr-1"></i> <span class="hidden md:inline">Tambah</span></button>
                                 </div>
                             </div>
                             
-                            <div class="col-span-2 space-y-4">
-                                <div><label class="text-xs font-bold text-gray-600">Keterangan Khusus</label><input type="text" id="k_ket" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500 transition"></div>
-                                <div><label class="text-xs font-bold text-gray-600">Status Awal</label><select id="k_status" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500"><option>Kosong</option><option>Maintenance</option></select></div>
+                            <div class="md:col-span-2 space-y-4">
+                                <div><label class="text-xs font-bold text-gray-600">Keterangan Khusus</label><input type="text" id="k_ket" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500 transition"></div>
+                                <div><label class="text-xs font-bold text-gray-600">Status Awal</label><select id="k_status" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-blue-500"><option>Kosong</option><option>Maintenance</option></select></div>
                             </div>
                             
                             <div class="md:col-span-4 flex items-end space-x-2 mt-2">
-                                <button type="submit" id="btn_save_kamar" class="w-1/2 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition"><i class="fa-solid fa-save mr-1"></i> SIMPAN DATA KAMAR</button>
-                                <button type="button" onclick="batalEdit('kamar')" id="btn_cancel_kamar" class="hidden w-1/2 bg-gray-500 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-gray-600 transition">Batal Edit</button>
+                                <button type="submit" id="btn_save_kamar" class="w-full md:w-1/2 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition text-sm md:text-base"><i class="fa-solid fa-save mr-1"></i> SIMPAN DATA KAMAR</button>
+                                <button type="button" onclick="batalEdit('kamar')" id="btn_cancel_kamar" class="hidden w-1/3 md:w-1/4 bg-gray-500 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-gray-600 transition text-sm md:text-base">Batal Edit</button>
                             </div>
                         </form>
                     </div>
                     <div class="bg-white p-0 rounded-xl shadow-sm border overflow-hidden">
-                        <div class="p-5 border-b bg-gray-50 flex justify-between items-center"><h3 class="text-lg font-bold">Daftar Kamar</h3><button onclick="exportTableToExcel('tbl-kamar', 'Data_Kamar')" class="bg-green-600 text-white px-4 py-2 text-xs font-bold rounded-lg shadow hover:bg-green-700 transition"><i class="fa-solid fa-file-excel mr-1"></i> Export Excel</button></div>
-                        <div class="overflow-x-auto p-5"><table class="w-full text-sm text-left"><thead class="bg-gray-800 text-white"><tr><th class="px-4 py-3 rounded-tl-lg">No Kamar</th><th class="px-4 py-3">Tipe</th><th class="px-4 py-3">Harga</th><th class="px-4 py-3 w-1/3">Fasilitas</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th></tr></thead><tbody id="tbl-kamar" class="divide-y text-gray-600"></tbody></table></div>
+                        <div class="p-4 md:p-5 border-b bg-gray-50 flex justify-between items-center"><h3 class="text-base md:text-lg font-bold">Daftar Kamar</h3><button onclick="exportTableToExcel('tbl-kamar', 'Data_Kamar')" class="bg-green-600 text-white px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-bold rounded-lg shadow hover:bg-green-700 transition"><i class="fa-solid fa-file-excel mr-1"></i> Export</button></div>
+                        <div class="overflow-x-auto p-4 md:p-5"><table class="w-full text-xs md:text-sm text-left whitespace-nowrap"><thead class="bg-gray-800 text-white"><tr><th class="px-4 py-3 rounded-tl-lg">No Kamar</th><th class="px-4 py-3">Tipe</th><th class="px-4 py-3">Harga</th><th class="px-4 py-3">Fasilitas</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th></tr></thead><tbody id="tbl-kamar" class="divide-y text-gray-600"></tbody></table></div>
                     </div>
                 </section>
 
                 <!-- 3. DATA TAMU -->
                 <section id="page-tamu" class="page-section">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
-                        <h3 class="text-lg font-bold mb-4 border-b pb-2">Registrasi / Edit Tamu</h3>
-                        <form id="form-tamu" onsubmit="submitTamu(event)" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div><label class="text-xs font-bold">NIK KTP</label><input type="text" id="t_nik" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition" required></div>
-                            <div><label class="text-xs font-bold">Nama Lengkap</label><input type="text" id="t_nama" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition" required></div>
-                            <div><label class="text-xs font-bold">No HP / WA</label><input type="text" id="t_hp" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition" required></div>
-                            <div><label class="text-xs font-bold">Alamat Lengkap</label><input type="text" id="t_alamat" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition"></div>
+                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border mb-6">
+                        <h3 class="text-base md:text-lg font-bold mb-4 border-b pb-2">Registrasi / Edit Tamu</h3>
+                        <form id="form-tamu" onsubmit="submitTamu(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div><label class="text-xs font-bold">NIK KTP</label><input type="text" id="t_nik" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition" required></div>
+                            <div><label class="text-xs font-bold">Nama Lengkap</label><input type="text" id="t_nama" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition" required></div>
+                            <div><label class="text-xs font-bold">No HP / WA</label><input type="text" id="t_hp" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition" required></div>
+                            <div><label class="text-xs font-bold">Alamat Lengkap</label><input type="text" id="t_alamat" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition"></div>
                             <div class="md:col-span-4 flex space-x-2 mt-2">
-                                <button type="submit" id="btn_save_tamu" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:bg-blue-700 transition"><i class="fa-solid fa-save mr-1"></i> Simpan Data Tamu</button>
-                                <button type="button" onclick="batalEdit('tamu')" id="btn_cancel_tamu" class="hidden bg-gray-500 text-white font-bold py-3 px-8 rounded-xl shadow hover:bg-gray-600 transition">Batal</button>
+                                <button type="submit" id="btn_save_tamu" class="w-full md:w-auto bg-blue-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:bg-blue-700 transition text-sm md:text-base"><i class="fa-solid fa-save mr-1"></i> Simpan Data Tamu</button>
+                                <button type="button" onclick="batalEdit('tamu')" id="btn_cancel_tamu" class="hidden w-1/3 md:w-auto bg-gray-500 text-white font-bold py-3 px-8 rounded-xl shadow hover:bg-gray-600 transition text-sm md:text-base">Batal</button>
                             </div>
                         </form>
                     </div>
                     <div class="bg-white p-0 rounded-xl shadow-sm border overflow-hidden">
-                        <div class="p-5 border-b bg-gray-50 flex justify-between items-center"><h3 class="text-lg font-bold">Database Tamu</h3><button onclick="exportTableToExcel('tbl-tamu', 'Data_Tamu')" class="bg-green-600 text-white px-4 py-2 text-xs font-bold rounded-lg shadow hover:bg-green-700 transition"><i class="fa-solid fa-file-excel mr-1"></i> Export Excel</button></div>
-                        <div class="overflow-x-auto p-5"><table class="w-full text-sm text-left"><thead class="bg-gray-800 text-white"><tr><th class="px-4 py-3 rounded-tl-lg">Nama Lengkap</th><th class="px-4 py-3">NIK KTP</th><th class="px-4 py-3">No HP / WA</th><th class="px-4 py-3">Alamat</th><th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th></tr></thead><tbody id="tbl-tamu" class="divide-y text-gray-600"></tbody></table></div>
+                        <div class="p-4 md:p-5 border-b bg-gray-50 flex justify-between items-center"><h3 class="text-base md:text-lg font-bold">Database Tamu</h3><button onclick="exportTableToExcel('tbl-tamu', 'Data_Tamu')" class="bg-green-600 text-white px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-bold rounded-lg shadow hover:bg-green-700 transition"><i class="fa-solid fa-file-excel mr-1"></i> Export Excel</button></div>
+                        <div class="overflow-x-auto p-4 md:p-5"><table class="w-full text-xs md:text-sm text-left whitespace-nowrap"><thead class="bg-gray-800 text-white"><tr><th class="px-4 py-3 rounded-tl-lg">Nama Lengkap</th><th class="px-4 py-3">NIK KTP</th><th class="px-4 py-3">No HP / WA</th><th class="px-4 py-3">Alamat</th><th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th></tr></thead><tbody id="tbl-tamu" class="divide-y text-gray-600"></tbody></table></div>
                     </div>
                 </section>
 
                 <!-- 4. RESERVASI -->
                 <section id="page-reservasi" class="page-section">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
-                        <h3 class="text-lg font-bold mb-4 border-b pb-2"><i class="fa-solid fa-calendar-plus text-yellow-500 mr-2"></i>Form Pemesanan Kamar (Reservasi)</h3>
-                        <form id="form-reservasi" onsubmit="submitReservasi(event)" class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border mb-6">
+                        <h3 class="text-base md:text-lg font-bold mb-4 border-b pb-2"><i class="fa-solid fa-calendar-plus text-yellow-500 mr-2"></i>Form Pemesanan Kamar</h3>
+                        <form id="form-reservasi" onsubmit="submitReservasi(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5">
                             <input type="hidden" id="r_kode">
                             
-                            <div><label class="text-xs font-bold text-gray-700">Nama Pemesan</label><input type="text" id="r_nama" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-100 transition" required></div>
-                            <div><label class="text-xs font-bold text-gray-700">Nomor HP</label><input type="text" id="r_hp" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-100 transition" required></div>
-                            <div class="md:col-span-2"><label class="text-xs font-bold text-gray-700">Pilih Kamar (Tersedia)</label><select id="r_kamar" onchange="calcReservasi()" class="w-full border p-2.5 rounded-lg mt-1 font-bold text-yellow-800 bg-yellow-50 outline-none focus:border-yellow-500 option-kamar-kosong" required></select></div>
+                            <div><label class="text-xs font-bold text-gray-700">Nama Pemesan</label><input type="text" id="r_nama" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-100 transition" required></div>
+                            <div><label class="text-xs font-bold text-gray-700">Nomor HP</label><input type="text" id="r_hp" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-100 transition" required></div>
+                            <div class="md:col-span-2"><label class="text-xs font-bold text-gray-700">Pilih Kamar (Tersedia)</label><select id="r_kamar" onchange="calcReservasi()" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 font-bold text-yellow-800 bg-yellow-50 outline-none focus:border-yellow-500 option-kamar-kosong" required></select></div>
                             
-                            <div class="col-span-2 grid grid-cols-2 gap-4 border p-4 rounded-lg bg-gray-50 border-dashed border-gray-300">
-                                <div><label class="text-xs font-bold text-gray-700">Tanggal Check-in</label><input type="date" id="r_in" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500" onchange="calcReservasi()" required></div>
-                                <div><label class="text-xs font-bold text-gray-700">Tanggal Check-out</label><input type="date" id="r_out" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500" onchange="calcReservasi()" required></div>
+                            <div class="md:col-span-2 grid grid-cols-2 gap-3 md:gap-4 border p-3 md:p-4 rounded-lg bg-gray-50 border-dashed border-gray-300">
+                                <div><label class="text-xs font-bold text-gray-700">Tgl Check-in</label><input type="date" id="r_in" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500 text-xs md:text-sm" onchange="calcReservasi()" required></div>
+                                <div><label class="text-xs font-bold text-gray-700">Tgl Check-out</label><input type="date" id="r_out" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500 text-xs md:text-sm" onchange="calcReservasi()" required></div>
                             </div>
                             
-                            <div class="col-span-2"><label class="text-xs font-bold text-gray-700">Estimasi Tagihan (Durasi x Harga)</label><input type="text" id="r_info" class="w-full border-2 border-yellow-300 p-4 rounded-lg mt-1 bg-yellow-100 font-black text-xl text-yellow-800 outline-none" readonly placeholder="Pilih kamar & tanggal..."></div>
+                            <div class="md:col-span-2"><label class="text-xs font-bold text-gray-700">Estimasi Tagihan (Durasi x Harga)</label><input type="text" id="r_info" class="w-full border-2 border-yellow-300 p-3 md:p-4 rounded-lg mt-1 bg-yellow-100 font-black text-lg md:text-xl text-yellow-800 outline-none" readonly placeholder="Pilih kamar & tanggal..."></div>
                             
-                            <div><label class="text-xs font-bold text-gray-700">Uang Muka / DP Diterima (Rp)</label><input type="text" id="r_dp" data-raw="0" oninput="formatInputUang(this)" class="w-full border p-2.5 rounded-lg mt-1 font-bold text-green-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 transition" placeholder="Rp 0"></div>
-                            <div><label class="text-xs font-bold text-gray-700">Metode Bayar DP</label><select id="r_metode" class="w-full border p-2.5 rounded-lg mt-1 outline-none"><option>Transfer</option><option>Tunai</option><option>QRIS / E-Wallet</option></select></div>
-                            <div class="md:col-span-2"><label class="text-xs font-bold text-gray-700">Catatan Tambahan Opsional</label><input type="text" id="r_catatan" class="w-full border p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500" placeholder="Cth: Ekstra bed, Honeymoon setup..."></div>
+                            <div><label class="text-xs font-bold text-gray-700">Uang Muka / DP Diterima</label><input type="text" id="r_dp" data-raw="0" oninput="formatInputUang(this)" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 font-bold text-green-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 transition" placeholder="Rp 0"></div>
+                            <div><label class="text-xs font-bold text-gray-700">Metode Bayar DP</label><select id="r_metode" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none"><option>Transfer</option><option>Tunai</option><option>QRIS / E-Wallet</option></select></div>
+                            <div class="md:col-span-2"><label class="text-xs font-bold text-gray-700">Catatan Opsional</label><input type="text" id="r_catatan" class="w-full border p-2 md:p-2.5 rounded-lg mt-1 outline-none focus:border-yellow-500" placeholder="Cth: Ekstra bed, Honeymoon setup..."></div>
                             
                             <div class="md:col-span-4 flex space-x-2 mt-4 pt-4 border-t">
-                                <button type="submit" id="btn_save_resv" class="w-full bg-yellow-500 text-white font-black text-lg tracking-widest py-4 rounded-xl hover:bg-yellow-600 shadow-xl transition transform hover:-translate-y-1"><i class="fa-solid fa-calendar-check mr-2"></i> SIMPAN RESERVASI SEKARANG</button>
-                                <button type="button" onclick="batalEdit('reservasi')" id="btn_cancel_resv" class="hidden w-1/3 bg-gray-500 text-white font-bold py-4 rounded-xl shadow hover:bg-gray-600 transition">Batal Edit</button>
+                                <button type="submit" id="btn_save_resv" class="w-full bg-yellow-500 text-white font-black text-sm md:text-lg tracking-widest py-3 md:py-4 rounded-xl hover:bg-yellow-600 shadow-xl transition transform hover:-translate-y-1"><i class="fa-solid fa-calendar-check mr-2"></i> SIMPAN RESERVASI</button>
+                                <button type="button" onclick="batalEdit('reservasi')" id="btn_cancel_resv" class="hidden w-1/3 bg-gray-500 text-white font-bold py-3 md:py-4 rounded-xl shadow hover:bg-gray-600 transition text-sm md:text-base">Batal</button>
                             </div>
                         </form>
                     </div>
                     <div class="bg-white p-0 rounded-xl shadow-sm border overflow-hidden">
-                        <div class="p-5 border-b bg-gray-50"><h3 class="text-lg font-bold">Daftar Jadwal Reservasi</h3></div>
-                        <div class="overflow-x-auto p-5"><table class="w-full text-sm text-left"><thead class="bg-gray-800 text-white"><tr><th class="px-4 py-3 rounded-tl-lg">Kode Booking</th><th class="px-4 py-3">Nama Pemesan</th><th class="px-4 py-3">Kamar</th><th class="px-4 py-3">Tgl Masuk - Keluar</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th></tr></thead><tbody id="tbl-reservasi" class="divide-y text-gray-600"></tbody></table></div>
+                        <div class="p-4 md:p-5 border-b bg-gray-50"><h3 class="text-base md:text-lg font-bold">Daftar Jadwal Reservasi</h3></div>
+                        <div class="overflow-x-auto p-4 md:p-5"><table class="w-full text-xs md:text-sm text-left whitespace-nowrap"><thead class="bg-gray-800 text-white"><tr><th class="px-4 py-3 rounded-tl-lg">Kode Booking</th><th class="px-4 py-3">Nama Pemesan</th><th class="px-4 py-3">Kamar</th><th class="px-4 py-3">Tgl Masuk - Keluar</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 rounded-tr-lg text-center">Aksi</th></tr></thead><tbody id="tbl-reservasi" class="divide-y text-gray-600"></tbody></table></div>
                     </div>
                 </section>
 
                 <!-- 5. CHECK IN -->
                 <section id="page-checkin" class="page-section">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border mb-5 flex space-x-4 items-end bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-                        <div class="w-1/2"><label class="text-xs font-bold text-blue-800 mb-1 block"><i class="fa-solid fa-search mr-1"></i> Tarik Data Tamu Lama (KTP/Nama)</label><div class="flex shadow-sm"><input type="text" id="ci_cari_tamu" placeholder="Ketik Nama / NIK..." class="p-3 w-full text-sm border border-r-0 rounded-l-lg outline-none focus:border-blue-400"><button onclick="cariTamuCI()" type="button" class="bg-blue-600 text-white px-6 font-bold text-sm rounded-r-lg hover:bg-blue-700 transition">CARI</button></div></div>
-                        <div class="w-1/2"><label class="text-xs font-bold text-yellow-800 mb-1 block"><i class="fa-solid fa-calendar-arrow-down mr-1"></i> Tarik Data Reservasi & DP Booking</label><div class="flex shadow-sm"><input type="text" id="ci_cari_resv" placeholder="Ketik Kode Booking..." class="p-3 w-full text-sm border border-r-0 rounded-l-lg outline-none border-yellow-300 focus:border-yellow-400 bg-yellow-50/50"><button onclick="cariReservasiCI()" type="button" class="bg-yellow-500 text-white px-6 font-bold text-sm rounded-r-lg hover:bg-yellow-600 transition">TARIK</button></div></div>
+                    <!-- RESPONSIVE SEARCH BARS (STACK ON MOBILE) -->
+                    <div class="bg-white p-4 md:p-5 rounded-xl shadow-sm border mb-5 flex flex-col md:flex-row gap-4 items-end bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                        <div class="w-full md:w-1/2"><label class="text-xs font-bold text-blue-800 mb-1 block"><i class="fa-solid fa-search mr-1"></i> Tarik Data Tamu Lama</label><div class="flex shadow-sm"><input type="text" id="ci_cari_tamu" placeholder="Ketik Nama / NIK..." class="p-2.5 md:p-3 w-full text-sm border border-r-0 rounded-l-lg outline-none focus:border-blue-400"><button onclick="cariTamuCI()" type="button" class="bg-blue-600 text-white px-4 md:px-6 font-bold text-xs md:text-sm rounded-r-lg hover:bg-blue-700 transition">CARI</button></div></div>
+                        <div class="w-full md:w-1/2"><label class="text-xs font-bold text-yellow-800 mb-1 block"><i class="fa-solid fa-calendar-arrow-down mr-1"></i> Tarik Reservasi & DP Booking</label><div class="flex shadow-sm"><input type="text" id="ci_cari_resv" placeholder="Ketik Kode Booking..." class="p-2.5 md:p-3 w-full text-sm border border-r-0 rounded-l-lg outline-none border-yellow-300 focus:border-yellow-400 bg-yellow-50/50"><button onclick="cariReservasiCI()" type="button" class="bg-yellow-500 text-white px-4 md:px-6 font-bold text-xs md:text-sm rounded-r-lg hover:bg-yellow-600 transition">TARIK</button></div></div>
                     </div>
 
                     <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-                        <div class="bg-gray-800 text-white p-5"><h3 class="text-lg font-black tracking-wide"><i class="fa-solid fa-door-open mr-2"></i>FORM CHECK-IN TAMU</h3></div>
-                        <form id="form-checkin" onsubmit="submitCheckin(event)" class="p-8 grid grid-cols-1 md:grid-cols-3 gap-10">
+                        <div class="bg-gray-800 text-white p-4 md:p-5"><h3 class="text-base md:text-lg font-black tracking-wide"><i class="fa-solid fa-door-open mr-2"></i>FORM CHECK-IN TAMU</h3></div>
+                        <form id="form-checkin" onsubmit="submitCheckin(event)" class="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10">
                             
                             <input type="hidden" id="ci_kode_booking" value="">
 
                             <!-- DATA TAMU -->
-                            <div class="col-span-1 space-y-5 bg-gray-50/50 p-6 rounded-xl border border-dashed border-gray-300">
-                                <h4 class="font-black text-sm text-blue-800 border-b-2 border-blue-500 pb-2 mb-4 inline-block">1. IDENTITAS TAMU</h4>
-                                <div><label class="text-xs font-bold text-gray-700">NIK / ID KTP</label><input type="text" id="ci_ktp" class="w-full border-b-2 border-gray-300 p-2.5 focus:border-blue-600 outline-none bg-transparent transition" required></div>
-                                <div><label class="text-xs font-bold text-gray-700">Nama Lengkap (Sesuai KTP)</label><input type="text" id="ci_nama" class="w-full border-b-2 border-gray-300 p-2.5 focus:border-blue-600 outline-none bg-transparent transition" required></div>
-                                <div><label class="text-xs font-bold text-gray-700">No HP / WhatsApp Aktif</label><input type="text" id="ci_hp" class="w-full border-b-2 border-gray-300 p-2.5 focus:border-blue-600 outline-none bg-transparent transition" required></div>
-                                <div><label class="text-xs font-bold text-gray-700">Alamat Lengkap Domisili</label><input type="text" id="ci_alamat" class="w-full border-b-2 border-gray-300 p-2.5 focus:border-blue-600 outline-none bg-transparent transition"></div>
+                            <div class="col-span-1 space-y-4 md:space-y-5 bg-gray-50/50 p-4 md:p-6 rounded-xl border border-dashed border-gray-300">
+                                <h4 class="font-black text-xs md:text-sm text-blue-800 border-b-2 border-blue-500 pb-2 mb-2 md:mb-4 inline-block">1. IDENTITAS TAMU</h4>
+                                <div><label class="text-xs font-bold text-gray-700">NIK / ID KTP</label><input type="text" id="ci_ktp" class="w-full border-b-2 border-gray-300 p-2 md:p-2.5 focus:border-blue-600 outline-none bg-transparent transition text-sm md:text-base" required></div>
+                                <div><label class="text-xs font-bold text-gray-700">Nama Lengkap Sesuai KTP</label><input type="text" id="ci_nama" class="w-full border-b-2 border-gray-300 p-2 md:p-2.5 focus:border-blue-600 outline-none bg-transparent transition text-sm md:text-base" required></div>
+                                <div><label class="text-xs font-bold text-gray-700">No HP / WhatsApp Aktif</label><input type="text" id="ci_hp" class="w-full border-b-2 border-gray-300 p-2 md:p-2.5 focus:border-blue-600 outline-none bg-transparent transition text-sm md:text-base" required></div>
+                                <div><label class="text-xs font-bold text-gray-700">Alamat Lengkap Domisili</label><input type="text" id="ci_alamat" class="w-full border-b-2 border-gray-300 p-2 md:p-2.5 focus:border-blue-600 outline-none bg-transparent transition text-sm md:text-base"></div>
                             </div>
                             
                             <!-- KAMAR & BAYAR -->
-                            <div class="col-span-2 space-y-6">
-                                <h4 class="font-black text-sm text-blue-800 border-b-2 border-blue-500 pb-2 inline-block">2. DETAIL KAMAR & PEMBAYARAN AWAL</h4>
-                                <div class="grid grid-cols-2 gap-5">
-                                    <div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-gray-700">Pilih Kamar (Kosong / Reservasi)</label><select id="ci_kamar" class="w-full border-2 border-blue-200 p-3.5 rounded-xl outline-none bg-blue-50 font-bold text-blue-800 focus:ring-4 focus:ring-blue-100 transition option-kamar-kosong" onchange="calcCheckin()" required></select></div>
-                                    <div class="col-span-2 md:col-span-1 grid grid-cols-2 gap-3">
-                                        <div><label class="text-xs font-bold text-gray-700">Tanggal Masuk</label><input type="date" id="ci_in" class="w-full border-2 border-gray-200 p-3 rounded-xl outline-none focus:border-blue-500 transition" onchange="calcCheckin()" required></div>
-                                        <div><label class="text-xs font-bold text-gray-700">Tanggal Keluar</label><input type="date" id="ci_out" class="w-full border-2 border-gray-200 p-3 rounded-xl outline-none focus:border-blue-500 transition" onchange="calcCheckin()" required></div>
+                            <div class="lg:col-span-2 space-y-4 md:space-y-6">
+                                <h4 class="font-black text-xs md:text-sm text-blue-800 border-b-2 border-blue-500 pb-2 inline-block">2. DETAIL KAMAR & PEMBAYARAN AWAL</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+                                    <div class="md:col-span-1"><label class="text-xs font-bold text-gray-700">Pilih Kamar (Kosong/Resv)</label><select id="ci_kamar" class="w-full border-2 border-blue-200 p-2.5 md:p-3.5 rounded-xl outline-none bg-blue-50 font-bold text-blue-800 focus:ring-4 focus:ring-blue-100 transition option-kamar-kosong text-sm md:text-base" onchange="calcCheckin()" required></select></div>
+                                    <div class="md:col-span-1 grid grid-cols-2 gap-2 md:gap-3">
+                                        <div><label class="text-xs font-bold text-gray-700">Tanggal Masuk</label><input type="date" id="ci_in" class="w-full border-2 border-gray-200 p-2 md:p-3 rounded-xl outline-none focus:border-blue-500 transition text-xs md:text-sm" onchange="calcCheckin()" required></div>
+                                        <div><label class="text-xs font-bold text-gray-700">Tanggal Keluar</label><input type="date" id="ci_out" class="w-full border-2 border-gray-200 p-2 md:p-3 rounded-xl outline-none focus:border-blue-500 transition text-xs md:text-sm" onchange="calcCheckin()" required></div>
                                     </div>
                                     
-                                    <div class="col-span-2 bg-gray-900 p-6 rounded-2xl text-white grid grid-cols-3 gap-6 shadow-xl mt-2 relative overflow-hidden">
+                                    <div class="md:col-span-2 bg-gray-900 p-4 md:p-6 rounded-2xl text-white grid grid-cols-3 gap-3 md:gap-6 shadow-xl mt-2 relative overflow-hidden">
                                         <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white opacity-5"></div>
                                         
                                         <div class="text-center border-r border-gray-700">
-                                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Durasi Inap</p>
-                                            <p class="text-4xl font-black mt-2 text-blue-400"><span id="ci_lbl_hari">0</span> <span class="text-sm font-normal text-gray-300">Malam</span></p>
+                                            <p class="text-[8px] md:text-[10px] text-gray-400 font-bold uppercase tracking-wider">Durasi</p>
+                                            <p class="text-2xl md:text-4xl font-black mt-1 md:mt-2 text-blue-400"><span id="ci_lbl_hari">0</span> <span class="text-[10px] md:text-sm font-normal text-gray-300">Mlm</span></p>
                                         </div>
                                         <div class="text-center border-r border-gray-700 relative group">
-                                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">Diskon Harga (Rp)</p>
-                                            <div class="relative w-4/5 mx-auto">
-                                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">-</span>
-                                                <input type="text" id="ci_diskon" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full text-center border-b-2 border-gray-600 bg-gray-800 py-2 rounded font-bold text-xl outline-none focus:border-yellow-400 text-yellow-400 transition">
+                                            <p class="text-[8px] md:text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1 md:mb-2">Diskon (Rp)</p>
+                                            <div class="relative w-full md:w-4/5 mx-auto px-1 md:px-0">
+                                                <span class="absolute inset-y-0 left-0 pl-1 md:pl-3 flex items-center text-gray-500 font-bold text-xs md:text-base">-</span>
+                                                <input type="text" id="ci_diskon" data-raw="0" oninput="formatInputUang(this)" placeholder="0" class="w-full text-center border-b-2 border-gray-600 bg-gray-800 py-1 md:py-2 rounded font-bold text-sm md:text-xl outline-none focus:border-yellow-400 text-yellow-400 transition">
                                             </div>
                                         </div>
                                         <div class="text-center">
-                                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Biaya Kamar Bersih</p>
-                                            <input type="text" id="ci_biaya" readonly data-raw="0" placeholder="Rp 0" class="w-full mt-2 text-center bg-transparent font-black text-3xl text-green-400 outline-none border-none">
+                                            <p class="text-[8px] md:text-[10px] text-gray-400 font-bold uppercase tracking-wider">Kamar Bersih</p>
+                                            <input type="text" id="ci_biaya" readonly data-raw="0" placeholder="Rp 0" class="w-full mt-1 md:mt-2 text-center bg-transparent font-black text-lg md:text-3xl text-green-400 outline-none border-none">
                                         </div>
                                     </div>
                                     
-                                    <div class="mt-4"><label class="text-xs font-bold text-gray-700">Metode Bayar (Awal/DP)</label><select id="ci_metode" class="w-full border-2 border-gray-200 p-3.5 rounded-xl outline-none focus:border-blue-500 transition"><option>Tunai</option><option>Transfer Bank</option><option>QRIS / E-Wallet</option><option>Debit/Kredit</option></select></div>
-                                    <div class="mt-4"><label class="text-xs font-bold text-gray-700">Uang Muka (DP) / Dibayar Awal</label><input type="text" id="ci_bayar" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-2 border-green-400 p-3.5 rounded-xl bg-green-50 font-black text-xl text-green-800 outline-none focus:ring-4 focus:ring-green-100 transition shadow-inner" required></div>
+                                    <div class="mt-2 md:mt-4"><label class="text-xs font-bold text-gray-700">Metode Bayar (Awal/DP)</label><select id="ci_metode" class="w-full border-2 border-gray-200 p-2.5 md:p-3.5 rounded-xl outline-none focus:border-blue-500 transition text-sm md:text-base"><option>Tunai</option><option>Transfer Bank</option><option>QRIS / E-Wallet</option><option>Debit/Kredit</option></select></div>
+                                    <div class="mt-2 md:mt-4"><label class="text-xs font-bold text-gray-700">Uang Muka / Dibayar Awal</label><input type="text" id="ci_bayar" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-2 border-green-400 p-2.5 md:p-3.5 rounded-xl bg-green-50 font-black text-lg md:text-xl text-green-800 outline-none focus:ring-4 focus:ring-green-100 transition shadow-inner" required></div>
                                 </div>
-                                <button type="submit" class="w-full bg-blue-600 text-white font-black tracking-widest py-5 mt-6 rounded-xl shadow-xl hover:bg-blue-700 hover:shadow-2xl text-lg transition transform hover:-translate-y-1"><i class="fa-solid fa-check-circle mr-2"></i> PROSES CHECK-IN & CETAK INVOICE</button>
+                                <button type="submit" class="w-full bg-blue-600 text-white font-black tracking-widest py-4 md:py-5 mt-4 md:mt-6 rounded-xl shadow-xl hover:bg-blue-700 hover:shadow-2xl text-sm md:text-lg transition transform hover:-translate-y-1"><i class="fa-solid fa-check-circle mr-2"></i> PROSES CHECK-IN</button>
                             </div>
                         </form>
                     </div>
@@ -450,70 +464,68 @@
 
                 <!-- 6. CHECK OUT -->
                 <section id="page-checkout" class="page-section">
-                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-red-200">
-                        <h3 class="text-2xl font-black mb-8 text-red-700 tracking-tight"><i class="fa-solid fa-sign-out-alt mr-3"></i>PROSES CHECK-OUT & PENAGIHAN AKHIR</h3>
+                    <div class="bg-white p-4 md:p-8 rounded-2xl shadow-lg border border-red-200">
+                        <h3 class="text-lg md:text-2xl font-black mb-6 md:mb-8 text-red-700 tracking-tight"><i class="fa-solid fa-sign-out-alt mr-2 md:mr-3"></i>PROSES CHECK-OUT & PENAGIHAN</h3>
                         
-                        <div class="bg-red-50 p-6 rounded-xl border border-red-100 flex items-end space-x-5 mb-8 shadow-inner">
-                            <div class="flex-1">
-                                <label class="text-sm font-bold text-red-900 block mb-2"><i class="fa-solid fa-bed mr-1"></i> Pilih Kamar yang Akan Checkout:</label>
-                                <select id="co_kamar" class="w-full border-2 border-red-200 p-4 rounded-xl font-bold text-xl outline-none focus:ring-4 focus:ring-red-100 option-kamar-terisi transition"><option value="">-- Pilih Kamar Terisi --</option></select>
+                        <div class="bg-red-50 p-4 md:p-6 rounded-xl border border-red-100 flex flex-col md:flex-row md:items-end gap-3 md:gap-5 mb-6 md:mb-8 shadow-inner">
+                            <div class="w-full md:flex-1">
+                                <label class="text-xs md:text-sm font-bold text-red-900 block mb-2"><i class="fa-solid fa-bed mr-1"></i> Pilih Kamar yang Akan Checkout:</label>
+                                <select id="co_kamar" class="w-full border-2 border-red-200 p-3 md:p-4 rounded-xl font-bold text-base md:text-xl outline-none focus:ring-4 focus:ring-red-100 option-kamar-terisi transition"><option value="">-- Pilih Kamar Terisi --</option></select>
                             </div>
-                            <button onclick="loadTagihanCheckout()" class="bg-gray-800 text-white px-8 py-4 rounded-xl font-bold shadow hover:bg-gray-900 transition flex items-center text-lg"><i class="fa-solid fa-search mr-2"></i> Cari Tagihan</button>
+                            <button onclick="loadTagihanCheckout()" class="w-full md:w-auto bg-gray-800 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl font-bold shadow hover:bg-gray-900 transition flex items-center justify-center text-sm md:text-lg"><i class="fa-solid fa-search mr-2"></i> Cari Tagihan</button>
                         </div>
                         
-                        <div id="co_area" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10 pt-6 border-t border-gray-200">
+                        <div id="co_area" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10 pt-6 border-t border-gray-200">
                             
-                            <div class="bg-white p-6 rounded-xl border shadow-sm">
-                                <h4 class="font-black text-gray-800 bg-gray-100 p-3 rounded-lg mb-6 flex items-center"><i class="fa-solid fa-file-invoice mr-2 text-gray-500"></i> Rincian Transaksi Awal</h4>
-                                <table class="w-full text-sm text-gray-700">
+                            <div class="bg-white p-4 md:p-6 rounded-xl border shadow-sm">
+                                <h4 class="font-black text-sm md:text-base text-gray-800 bg-gray-100 p-2 md:p-3 rounded-lg mb-4 md:mb-6 flex items-center"><i class="fa-solid fa-file-invoice mr-2 text-gray-500"></i> Rincian Transaksi Awal</h4>
+                                <table class="w-full text-xs md:text-sm text-gray-700">
                                     <tbody class="divide-y divide-gray-100">
-                                        <tr><td class="py-3 font-semibold text-gray-500">No Invoice</td><td class="py-3 font-bold font-mono text-blue-600 text-right" id="lbl_co_inv">-</td></tr>
-                                        <tr><td class="py-3 font-semibold text-gray-500">Nama Tamu</td><td class="py-3 font-bold text-gray-800 text-right" id="lbl_co_nama">-</td></tr>
-                                        <tr><td class="py-3 font-semibold text-gray-500">Kamar & Durasi</td><td class="py-3 font-bold text-gray-800 text-right">Kmr <span id="lbl_co_nokamar" class="text-blue-600">-</span> (<span id="lbl_co_hari">-</span> Malam)</td></tr>
-                                        <tr><td class="py-3 font-semibold text-gray-500">Tgl Masuk</td><td class="py-3 font-bold text-gray-800 text-right" id="lbl_co_in">-</td></tr>
-                                        <tr><td class="py-4 font-semibold text-gray-800 bg-gray-50 px-2 rounded-t mt-2">Biaya Kamar Awal (Kotor)</td><td class="py-4 font-black text-gray-800 text-xl text-right bg-gray-50 px-2 rounded-t mt-2" id="lbl_co_biaya">Rp 0</td></tr>
-                                        <tr><td class="py-3 font-semibold text-red-600 px-2 bg-red-50/50">Diskon Harga (Check-in)</td><td class="py-3 font-bold text-red-600 text-lg text-right px-2 bg-red-50/50" id="lbl_co_diskon_awal">- Rp 0</td></tr>
-                                        <tr><td class="py-3 font-semibold text-green-700 px-2 bg-green-50/50 rounded-b">Uang Muka (DP) Masuk</td><td class="py-3 font-black text-green-600 text-xl text-right px-2 bg-green-50/50 rounded-b" id="lbl_co_dp_awal">Rp 0</td></tr>
+                                        <tr><td class="py-2 md:py-3 font-semibold text-gray-500">No Invoice</td><td class="py-2 md:py-3 font-bold font-mono text-blue-600 text-right" id="lbl_co_inv">-</td></tr>
+                                        <tr><td class="py-2 md:py-3 font-semibold text-gray-500">Nama Tamu</td><td class="py-2 md:py-3 font-bold text-gray-800 text-right" id="lbl_co_nama">-</td></tr>
+                                        <tr><td class="py-2 md:py-3 font-semibold text-gray-500">Kamar & Durasi</td><td class="py-2 md:py-3 font-bold text-gray-800 text-right">Kmr <span id="lbl_co_nokamar" class="text-blue-600">-</span> (<span id="lbl_co_hari">-</span> Mlm)</td></tr>
+                                        <tr><td class="py-2 md:py-3 font-semibold text-gray-500">Tgl Masuk</td><td class="py-2 md:py-3 font-bold text-gray-800 text-right" id="lbl_co_in">-</td></tr>
+                                        <tr><td class="py-3 md:py-4 font-semibold text-gray-800 bg-gray-50 px-2 rounded-t mt-2">Biaya Kamar Awal (Kotor)</td><td class="py-3 md:py-4 font-black text-gray-800 text-base md:text-xl text-right bg-gray-50 px-2 rounded-t mt-2" id="lbl_co_biaya">Rp 0</td></tr>
+                                        <tr><td class="py-2 md:py-3 font-semibold text-red-600 px-2 bg-red-50/50">Diskon Harga (Check-in)</td><td class="py-2 md:py-3 font-bold text-red-600 text-sm md:text-lg text-right px-2 bg-red-50/50" id="lbl_co_diskon_awal">- Rp 0</td></tr>
+                                        <tr><td class="py-2 md:py-3 font-semibold text-green-700 px-2 bg-green-50/50 rounded-b">Uang Muka (DP) Masuk</td><td class="py-2 md:py-3 font-black text-green-600 text-base md:text-xl text-right px-2 bg-green-50/50 rounded-b" id="lbl_co_dp_awal">Rp 0</td></tr>
                                     </tbody>
                                 </table>
                             </div>
 
-                            <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
-                                <h4 class="font-black text-gray-800 mb-6 border-b-2 border-gray-300 pb-2 flex items-center"><i class="fa-solid fa-cart-plus mr-2 text-blue-500"></i> Tambahan Tagihan & Denda</h4>
+                            <div class="bg-gray-50 p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+                                <h4 class="font-black text-sm md:text-base text-gray-800 mb-4 md:mb-6 border-b-2 border-gray-300 pb-2 flex items-center"><i class="fa-solid fa-cart-plus mr-2 text-blue-500"></i> Tambahan & Denda</h4>
                                 
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm"><label class="text-[10px] font-bold text-gray-500 uppercase">Layanan Laundry</label><input type="text" id="co_laundry" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-gray-300 py-1.5 mt-1 font-bold text-lg outline-none focus:border-blue-400 bg-transparent transition"></div>
-                                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm"><label class="text-[10px] font-bold text-gray-500 uppercase">Makanan / Resto</label><input type="text" id="co_makan" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-gray-300 py-1.5 mt-1 font-bold text-lg outline-none focus:border-blue-400 bg-transparent transition"></div>
-                                    
-                                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm"><label class="text-[10px] font-bold text-gray-500 uppercase">Snack / Minibar</label><input type="text" id="co_minibar" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-gray-300 py-1.5 mt-1 font-bold text-lg outline-none focus:border-blue-400 bg-transparent transition"></div>
-                                    
-                                    <div class="bg-white p-3 rounded-lg border border-red-200 shadow-sm"><label class="text-[10px] font-bold text-red-500 uppercase">Denda / Kerusakan</label><input type="text" id="co_denda" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-red-300 py-1.5 mt-1 font-bold text-lg outline-none text-red-600 focus:border-red-500 bg-transparent transition"></div>
-                                    <div class="bg-white p-3 rounded-lg border border-green-200 shadow-sm md:col-span-2"><label class="text-[10px] font-bold text-green-600 uppercase">Diskon Ekstra (Saat Checkout)</label><input type="text" id="co_diskon" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-green-300 py-1.5 mt-1 font-bold text-lg outline-none focus:border-green-500 text-green-600 bg-transparent transition"></div>
+                                <div class="grid grid-cols-2 gap-3 md:gap-4 mb-6">
+                                    <div class="bg-white p-2.5 md:p-3 rounded-lg border border-gray-200 shadow-sm"><label class="text-[9px] md:text-[10px] font-bold text-gray-500 uppercase">Layanan Laundry</label><input type="text" id="co_laundry" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-gray-300 py-1 md:py-1.5 mt-1 font-bold text-sm md:text-lg outline-none focus:border-blue-400 bg-transparent transition"></div>
+                                    <div class="bg-white p-2.5 md:p-3 rounded-lg border border-gray-200 shadow-sm"><label class="text-[9px] md:text-[10px] font-bold text-gray-500 uppercase">Makanan Resto</label><input type="text" id="co_makan" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-gray-300 py-1 md:py-1.5 mt-1 font-bold text-sm md:text-lg outline-none focus:border-blue-400 bg-transparent transition"></div>
+                                    <div class="bg-white p-2.5 md:p-3 rounded-lg border border-gray-200 shadow-sm"><label class="text-[9px] md:text-[10px] font-bold text-gray-500 uppercase">Snack Minibar</label><input type="text" id="co_minibar" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-gray-300 py-1 md:py-1.5 mt-1 font-bold text-sm md:text-lg outline-none focus:border-blue-400 bg-transparent transition"></div>
+                                    <div class="bg-white p-2.5 md:p-3 rounded-lg border border-red-200 shadow-sm"><label class="text-[9px] md:text-[10px] font-bold text-red-500 uppercase">Denda / Kerusakan</label><input type="text" id="co_denda" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-red-300 py-1 md:py-1.5 mt-1 font-bold text-sm md:text-lg outline-none text-red-600 focus:border-red-500 bg-transparent transition"></div>
+                                    <div class="bg-white p-2.5 md:p-3 rounded-lg border border-green-200 shadow-sm col-span-2"><label class="text-[9px] md:text-[10px] font-bold text-green-600 uppercase">Diskon Ekstra (Checkout)</label><input type="text" id="co_diskon" data-raw="0" oninput="formatInputUang(this)" placeholder="Rp 0" class="w-full border-b-2 border-green-300 py-1 md:py-1.5 mt-1 font-bold text-sm md:text-lg outline-none focus:border-green-500 text-green-600 bg-transparent transition"></div>
                                 </div>
                                 
-                                <div class="bg-red-600 text-white p-6 rounded-xl text-center border-4 border-red-200 shadow-xl mt-6 relative overflow-hidden">
+                                <div class="bg-red-600 text-white p-5 md:p-6 rounded-xl text-center border-4 border-red-200 shadow-xl mt-4 md:mt-6 relative overflow-hidden">
                                     <div class="absolute top-0 right-0 -mr-6 -mt-6 w-24 h-24 rounded-full bg-white opacity-10"></div>
                                     
                                     <!-- BREAKDOWN BIAYA CHECKOUT (SISA KAMAR + BIAYA TAMBAHAN) -->
-                                    <div class="flex justify-between items-center border-b border-red-400 pb-4 mb-4 text-sm font-bold text-red-100">
+                                    <div class="flex justify-between items-center border-b border-red-400 pb-3 md:pb-4 mb-3 md:mb-4 text-xs md:text-sm font-bold text-red-100">
                                         <div class="text-left">
-                                            <p class="text-[10px] uppercase tracking-wider mb-1 opacity-80">Sisa Kamar (Blm Lunas)</p>
-                                            <p id="lbl_co_sisa_kamar" class="text-2xl text-white">Rp 0</p>
+                                            <p class="text-[9px] md:text-[10px] uppercase tracking-wider mb-1 opacity-80">Sisa Kamar (Blm Lunas)</p>
+                                            <p id="lbl_co_sisa_kamar" class="text-lg md:text-2xl text-white">Rp 0</p>
                                         </div>
-                                        <i class="fa-solid fa-plus text-2xl opacity-50"></i>
+                                        <i class="fa-solid fa-plus text-xl md:text-2xl opacity-50"></i>
                                         <div class="text-right">
-                                            <p class="text-[10px] uppercase tracking-wider mb-1 opacity-80">Biaya Tambahan</p>
-                                            <p id="lbl_co_sisa_tambahan" class="text-2xl text-white">Rp 0</p>
+                                            <p class="text-[9px] md:text-[10px] uppercase tracking-wider mb-1 opacity-80">Biaya Tambahan</p>
+                                            <p id="lbl_co_sisa_tambahan" class="text-lg md:text-2xl text-white">Rp 0</p>
                                         </div>
                                     </div>
 
-                                    <p class="text-xs font-bold text-red-200 uppercase tracking-widest mb-1">TOTAL PELUNASAN SEKARANG</p>
-                                    <p class="text-5xl font-black drop-shadow-md" id="lbl_co_sisa">Rp 0</p>
+                                    <p class="text-[10px] md:text-xs font-bold text-red-200 uppercase tracking-widest mb-1">TOTAL PELUNASAN SEKARANG</p>
+                                    <p class="text-3xl md:text-5xl font-black drop-shadow-md" id="lbl_co_sisa">Rp 0</p>
                                 </div>
                                 
-                                <div class="flex flex-col space-y-3 mt-6">
-                                    <button onclick="submitCheckout()" class="w-full bg-gray-900 text-white font-black tracking-widest py-4 rounded-xl hover:bg-black shadow-lg text-lg transition transform hover:-translate-y-1"><i class="fa-solid fa-flag-checkered mr-2 text-green-400"></i> PELUNASAN & CHECK-OUT</button>
-                                    <button onclick="triggerPrint('checkout', null)" class="w-full bg-white text-gray-800 border-2 border-gray-300 font-bold py-3 rounded-xl hover:bg-gray-100 shadow transition"><i class="fa-solid fa-print mr-1 text-gray-500"></i> Cetak Ulang / Cek Struk</button>
+                                <div class="flex flex-col space-y-3 mt-4 md:mt-6">
+                                    <button onclick="submitCheckout()" class="w-full bg-gray-900 text-white font-black tracking-widest py-3 md:py-4 rounded-xl hover:bg-black shadow-lg text-sm md:text-lg transition transform hover:-translate-y-1"><i class="fa-solid fa-flag-checkered mr-2 text-green-400"></i> PELUNASAN & CHECK-OUT</button>
+                                    <button onclick="triggerPrint('checkout', null)" class="w-full bg-white text-gray-800 border-2 border-gray-300 font-bold py-2.5 md:py-3 rounded-xl hover:bg-gray-100 shadow transition text-sm md:text-base"><i class="fa-solid fa-print mr-1 text-gray-500"></i> Cetak Ulang Struk</button>
                                 </div>
                             </div>
                         </div>
@@ -523,68 +535,68 @@
                 <!-- 7. PEMBAYARAN -->
                 <section id="page-pembayaran" class="page-section">
                     <div class="bg-white p-0 rounded-2xl shadow-sm border overflow-hidden">
-                        <div class="p-6 border-b bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
-                            <h3 class="text-xl font-black text-gray-800"><i class="fa-solid fa-file-invoice-dollar mr-2 text-blue-500"></i>Riwayat Pembayaran</h3>
-                            <div class="flex w-full md:w-auto space-x-3">
+                        <div class="p-4 md:p-6 border-b bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4">
+                            <h3 class="text-lg md:text-xl font-black text-gray-800 w-full md:w-auto"><i class="fa-solid fa-file-invoice-dollar mr-2 text-blue-500"></i>Riwayat Transaksi</h3>
+                            <div class="flex w-full md:w-auto space-x-2 md:space-x-3">
                                 <div class="relative w-full md:w-64">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fa-solid fa-search text-gray-400"></i>
                                     </div>
-                                    <input type="text" id="cari_riwayat" oninput="cariRiwayatTransaksi()" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm outline-none transition" placeholder="Cari Tamu / Invoice...">
+                                    <input type="text" id="cari_riwayat" oninput="cariRiwayatTransaksi()" class="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-xs md:text-sm outline-none transition" placeholder="Cari Tamu / Invoice...">
                                 </div>
-                                <button onclick="exportTableToExcel('tbl-transaksi-full', 'Riwayat_Transaksi')" class="bg-green-600 text-white px-5 py-2 text-sm font-bold rounded-lg shadow hover:bg-green-700 transition flex-shrink-0"><i class="fa-solid fa-file-excel mr-1"></i> Export</button>
+                                <button onclick="exportTableToExcel('tbl-transaksi-full', 'Riwayat_Transaksi')" class="bg-green-600 text-white px-3 md:px-5 py-2 text-xs md:text-sm font-bold rounded-lg shadow hover:bg-green-700 transition flex-shrink-0"><i class="fa-solid fa-file-excel mr-1"></i> Export</button>
                             </div>
                         </div>
-                        <div class="overflow-x-auto p-6"><table id="tbl-transaksi-full" class="w-full text-sm text-left"><thead class="bg-gray-800 text-white"><tr><th class="px-4 py-4 rounded-tl-lg">No. Invoice</th><th class="px-4 py-4">Nama Tamu</th><th class="px-4 py-4">Kamar</th><th class="px-4 py-4 text-right">Total Tagihan</th><th class="px-4 py-4 text-center">Status</th><th class="px-4 py-4 text-center rounded-tr-lg">Cetak</th></tr></thead><tbody id="tbl-transaksi" class="divide-y text-gray-700"></tbody></table></div>
+                        <div class="overflow-x-auto p-4 md:p-6"><table id="tbl-transaksi-full" class="w-full text-xs md:text-sm text-left whitespace-nowrap"><thead class="bg-gray-800 text-white"><tr><th class="px-4 py-3 md:py-4 rounded-tl-lg">No. Invoice</th><th class="px-4 py-3 md:py-4">Nama Tamu</th><th class="px-4 py-3 md:py-4">Kamar</th><th class="px-4 py-3 md:py-4 text-right">Total Tagihan</th><th class="px-4 py-3 md:py-4 text-center">Status</th><th class="px-4 py-3 md:py-4 text-center rounded-tr-lg">Cetak</th></tr></thead><tbody id="tbl-transaksi" class="divide-y text-gray-700"></tbody></table></div>
                     </div>
                 </section>
 
                 <!-- 8. LAPORAN -->
                 <section id="page-laporan" class="page-section">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div class="bg-white p-8 rounded-2xl border border-blue-100 shadow-sm border-t-8 border-t-blue-500 text-center transition hover:shadow-md"><p class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide">Total Pendapatan (Bulan Ini)</p><h3 class="text-4xl font-black text-blue-600 drop-shadow-sm" id="lap_pendapatan">Rp 0</h3></div>
-                        <div class="bg-white p-8 rounded-2xl border border-green-100 shadow-sm border-t-8 border-t-green-500 text-center transition hover:shadow-md"><p class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide">Okupansi Kamar Saat Ini</p><h3 class="text-4xl font-black text-green-600 drop-shadow-sm" id="lap_okupansi">0%</h3></div>
-                        <div class="bg-white p-8 rounded-2xl border border-purple-100 shadow-sm border-t-8 border-t-purple-500 text-center transition hover:shadow-md"><p class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide">Kamar Terlaris (Bulan Ini)</p><h3 class="text-4xl font-black text-purple-600 drop-shadow-sm" id="lap_terlaris">-</h3></div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+                        <div class="bg-white p-6 md:p-8 rounded-2xl border border-blue-100 shadow-sm border-t-8 border-t-blue-500 text-center transition hover:shadow-md"><p class="text-xs md:text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide">Pendapatan (Bulan Ini)</p><h3 class="text-2xl md:text-4xl font-black text-blue-600 drop-shadow-sm" id="lap_pendapatan">Rp 0</h3></div>
+                        <div class="bg-white p-6 md:p-8 rounded-2xl border border-green-100 shadow-sm border-t-8 border-t-green-500 text-center transition hover:shadow-md"><p class="text-xs md:text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide">Okupansi Saat Ini</p><h3 class="text-2xl md:text-4xl font-black text-green-600 drop-shadow-sm" id="lap_okupansi">0%</h3></div>
+                        <div class="bg-white p-6 md:p-8 rounded-2xl border border-purple-100 shadow-sm border-t-8 border-t-purple-500 text-center transition hover:shadow-md"><p class="text-xs md:text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide">Terlaris (Bulan Ini)</p><h3 class="text-2xl md:text-4xl font-black text-purple-600 drop-shadow-sm" id="lap_terlaris">-</h3></div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
-                        <div class="bg-white p-8 rounded-2xl shadow-sm border">
-                            <h3 class="text-lg font-black mb-6 border-b-2 border-gray-200 pb-3 text-gray-800"><i class="fa-solid fa-chart-line text-blue-500 mr-2"></i>Kinerja Tipe Kamar (Bulan Ini)</h3>
-                            <table class="w-full text-sm text-left"><thead class="bg-gray-100 text-gray-600"><tr><th class="py-3 px-4 rounded-l-lg">Tipe Kamar</th><th class="py-3 px-4 text-center">Disewa</th><th class="py-3 px-4 text-right rounded-r-lg">Total Pendapatan</th></tr></thead><tbody id="tbl-lap-tipe" class="divide-y text-gray-800"></tbody></table>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-6">
+                        <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border overflow-x-auto">
+                            <h3 class="text-base md:text-lg font-black mb-4 md:mb-6 border-b-2 border-gray-200 pb-2 md:pb-3 text-gray-800"><i class="fa-solid fa-chart-line text-blue-500 mr-2"></i>Kinerja Tipe Kamar</h3>
+                            <table class="w-full text-xs md:text-sm text-left whitespace-nowrap"><thead class="bg-gray-100 text-gray-600"><tr><th class="py-2 md:py-3 px-3 md:px-4 rounded-l-lg">Tipe Kamar</th><th class="py-2 md:py-3 px-3 md:px-4 text-center">Disewa</th><th class="py-2 md:py-3 px-3 md:px-4 text-right rounded-r-lg">Total Pendapatan</th></tr></thead><tbody id="tbl-lap-tipe" class="divide-y text-gray-800"></tbody></table>
                         </div>
-                        <div class="bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl shadow-sm border border-green-100 text-center flex flex-col justify-center items-center">
-                            <div class="bg-green-500 text-white w-24 h-24 rounded-full flex items-center justify-center mb-6 shadow-lg transform transition hover:scale-110"><i class="fa-solid fa-file-excel text-5xl"></i></div>
-                            <h2 class="text-2xl font-black text-gray-800">Export Seluruh Transaksi</h2>
-                            <p class="text-sm text-gray-600 mt-3 mb-6 max-w-sm">Unduh database asli transaksi keuangan, riwayat tamu, dan histori checkout langsung ke format Excel (.xlsx) murni.</p>
-                            <button onclick="exportSemuaTransaksiExcel()" class="bg-green-600 text-white px-8 py-4 rounded-xl font-black tracking-wide hover:bg-green-700 shadow-lg w-full max-w-md transition transform hover:-translate-y-1"><i class="fa-solid fa-download mr-2"></i> DOWNLOAD LAPORAN EXCEL</button>
+                        <div class="bg-gradient-to-br from-green-50 to-white p-6 md:p-8 rounded-2xl shadow-sm border border-green-100 text-center flex flex-col justify-center items-center">
+                            <div class="bg-green-500 text-white w-16 h-16 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-lg transform transition hover:scale-110"><i class="fa-solid fa-file-excel text-3xl md:text-5xl"></i></div>
+                            <h2 class="text-xl md:text-2xl font-black text-gray-800">Export Transaksi</h2>
+                            <p class="text-xs md:text-sm text-gray-600 mt-2 md:mt-3 mb-4 md:mb-6 max-w-sm">Unduh database asli transaksi keuangan, riwayat tamu, dan histori checkout langsung ke format Excel (.xlsx).</p>
+                            <button onclick="exportSemuaTransaksiExcel()" class="bg-green-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl font-black tracking-wide hover:bg-green-700 shadow-lg w-full max-w-md transition transform hover:-translate-y-1 text-xs md:text-base"><i class="fa-solid fa-download mr-2"></i> DOWNLOAD EXCEL</button>
                         </div>
                     </div>
                 </section>
 
                 <!-- 9. PENGATURAN -->
                 <section id="page-pengaturan" class="page-section">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="bg-white p-8 rounded-2xl shadow-sm border h-fit">
-                            <h3 class="text-xl font-black mb-6 border-b-2 border-gray-200 pb-3 text-gray-800"><i class="fa-solid fa-building text-blue-500 mr-2"></i>Profil Penginapan (Struk Invoice)</h3>
-                            <div class="space-y-5">
-                                <div><label class="text-xs font-bold text-gray-600 uppercase">Nama Penginapan</label><input type="text" class="w-full border-b-2 border-gray-300 p-2 mt-1 bg-gray-50 font-black text-lg text-blue-800 outline-none focus:border-blue-500 transition" value="HOTEL PENGINAPAN" id="set_hotel"></div>
-                                <div><label class="text-xs font-bold text-gray-600 uppercase">Alamat Lengkap</label><input type="text" class="w-full border-b-2 border-gray-300 p-2 mt-1 bg-gray-50 outline-none focus:border-blue-500 transition" value="Jl. Contoh Alamat No. 12, Kota" id="set_alamat"></div>
-                                <div><label class="text-xs font-bold text-gray-600 uppercase">Nomor Telepon</label><input type="text" class="w-full border-b-2 border-gray-300 p-2 mt-1 bg-gray-50 font-bold outline-none focus:border-blue-500 transition" value="0812-3456-7890" id="set_telp"></div>
-                                <button onclick="simpanProfilPengaturan()" class="w-full bg-blue-600 text-white font-black tracking-widest py-4 rounded-xl shadow-lg hover:bg-blue-700 mt-4 transition transform hover:-translate-y-1"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> SIMPAN & SINKRON KE GSHEET</button>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                        <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border h-fit">
+                            <h3 class="text-lg md:text-xl font-black mb-4 md:mb-6 border-b-2 border-gray-200 pb-2 md:pb-3 text-gray-800"><i class="fa-solid fa-building text-blue-500 mr-2"></i>Profil Penginapan (Struk)</h3>
+                            <div class="space-y-4 md:space-y-5">
+                                <div><label class="text-[10px] md:text-xs font-bold text-gray-600 uppercase">Nama Penginapan</label><input type="text" class="w-full border-b-2 border-gray-300 p-1.5 md:p-2 mt-1 bg-gray-50 font-black text-base md:text-lg text-blue-800 outline-none focus:border-blue-500 transition" value="HOTEL PENGINAPAN" id="set_hotel"></div>
+                                <div><label class="text-[10px] md:text-xs font-bold text-gray-600 uppercase">Alamat Lengkap</label><input type="text" class="w-full border-b-2 border-gray-300 p-1.5 md:p-2 mt-1 bg-gray-50 outline-none focus:border-blue-500 transition text-sm md:text-base" value="Jl. Contoh Alamat No. 12, Kota" id="set_alamat"></div>
+                                <div><label class="text-[10px] md:text-xs font-bold text-gray-600 uppercase">Nomor Telepon</label><input type="text" class="w-full border-b-2 border-gray-300 p-1.5 md:p-2 mt-1 bg-gray-50 font-bold outline-none focus:border-blue-500 transition text-sm md:text-base" value="0812-3456-7890" id="set_telp"></div>
+                                <button onclick="simpanProfilPengaturan()" class="w-full bg-blue-600 text-white font-black tracking-widest py-3 md:py-4 rounded-xl shadow-lg hover:bg-blue-700 mt-2 md:mt-4 transition transform hover:-translate-y-1 text-sm md:text-base"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> SIMPAN & SINKRON</button>
                             </div>
                         </div>
-                        <div class="space-y-8">
-                            <div class="bg-white p-8 rounded-2xl shadow-sm border">
-                                <div class="flex justify-between items-center mb-6 border-b-2 border-gray-200 pb-3">
-                                    <h3 class="text-xl font-black text-gray-800"><i class="fa-solid fa-users-cog text-blue-500 mr-2"></i>Manajemen User & Hak Akses</h3>
-                                    <button onclick="tambahUserBaru()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 shadow transition"><i class="fa-solid fa-plus mr-1"></i> Tambah User</button>
+                        <div class="space-y-6 md:space-y-8">
+                            <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border">
+                                <div class="flex justify-between items-center mb-4 md:mb-6 border-b-2 border-gray-200 pb-2 md:pb-3">
+                                    <h3 class="text-lg md:text-xl font-black text-gray-800"><i class="fa-solid fa-users-cog text-blue-500 mr-2"></i>Manajemen PIN User</h3>
+                                    <button onclick="tambahUserBaru()" class="bg-blue-600 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-bold hover:bg-blue-700 shadow transition"><i class="fa-solid fa-plus md:mr-1"></i> <span class="hidden md:inline">Tambah User</span></button>
                                 </div>
-                                <div class="overflow-x-auto max-h-60"><table class="w-full text-sm text-left"><thead class="bg-gray-100 text-gray-600"><tr><th class="px-3 py-3 rounded-l">Nama Karyawan</th><th class="px-3 py-3">Jabatan</th><th class="px-3 py-3 text-center">Status</th><th class="px-3 py-3 text-right rounded-r">Aksi</th></tr></thead><tbody id="tbl-users" class="divide-y text-gray-800"></tbody></table></div>
+                                <div class="overflow-x-auto max-h-60"><table class="w-full text-xs md:text-sm text-left whitespace-nowrap"><thead class="bg-gray-100 text-gray-600"><tr><th class="px-2 md:px-3 py-2 md:py-3 rounded-l">Nama Karyawan</th><th class="px-2 md:px-3 py-2 md:py-3">Jabatan</th><th class="px-2 md:px-3 py-2 md:py-3 text-center">Status</th><th class="px-2 md:px-3 py-2 md:py-3 text-right rounded-r">Aksi</th></tr></thead><tbody id="tbl-users" class="divide-y text-gray-800"></tbody></table></div>
                             </div>
-                            <div class="bg-gradient-to-r from-orange-50 to-red-50 p-8 rounded-2xl shadow-sm border border-orange-200">
-                                <h3 class="text-xl font-black mb-2 text-orange-800"><i class="fa-solid fa-database mr-2"></i>Backup Sistem Penuh</h3>
-                                <p class="text-sm text-orange-700 mb-6">Amankan seluruh data Anda. Unduh langsung dari Server Google Sheets.</p>
-                                <button onclick="window.open('https://docs.google.com/spreadsheets/d/1Z2iCSjdW2oi5dEucNR34mD-U2TEHi779OfbKgm11vwA/export?format=xlsx', '_blank')" class="w-full bg-orange-600 text-white font-black tracking-widest py-4 rounded-xl shadow-lg hover:bg-orange-700 transition transform hover:-translate-y-1"><i class="fa-solid fa-cloud-download-alt mr-2"></i> UNDUH DATABASE ASLI (GS)</button>
+                            <div class="bg-gradient-to-r from-orange-50 to-red-50 p-5 md:p-8 rounded-2xl shadow-sm border border-orange-200">
+                                <h3 class="text-lg md:text-xl font-black mb-1 md:mb-2 text-orange-800"><i class="fa-solid fa-database mr-2"></i>Backup Sistem Penuh</h3>
+                                <p class="text-xs md:text-sm text-orange-700 mb-4 md:mb-6">Amankan seluruh data Anda. Unduh langsung dari Server Google Sheets.</p>
+                                <button onclick="window.open('https://docs.google.com/spreadsheets/d/1Z2iCSjdW2oi5dEucNR34mD-U2TEHi779OfbKgm11vwA/export?format=xlsx', '_blank')" class="w-full bg-orange-600 text-white font-black tracking-widest py-3 md:py-4 rounded-xl shadow-lg hover:bg-orange-700 transition transform hover:-translate-y-1 text-xs md:text-base"><i class="fa-solid fa-cloud-download-alt mr-2"></i> UNDUH DATABASE (GS)</button>
                             </div>
                         </div>
                     </div>
@@ -600,9 +612,23 @@
         let globalKamar=[], globalTamu=[], globalReservasi=[], globalTransaksi=[], globalUsers=[];
         let editMode = { active: false, type: null, idVal: null };
 
+        // ================= MOBILE SIDEBAR LOGIC =================
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
         // ================= SISTEM PIN & KEYBOARD =================
-        const pinInputBox = document.getElementById('pin1');
-        
         function moveNext(elem, nextId, event) {
             if (event.key === 'Backspace') {
                 if (elem.value === '' && elem.previousElementSibling && elem.previousElementSibling.classList.contains('pin-box')) { elem.previousElementSibling.focus(); } return;
@@ -661,6 +687,7 @@
         function switchShift() {
             Swal.fire({ title: 'Kunci Layar?', text: 'Aplikasi akan kembali ke mode PIN untuk keamanan.', icon: 'question', showCancelButton: true, confirmButtonColor: '#f97316', confirmButtonText: 'Ya, Kunci Layar' }).then((result) => {
                 if (result.isConfirmed) {
+                    if (window.innerWidth < 768) toggleSidebar(); // Tutup sidebar mobile kalau terbuka
                     localStorage.removeItem('isLoggedIn'); document.getElementById('app-container').classList.add('opacity-0');
                     setTimeout(() => {
                         document.getElementById('app-container').classList.add('hidden'); let loginBox = document.getElementById('login-screen'); loginBox.classList.remove('hidden');
@@ -672,7 +699,7 @@
             })
         }
 
-        const pageTitles = { 'dashboard': { t: 'Dashboard', s: 'Ringkasan kondisi penginapan secara real-time' }, 'kamar': { t: 'Data Kamar', s: 'Manajemen fasilitas dan harga kamar' }, 'tamu': { t: 'Data Tamu', s: 'Database riwayat tamu pelanggan' }, 'reservasi': { t: 'Reservasi', s: 'Daftar jadwal pemesanan kamar' }, 'checkin': { t: 'Check In', s: 'Proses tamu masuk dan pembuatan tagihan' }, 'checkout': { t: 'Check Out', s: 'Proses tamu keluar dan penagihan akhir' }, 'pembayaran': { t: 'Pembayaran', s: 'Riwayat invoice dan transaksi' }, 'laporan': { t: 'Laporan & Okupansi', s: 'Statistik pendapatan dan cetak laporan' }, 'pengaturan': { t: 'Pengaturan Sistem', s: 'Konfigurasi profil dan manajemen user' } };
+        const pageTitles = { 'dashboard': { t: 'Dashboard', s: 'Ringkasan kondisi penginapan secara real-time' }, 'kamar': { t: 'Data Kamar', s: 'Manajemen fasilitas dan harga kamar' }, 'tamu': { t: 'Data Tamu', s: 'Database riwayat tamu pelanggan' }, 'reservasi': { t: 'Reservasi', s: 'Daftar jadwal pemesanan kamar' }, 'checkin': { t: 'Check In', s: 'Proses tamu masuk dan pembuatan tagihan' }, 'checkout': { t: 'Check Out', s: 'Proses tamu keluar dan penagihan akhir' }, 'pembayaran': { t: 'Pembayaran', s: 'Riwayat invoice dan transaksi' }, 'laporan': { t: 'Laporan', s: 'Statistik pendapatan dan cetak laporan' }, 'pengaturan': { t: 'Pengaturan Sistem', s: 'Konfigurasi profil dan manajemen user' } };
         const setElem = (id, val, isHTML=false, isInput=false) => { let el = document.getElementById(id); if(el) { if(isInput) el.value = val; else if(isHTML) el.innerHTML = val; else el.innerText = val; } };
         const safeStr = (str) => { if (str === null || str === undefined) return ''; return String(str).replace(/[\r\n'"\\]/g, ' ').trim(); };
         const formatRp = (angka) => { let num = parseFloat(angka); if(isNaN(num)) num = 0; return 'Rp ' + num.toLocaleString('id-ID'); };
@@ -737,6 +764,12 @@
             if(pageTitles[pageId]) { setElem('page-title', pageTitles[pageId].t); setElem('page-subtitle', pageTitles[pageId].s); }
             if(pageId === 'checkin') { document.getElementById('ci_in').value = getTodayYMD(); document.getElementById('ci_out').value = getTodayYMD(); }
             if(pageId === 'laporan') renderLaporanData();
+
+            // Tutup sidebar otomatis di versi Mobile jika menu di klik
+            if(window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                if(!sidebar.classList.contains('-translate-x-full')) toggleSidebar();
+            }
         }
 
         async function fetchAPI(action) { try { let res = await fetch(`${API_URL}?action=${action}`); return await res.json(); } catch(e) { return { status: 'error', data: [] }; } }
@@ -826,7 +859,7 @@
                         if(stKmr === 'Terisi') { bg = 'bg-red-500'; tc = 'text-red-500'; ic = 'fa-bed'; } else if(stKmr === 'Booking') { bg = 'bg-yellow-400'; tc = 'text-yellow-600'; ic = 'fa-calendar'; } else if(stKmr === 'Cleaning' || stKmr === 'Maintenance') { bg = 'bg-orange-500'; tc = 'text-orange-500'; ic = 'fa-broom'; } else { stKmr='Kosong'; bg = 'bg-green-500'; tc = 'text-green-500'; ic = 'fa-door-open'; }
                         
                         let safeNo = noKmr.replace(/'/g, "\\'"); 
-                        htmlGrid += `<div onclick="klikKamarDashboard('${safeNo}', '${stKmr}', '${safeTipe}', '${safeHarga}')" class="border border-gray-100 rounded-xl p-4 flex flex-col items-center justify-center bg-white shadow-sm hover:shadow-md cursor-pointer transition"><p class="font-black text-gray-800 mb-2 text-xl">${noKmr}</p><div class="flex items-center space-x-2 bg-gray-50 px-3 py-1 rounded-full border border-gray-100"><div class="${bg} text-white w-5 h-5 rounded flex items-center justify-center text-[10px]"><i class="fa-solid ${ic}"></i></div><span class="${tc} text-xs font-black uppercase">${stKmr}</span></div></div>`;
+                        htmlGrid += `<div onclick="klikKamarDashboard('${safeNo}', '${stKmr}', '${safeTipe}', '${safeHarga}')" class="border border-gray-100 rounded-xl p-4 flex flex-col items-center justify-center bg-white shadow-sm hover:shadow-md cursor-pointer transition"><p class="font-black text-gray-800 mb-2 text-xl">${noKmr}</p><div class="flex items-center space-x-2 bg-gray-50 px-3 py-1 rounded-full border border-gray-100"><div class="${bg} text-white w-5 h-5 rounded flex items-center justify-center text-[10px]"><i class="fa-solid ${ic}"></i></div><span class="${tc} text-[10px] md:text-xs font-black uppercase">${stKmr}</span></div></div>`;
                     });
                 }
                 setElem('room-grid', htmlGrid, true);
@@ -866,7 +899,7 @@
         }
         function tambahFasilitasManualInline() {
             let val = document.getElementById('k_f_custom').value.trim();
-            if(val) { let fid = 'f_cust_' + Math.floor(Math.random()*1000); document.getElementById('fas_container').insertAdjacentHTML('beforeend', `<label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="${fid}" value="${val}" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><span>${val}</span></label>`); document.getElementById('k_f_custom').value = ''; }
+            if(val) { let fid = 'f_cust_' + Math.floor(Math.random()*1000); document.getElementById('fas_container').insertAdjacentHTML('beforeend', `<label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="${fid}" value="${val}" checked class="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600 rounded focus:ring-blue-500"><span>${val}</span></label>`); document.getElementById('k_f_custom').value = ''; }
         }
         async function submitKamar(e) {
             e.preventDefault(); let fas = [];
@@ -878,7 +911,7 @@
         function editRowKamar(no) {
             let k = globalKamar.find(x => String(x['No Kamar']) === String(no)); if(!k) return;
             document.getElementById('k_no').value = k['No Kamar']; document.getElementById('k_no').readOnly = true; document.getElementById('k_tipe').value = k['Tipe']; setRawNum('k_harga', parseRpToNum(k['Harga'])); document.getElementById('k_lantai').value = k['Lantai']; document.getElementById('k_ket').value = k['Keterangan']; document.getElementById('k_status').value = k['Status'];
-            let htmlF = ''; (String(k['Fasilitas']||'')).split(',').forEach(f => { f = f.trim(); if(!f) return; let id = 'f_'+f.replace(/\s+/g,'').toLowerCase(); htmlF += `<label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="${id}" value="${f}" checked class="w-4 h-4 text-blue-600 rounded"><span>${f}</span></label>`; }); document.getElementById('fas_container').innerHTML = htmlF || 'Tidak ada';
+            let htmlF = ''; (String(k['Fasilitas']||'')).split(',').forEach(f => { f = f.trim(); if(!f) return; let id = 'f_'+f.replace(/\s+/g,'').toLowerCase(); htmlF += `<label class="flex items-center space-x-1 cursor-pointer"><input type="checkbox" id="${id}" value="${f}" checked class="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600 rounded"><span>${f}</span></label>`; }); document.getElementById('fas_container').innerHTML = htmlF || 'Tidak ada';
             editMode = { active: true, type: 'kamar', idVal: no }; document.getElementById('btn_save_kamar').innerHTML = '<i class="fa-solid fa-save"></i> UPDATE DATA KAMAR'; document.getElementById('btn_cancel_kamar').classList.remove('hidden'); window.scrollTo(0,0);
         }
 
@@ -909,10 +942,10 @@
                     let k = globalKamar.find(x => String(x['No Kamar']) === String(nok));
                     if(k) { 
                         let harga = parseRpToNum(k['Harga']);
-                        infoBox.value = `${days} Malam x ${formatRp(harga)} = ${formatRp(days * harga)}`;
+                        infoBox.value = `${days} Mlm x ${formatRp(harga)} = ${formatRp(days * harga)}`;
                     }
                 } else {
-                    infoBox.value = "Format tanggal tidak valid";
+                    infoBox.value = "Tgl Tidak Valid";
                 }
             } else {
                 infoBox.value = "";
@@ -976,26 +1009,26 @@
             globalUsers.forEach(u => {
                 if(!u || !u['Username']) return;
                 let st = u['Status']==='Aktif' ? 'text-green-600' : 'text-red-600';
-                ht += `<tr><td class="px-3 py-3 font-bold">${safeStr(u['Username'])}</td><td class="px-3 py-3"><span class="px-2 py-1 rounded text-xs font-bold bg-gray-200">${safeStr(u['Role'])}</span></td><td class="px-3 py-3 text-center font-bold ${st}">${safeStr(u['Status'])}</td><td class="px-3 py-3 text-right"><button onclick="hapusData('Data User', 1, '${safeStr(u['Username'])}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                ht += `<tr><td class="px-2 md:px-3 py-2 md:py-3 font-bold">${safeStr(u['Username'])}</td><td class="px-2 md:px-3 py-2 md:py-3"><span class="px-2 py-1 rounded text-[10px] md:text-xs font-bold bg-gray-200">${safeStr(u['Role'])}</span></td><td class="px-2 md:px-3 py-2 md:py-3 text-center font-bold ${st}">${safeStr(u['Status'])}</td><td class="px-2 md:px-3 py-2 md:py-3 text-right"><button onclick="hapusData('Data User', 1, '${safeStr(u['Username'])}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
             document.getElementById('tbl-users').innerHTML = ht || '<tr><td colspan="4" class="text-center py-4 text-gray-500">Belum ada user.</td></tr>';
         }
         
         async function tambahUserBaru() {
-            let menuOpts = allMenus.filter(m=>m.type!=='divider').map(m => `<label class="flex items-center space-x-2"><input type="checkbox" value="${m.text}" class="menu-akses w-4 h-4 rounded"><span>${m.text}</span></label>`).join('');
+            let menuOpts = allMenus.filter(m=>m.type!=='divider').map(m => `<label class="flex items-center space-x-2"><input type="checkbox" value="${m.text}" class="menu-akses w-3 h-3 md:w-4 md:h-4 rounded"><span>${m.text}</span></label>`).join('');
             
             const { value: formValues } = await Swal.fire({
                 title: 'Tambah PIN Karyawan', html: `
                 <div class="space-y-4">
-                    <input id="swal-u" class="swal2-input !mt-0 !w-full" placeholder="Nama Karyawan (Cth: Budi)" required>
-                    <input id="swal-p" type="password" maxlength="6" inputmode="numeric" class="swal2-input !mt-0 !w-full" placeholder="Buat PIN 6 Angka (Cth: 123456)" required>
-                    <select id="swal-r" class="swal2-select !w-full" onchange="document.getElementById('swal-custom').classList.toggle('hidden', this.value !== 'Custom'); document.getElementById('akses-box').style.display = this.value==='Super Admin'?'none':'block';">
+                    <input id="swal-u" class="swal2-input !mt-0 !w-full text-sm md:text-base" placeholder="Nama Karyawan (Cth: Budi)" required>
+                    <input id="swal-p" type="password" maxlength="6" inputmode="numeric" class="swal2-input !mt-0 !w-full text-sm md:text-base" placeholder="Buat PIN 6 Angka (Cth: 123456)" required>
+                    <select id="swal-r" class="swal2-select !w-full text-sm md:text-base" onchange="document.getElementById('swal-custom').classList.toggle('hidden', this.value !== 'Custom'); document.getElementById('akses-box').style.display = this.value==='Super Admin'?'none':'block';">
                         <option value="Super Admin">Super Admin</option>
                         <option value="Resepsionis">Resepsionis</option>
                         <option value="Custom">+ Tambah Jabatan Baru...</option>
                     </select>
-                    <input id="swal-custom" class="swal2-input hidden !w-full" placeholder="Ketik Jabatan (Misal: Dapur)">
-                    <div id="akses-box" class="text-left text-sm p-4 border rounded-xl bg-gray-50 hidden"><p class="font-bold mb-3 border-b pb-1">Hak Akses Menu:</p><div class="grid grid-cols-2 gap-3">${menuOpts}</div></div>
+                    <input id="swal-custom" class="swal2-input hidden !w-full text-sm md:text-base" placeholder="Ketik Jabatan (Misal: Dapur)">
+                    <div id="akses-box" class="text-left text-xs md:text-sm p-4 border rounded-xl bg-gray-50 hidden"><p class="font-bold mb-3 border-b pb-1">Hak Akses Menu:</p><div class="grid grid-cols-2 gap-3">${menuOpts}</div></div>
                 </div>`, 
                 focusConfirm: false, showCancelButton:true,
                 preConfirm: () => { 
@@ -1009,23 +1042,6 @@
             });
             if (formValues && formValues[0]) {
                 if(await postAPI('addUser', [formValues[0], formValues[1], formValues[2], formValues[3], "Aktif"])) loadAllData();
-            }
-        }
-
-        // ================= PENGATURAN (SINKRON GSHEET) =================
-        async function simpanProfilPengaturan() {
-            let n = document.getElementById('set_hotel').value;
-            let a = document.getElementById('set_alamat').value;
-            let t = document.getElementById('set_telp').value;
-
-            let arrData = [
-                ["Profil Invoice", "Nama Penginapan", n, "Menyesuaikan Struk Invoice"],
-                ["Profil Invoice", "Alamat Lengkap", a, "Menyesuaikan Struk Invoice"],
-                ["Profil Invoice", "Nomor Telepon", t, "Menyesuaikan Struk Invoice"]
-            ];
-
-            if(await postAPI('savePengaturan', arrData)) {
-                Swal.fire({icon: 'success', title: 'Tersimpan!', text: 'Profil penginapan telah tersinkronisasi ke Google Sheets.', timer: 2000, showConfirmButton:false});
             }
         }
 
@@ -1072,12 +1088,11 @@
                 let okupansi = globalKamar.length > 0 ? Math.round((terisiVal / globalKamar.length) * 100) : 0;
                 
                 setElem('lap_pendapatan', formatRp(blnIniTot)); setElem('lap_okupansi', okupansi + "%"); setElem('lap_terlaris', mxC > 0 ? favR : "-");
-                let hTipe = ''; for(let key in tipeMap) { hTipe += `<tr><td class="py-3 px-4 font-bold border-r border-gray-200">${key}</td><td class="py-3 px-4 text-center border-r border-gray-200">${tipeMap[key].c} Kali</td><td class="py-3 px-4 text-right font-black text-green-600">${formatRp(tipeMap[key].rev)}</td></tr>`; }
+                let hTipe = ''; for(let key in tipeMap) { hTipe += `<tr><td class="py-2 md:py-3 px-3 md:px-4 font-bold border-r border-gray-200">${key}</td><td class="py-2 md:py-3 px-3 md:px-4 text-center border-r border-gray-200">${tipeMap[key].c} Kali</td><td class="py-2 md:py-3 px-3 md:px-4 text-right font-black text-green-600">${formatRp(tipeMap[key].rev)}</td></tr>`; }
                 setElem('tbl-lap-tipe', hTipe, true);
             } catch(e) { console.error("Lap render err", e); }
         }
 
-        // FUNGSI EXPORT EXCEL NYATA 
         function exportTableToExcel(tableID, filename = ''){
             let tableSelect = document.getElementById(tableID);
             let tableHTML = tableSelect.outerHTML.replace(/<th[^>]*>Aksi<\/th>/gi, "").replace(/<th[^>]*>Cetak<\/th>/gi, "").replace(/<td[^>]*>.*?<\/td>/gi, function(m){ return m.includes('fa-') ? '' : m; });
@@ -1223,21 +1238,6 @@
             setTimeout(() => { window.print(); document.getElementById('print-area').classList.add('hidden'); }, 300);
         }
 
-        // ================= UPDATE DOM TABEL =================
-        function updateDOMKamar() {
-            let ht=''; let ok='<option value="">-- Pilih Kamar Kosong --</option>'; let ot='<option value="">-- Pilih Kamar Terisi --</option>';
-            globalKamar.forEach(k => {
-                if(!k || !k['No Kamar']) return;
-                let st = String(k['Status']||'Kosong').trim(); let stColor = st === 'Kosong' ? 'text-green-600' : (st === 'Terisi' ? 'text-red-600' : 'text-orange-600');
-                ht+=`<tr class="hover:bg-gray-50 border-b"><td class="px-4 py-4 font-bold">${safeStr(k['No Kamar'])}</td><td class="px-4 py-4">${safeStr(k['Tipe'])}</td><td class="px-4 py-4 font-bold text-gray-700">${formatRp(parseRpToNum(k['Harga']))}</td><td class="px-4 py-4 text-xs text-gray-500 w-1/4">${safeStr(k['Fasilitas'])}</td><td class="px-4 py-4 font-black uppercase text-[10px] ${stColor}"><span class="bg-gray-100 px-2 py-1 border rounded">${st}</span></td><td class="px-4 py-4 text-center"><button onclick="editRowKamar('${String(k['No Kamar']).replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700 mr-4"><i class="fa-solid fa-edit"></i></button><button onclick="hapusData('Data Kamar', 1, '${String(k['No Kamar']).replace(/'/g, "\\'")}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                if(st === 'Kosong' || st === 'Cleaning' || st === 'Maintenance') ok+=`<option value="${safeStr(k['No Kamar'])}">${safeStr(k['No Kamar'])} - ${safeStr(k['Tipe'])} (${formatRp(parseRpToNum(k['Harga']))})</option>`;
-                if(st === 'Terisi') ot+=`<option value="${safeStr(k['No Kamar'])}">${safeStr(k['No Kamar'])} - ${safeStr(k['Tipe'])}</option>`;
-            });
-            setElem('tbl-kamar', ht || '<tr><td colspan="6" class="text-center py-4">Data kosong</td></tr>', true); document.querySelectorAll('.option-kamar-kosong').forEach(e => e.innerHTML=ok); document.querySelectorAll('.option-kamar-terisi').forEach(e => e.innerHTML=ot);
-        }
-        function updateDOMTamu() { let ht=''; globalTamu.forEach(t => { if(!t || !t['NIK']) return; ht+=`<tr class="hover:bg-gray-50 border-b"><td class="px-4 py-4 font-bold text-gray-800">${safeStr(t['Nama Lengkap'])}</td><td class="px-4 py-4 text-gray-600">${safeStr(t['NIK'])}</td><td class="px-4 py-4">${safeStr(t['No HP'])}</td><td class="px-4 py-4 text-xs text-gray-500">${safeStr(t['Alamat'])}</td><td class="px-4 py-4 text-center"><button onclick="editRowTamu('${safeStr(t['NIK'])}')" class="text-blue-500 mr-4"><i class="fa-solid fa-edit"></i></button><button onclick="hapusData('Data Tamu', 1, '${safeStr(t['NIK'])}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td></tr>`; }); setElem('tbl-tamu', ht || '<tr><td colspan="5" class="text-center py-4">Data kosong</td></tr>', true); }
-        function updateDOMReservasi() { let ht=''; [...globalReservasi].reverse().forEach(r => { if(!r || !r['Kode Booking']) return; let st=String(r['Status Booking']||'').trim(); let stClass=st==='Menunggu'?'bg-yellow-100 text-yellow-700':(st==='Selesai'?'bg-green-100 text-green-700':'bg-gray-100 text-gray-700'); ht+=`<tr class="hover:bg-gray-50 border-b"><td class="px-4 py-4 font-mono text-xs text-gray-500">${safeStr(r['Kode Booking'])}</td><td class="px-4 py-4 font-bold text-gray-800">${safeStr(r['Nama Pemesan'])}</td><td class="px-4 py-4 font-bold">${safeStr(r['No Kamar'])}</td><td class="px-4 py-4">${parseDateStandard(r['Tgl Check-in'])} <span class="mx-1 text-gray-400"><i class="fa-solid fa-arrow-right"></i></span> ${parseDateStandard(r['Tgl Check-out'])}</td><td class="px-4 py-4 text-center"><span class="px-2 py-1 rounded text-[10px] font-black uppercase ${stClass} border">${st}</span></td><td class="px-4 py-4 text-center"><button onclick="editRowReservasi('${safeStr(r['Kode Booking'])}')" class="text-blue-500 mr-4"><i class="fa-solid fa-edit"></i></button><button onclick="hapusData('Reservasi', 1, '${safeStr(r['Kode Booking'])}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td></tr>`; }); setElem('tbl-reservasi', ht || '<tr><td colspan="6" class="text-center py-4">Data kosong</td></tr>', true); }
-        
         // FUNGSI SEARCH FILTER
         function cariRiwayatTransaksi() {
             let input = document.getElementById("cari_riwayat").value.toLowerCase();
@@ -1249,7 +1249,7 @@
             }
         }
 
-        function updateDOMTransaksi() { let ht=''; [...globalTransaksi].reverse().forEach(t => { if(!t || !t['No Invoice']) return; ht+=`<tr class="hover:bg-gray-50 border-b"><td class="px-4 py-4 font-mono text-xs text-blue-600 font-bold">${safeStr(t['No Invoice'])}</td><td class="px-4 py-4 font-bold text-gray-800">${safeStr(t['Nama Tamu'])} <span class="text-[10px] text-gray-400 block mt-1">Kamar ${safeStr(t['No Kamar'])}</span></td><td class="px-4 py-4 text-gray-700 font-bold text-right">${formatRp(parseRpToNum(t['Total Tagihan']))}</td><td class="px-4 py-4 text-center text-[10px] uppercase font-black"><span class="${String(t['Status Transaksi']).includes('Aktif') ? 'text-red-500 bg-red-100 border-red-200' : 'text-green-600 bg-green-100 border-green-200'} px-2 py-1 rounded border">${safeStr(t['Status Transaksi'])}</span></td><td class="px-4 py-4 text-center"><button onclick="triggerPrint('riwayat', '${safeStr(t['No Invoice'])}')" class="bg-gray-800 text-white px-4 py-2 rounded-lg text-xs hover:bg-black shadow transition"><i class="fa-solid fa-print mr-1"></i> Cetak</button></td></tr>`; }); setElem('tbl-transaksi', ht || '<tr><td colspan="6" class="text-center py-4">Data kosong</td></tr>', true); }
+        function updateDOMTransaksi() { let ht=''; [...globalTransaksi].reverse().forEach(t => { if(!t || !t['No Invoice']) return; ht+=`<tr class="hover:bg-gray-50 border-b"><td class="px-4 py-3 md:py-4 font-mono text-xs text-blue-600 font-bold">${safeStr(t['No Invoice'])}</td><td class="px-4 py-3 md:py-4 font-bold text-gray-800">${safeStr(t['Nama Tamu'])} <span class="text-[10px] text-gray-400 block mt-1">Kamar ${safeStr(t['No Kamar'])}</span></td><td class="px-4 py-3 md:py-4 text-gray-700 font-bold text-right">${formatRp(parseRpToNum(t['Total Tagihan']))}</td><td class="px-4 py-3 md:py-4 text-center text-[10px] uppercase font-black"><span class="${String(t['Status Transaksi']).includes('Aktif') ? 'text-red-500 bg-red-100 border-red-200' : 'text-green-600 bg-green-100 border-green-200'} px-2 py-1 rounded border">${safeStr(t['Status Transaksi'])}</span></td><td class="px-4 py-3 md:py-4 text-center"><button onclick="triggerPrint('riwayat', '${safeStr(t['No Invoice'])}')" class="bg-gray-800 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs hover:bg-black shadow transition"><i class="fa-solid fa-print md:mr-1"></i> <span class="hidden md:inline">Cetak</span></button></td></tr>`; }); setElem('tbl-transaksi', ht || '<tr><td colspan="6" class="text-center py-4">Data kosong</td></tr>', true); }
         
         // PWA SERVICE WORKER
         if ('serviceWorker' in navigator) {
