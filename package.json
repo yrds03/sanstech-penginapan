@@ -1,0 +1,13 @@
+{
+  "name": "sanstech-penginapan",
+  "version": "1.1.0",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i styles.css -o vendor/tailwind.css --minify",
+    "check": "node --check app.js && node --check sw.js",
+    "test": "python tests/browser_check.py"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

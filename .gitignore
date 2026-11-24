@@ -1,0 +1,8 @@
+.test-deps/
+.build-tools/
+.review/
+upstream-review/
+__pycache__/
+test-results/
+*.log
+node_modules/
