@@ -1,6 +1,6 @@
 'use strict';
 const CACHE_PREFIX = 'sanstech-penginapan-';
-const CACHE_NAME = CACHE_PREFIX + 'v3';
+const CACHE_NAME = CACHE_PREFIX + 'v4';
 const APP_FILES = ['./', './index.html', './app.js', './manifest.json', './icons/icon-192.png', './icons/icon-512.png', './vendor/tailwind.css', './vendor/sweetalert2.all.min.js', './vendor/xlsx.full.min.js', './vendor/fontawesome.min.css', './vendor/webfonts/fa-solid-900.woff2', './vendor/webfonts/fa-regular-400.woff2', './vendor/webfonts/fa-brands-400.woff2'];
 self.addEventListener('install', event => {
     event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_FILES)).then(() => self.skipWaiting()));

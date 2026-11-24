@@ -1,7 +1,8 @@
 'use strict';
 
 const SS_ID = '1Z2iCSjdW2oi5dEucNR34mD-U2TEHi779OfbKgm11vwA';
-const API_VERSION = '2.0.0';
+const API_VERSION = '2.1.0';
+const SCHEMA_VERSION = '2.0.0';
 const HOTEL_TZ = 'Asia/Jakarta';
 const SHEET_SCHEMA = {
   'Dashboard': ['Indikator', 'Nilai', 'Keterangan'],
@@ -77,12 +78,12 @@ function readRows_(name) {
 }
 function writeRows_(name, rows) {
   const sheet = sheet_(name), headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(str_);
-  const oldValues = sheet.getDataRange().getValues(), oldFormulas = sheet.getDataRange().getFormulas(), extras = {};
-  oldValues.slice(1).forEach((row, index) => { extras[str_(row[0])] = headers.map((h, col) => oldFormulas[index + 1][col] || safeCell_(row[col])); });
+  const oldValues = sheet.getDataRange().getValues(), oldFormulas = sheet.getDataRange().getFormulas(), extras = new Map();
+  oldValues.slice(1).forEach((row, index) => { extras.set(str_(row[0]), headers.map((h, col) => oldFormulas[index + 1][col] || safeCell_(row[col]))); });
   const last = sheet.getLastRow();
   if (rows.length + 1 > sheet.getMaxRows()) sheet.insertRowsAfter(sheet.getMaxRows(), rows.length + 1 - sheet.getMaxRows());
   if (rows.length) sheet.getRange(2, 1, rows.length, headers.length).setValues(rows.map(row => headers.map((h, col) => {
-    if (!SHEET_SCHEMA[name].includes(h) && extras[str_(row[headers[0]])]) return extras[str_(row[headers[0]])][col];
+    if (!SHEET_SCHEMA[name].includes(h) && extras.has(str_(row[headers[0]]))) return extras.get(str_(row[headers[0]]))[col];
     return safeCell_(row[h] === undefined ? '' : row[h]);
   })));
   if (last > rows.length + 1) sheet.getRange(rows.length + 2, 1, last - rows.length - 1, headers.length).clearContent();
@@ -126,7 +127,7 @@ function setupSistemPenginapan() {
     reconcile_(next); persist_(before, next); installTriggers_();
     PropertiesService.getScriptProperties().deleteProperty('PIN_ADMIN_AWAL');
     PropertiesService.getScriptProperties().setProperty('PAYMENTS_MIGRATED', now_());
-    PropertiesService.getScriptProperties().setProperty('SCHEMA_VERSION', API_VERSION);
+    PropertiesService.getScriptProperties().setProperty('SCHEMA_VERSION', SCHEMA_VERSION);
     return { spreadsheetId: SS_ID, sheets: Object.keys(SHEET_SCHEMA), apiVersion: API_VERSION, message: 'Sheet, header, format, dan trigger tersinkronisasi.' };
   });
 }
@@ -220,7 +221,7 @@ function migrateUsers_(state) {
 function publicUser_(u) { const profile = {}; ['Username', 'Role', 'Hak Akses', 'Status'].forEach(key => { profile[key] = u[key]; }); return profile; }
 function login_(data) {
   const properties = PropertiesService.getScriptProperties();
-  if (properties.getProperty('SCHEMA_VERSION') !== API_VERSION) fail_('SETUP_REQUIRED', 'Jalankan setupSistemPenginapan di editor Apps Script terlebih dahulu.');
+  if (properties.getProperty('SCHEMA_VERSION') !== SCHEMA_VERSION) fail_('SETUP_REQUIRED', 'Jalankan setupSistemPenginapan di editor Apps Script terlebih dahulu.');
   let attempts; try { attempts = JSON.parse(properties.getProperty('LOGIN_ATTEMPTS') || '{}'); } catch (_) { attempts = {}; }
   const now = Date.now(); if (!attempts.start || now - attempts.start > 300000) attempts = { start: now, failures: 0 };
   if (attempts.failures >= 15) fail_('RATE_LIMIT', 'Terlalu banyak PIN salah. Tunggu lima menit sebelum mencoba lagi.');
@@ -242,7 +243,7 @@ function authenticate_(token) {
 function doGet(e) {
   try {
     const action = str_(e && e.parameter && e.parameter.action);
-    if (!action || action === 'getCapabilities') return response_({ apiVersion: API_VERSION, serverAuth: true, snapshot: true, paymentLedger: true, spreadsheetId: SS_ID });
+    if (!action || action === 'getCapabilities') return response_({ apiVersion: API_VERSION, serverAuth: true, snapshot: true, paymentLedger: true, preserveBookingPrice: true, setupComplete: PropertiesService.getScriptProperties().getProperty('SCHEMA_VERSION') === SCHEMA_VERSION, spreadsheetId: SS_ID });
     fail_('UNAUTHORIZED', 'Gunakan endpoint POST dengan sesi login; data dan PIN tidak tersedia melalui URL publik.');
   } catch (error) { return errorResponse_(error); }
 }
@@ -279,7 +280,8 @@ function snapshot_(user) {
     reservasi: can(['Dashboard', 'Reservasi', 'Check In']) ? state.Reservasi : [], transaksi: transactions,
     users: allowed_(user, 'Pengaturan') ? state['Data User'].map(publicUser_) : [publicUser_(user)],
     pengaturan: state.Pengaturan, pembayaran: can(['Dashboard', 'Pembayaran', 'Laporan']) ? state.Pembayaran : [],
-    user: publicUser_(user), syncedAt: now_(), apiVersion: API_VERSION
+    user: publicUser_(user), syncedAt: now_(), apiVersion: API_VERSION,
+    recoveryRequired: !!PropertiesService.getScriptProperties().getProperty('RECOVERY_REQUIRED')
   };
 }
 function overlap_(a, b, c, d) {
@@ -439,7 +441,9 @@ function saveBooking_(state, r, old, user) {
   const days = days_(r['Tgl Check-in'], r['Tgl Check-out']);
   if (date_(r['Tgl Check-in']) < today_() && (!old || date_(r['Tgl Check-in']) !== date_(old['Tgl Check-in']))) fail_('VALIDATION', 'Reservasi baru tidak dapat memakai tanggal lampau.');
   conflict_(state, r['No Kamar'], r['Tgl Check-in'], r['Tgl Check-out'], old ? old['Kode Booking'] : '');
-  const total = days * number_(room.Harga); if (number_(r['Harga Total']) !== total || number_(r.DP) < 0 || number_(r.DP) > total) fail_('VALIDATION', 'Total harga atau DP reservasi tidak sesuai tarif.');
+  const unchangedStay = old && str_(old['No Kamar']) === str_(r['No Kamar']) && date_(old['Tgl Check-in']) === date_(r['Tgl Check-in']) && date_(old['Tgl Check-out']) === date_(r['Tgl Check-out']);
+  const total = unchangedStay ? number_(old['Harga Total']) : days * number_(room.Harga);
+  if (total <= 0 || number_(r['Harga Total']) !== total || number_(r.DP) < 0 || number_(r.DP) > total) fail_('VALIDATION', 'Total harga atau DP reservasi tidak sesuai tarif.');
   if (old && number_(r.DP) < number_(old.DP)) fail_('VALIDATION', 'Pengurangan DP memerlukan pencatatan pengembalian dana.');
   r['Jumlah Hari'] = days; r['Harga Total'] = total; r['Tgl Check-in'] = date_(r['Tgl Check-in']); r['Tgl Check-out'] = date_(r['Tgl Check-out']); r['Status Booking'] = 'Menunggu';
   payment_(state, { booking: r['Kode Booking'], amount: number_(r.DP) - (old ? number_(old.DP) : 0), kind: 'DP Reservasi', method: r['Metode Bayar'], user: user.Username });
@@ -448,7 +452,7 @@ function checkIn_(state, data, user) {
   const t = rowObject_('Transaksi (In-Out)', data.transaksiData); const invoice = required_(t['No Invoice'], 'Invoice');
   if (byId_(state['Transaksi (In-Out)'], 'No Invoice', invoice)) fail_('CONFLICT', 'Invoice sudah ada.');
   const room = byId_(state['Data Kamar'], 'No Kamar', data.noKamar); const booking = data.kodeBooking ? byId_(state.Reservasi, 'Kode Booking', data.kodeBooking) : null;
-  if (!room || str_(room['No Kamar']) !== str_(t['No Kamar']) || ['Cleaning', 'Maintenance'].includes(room.Status)) fail_('CONFLICT', 'Kamar belum siap untuk check-in.');
+  if (!room || str_(room['No Kamar']) !== str_(t['No Kamar']) || !['Kosong', 'Booking'].includes(str_(room.Status))) fail_('CONFLICT', 'Kamar belum siap untuk check-in.');
   if (state['Transaksi (In-Out)'].some(x => active_(x) && str_(x['No Kamar']) === str_(data.noKamar))) fail_('CONFLICT', 'Kamar sudah memiliki tamu aktif.');
   if (data.kodeBooking && (!booking || !waiting_(booking) || str_(booking['No Kamar']) !== str_(data.noKamar))) fail_('CONFLICT', 'Reservasi sudah digunakan atau kamar berbeda.');
   if (room.Status === 'Booking' && !booking) fail_('CONFLICT', 'Tarik kode booking sebelum check-in.');

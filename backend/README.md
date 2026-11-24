@@ -4,6 +4,8 @@
 
 ## Pemasangan satu kali
 
+Untuk pembaruan **2.0.0 → 2.1.0** pada sistem yang sudah selesai setup, cukup ganti `Code.gs` dan perbarui deployment yang sama ke versi baru. Skema, hash PIN, dan jurnal pembayaran tetap kompatibel; setup ulang tidak diwajibkan. Endpoint `getCapabilities` sesudah pembaruan harus melaporkan `apiVersion: "2.1.0"` dan `setupComplete: true`.
+
 1. Buka spreadsheet, pilih **Ekstensi → Apps Script**. Gunakan proyek yang memiliki deployment `AKfycbyjAptPUXrwxBve2yA6Px0KmCnhm5muxOoevwIlV6VkuqPpRCqDLR671TDoI2ePny_t`.
 2. Salin cadangan spreadsheet dan kode lama sebelum migrasi. Pada proyek tersebut, ganti seluruh isi `Code.gs` dengan berkas ini; jangan menambahkan kode baru di bawah kode lama.
 3. Pada **Project Settings**, tampilkan manifest `appsscript.json`. Sesuaikan manifest dengan berkas yang disertakan: zona waktu Asia/Jakarta, runtime V8, izin spreadsheet dan pemasangan trigger.
@@ -41,6 +43,9 @@ Setup tidak menambahkan kamar atau tamu fiktif. Sheet tanpa header yang dapat di
 - `saatSheetDiubah`: trigger edit spreadsheet terpasang; memperbarui status kamar, statistik tamu, dan dashboard setelah perubahan manual. Perubahan dari API tidak memicu `onEdit`, sehingga API juga melakukan rekonsiliasi langsung sebelum mengembalikan sukses.
 - `sinkronkanSistemPenginapan`: trigger setiap lima menit untuk memperbarui status Booking berdasarkan hari Jakarta dan memeriksa kembali sheet/header. Setup berulang tidak menambah trigger duplikat.
 - Frontend versi baru mengambil snapshot konsisten saat login dan setelah penyimpanan. Penyegaran berkala setiap 30 detik dilakukan ketika tidak ada formulir aktif atau penyimpanan berlangsung.
+- Respons sinkronisasi dari shift lama diabaikan setelah logout. Draft profil tidak ditimpa penyegaran; invoice memakai profil terakhir yang tersimpan. Snapshot yang kehilangan jurnal pembayaran ditolak agar saldo tidak berubah menjadi nol.
+- Logout menghapus data tamu, pencarian, dan isi invoice dari tampilan sambil mempertahankan struktur rincian checkout, sehingga login shift berikutnya tetap berfungsi.
+- Edit nama, kontak, atau catatan reservasi dengan kamar dan jadwal tetap mempertahankan harga yang sudah disepakati, meskipun tarif kamar master berubah. Penggantian kamar atau jadwal memakai tarif master yang berlaku.
 - Reservasi mencatat DP pada waktu penerimaan yang sebenarnya. Check-in hanya menambahkan selisih pembayaran di atas DP reservasi. Checkout mencatat pelunasan, mengubah kamar ke Cleaning, dan memperbarui total tamu.
 - Pembayaran historis diisi satu kali saat migrasi dan diberi keterangan bahwa tanggal penerimaan aslinya tidak tersedia. Nilai DP historis memakai tanggal check-in, pelunasan memakai tanggal checkout, dan DP reservasi menunggu memakai waktu migrasi. Periksa jurnal migrasi terhadap pembukuan asli; sistem tidak dapat menemukan tanggal yang tidak pernah dicatat.
 

@@ -159,3 +159,22 @@ test('recovery flag blocks mutations and scheduled writes until owner review', (
     const before = b.rows('Dashboard'); assert.equal(b.context.sinkronkanSistemPenginapan().code, 'RECOVERY_REQUIRED');
     assert.deepEqual(b.rows('Dashboard'), before);
 });
+test('editing booking notes preserves the agreed total after a room rate change', () => {
+    const b = initialized(); write(b, 'addReservasi', booking(b));
+    const room = b.rows('Data Kamar')[0]; room.Harga = 350000;
+    assert.equal(write(b, 'updateData', { sheetName: 'Data Kamar', searchColIndex: 1, searchValue: '101', rowData: b.objectRow('Data Kamar', room) }).status, 'success');
+    const reservation = b.rows('Reservasi')[0]; reservation.Catatan = 'Late arrival';
+    const result = write(b, 'updateData', { sheetName: 'Reservasi', searchColIndex: 1, searchValue: 'BK-TEST', rowData: b.objectRow('Reservasi', reservation) });
+    assert.equal(result.status, 'success'); assert.equal(b.rows('Reservasi')[0]['Harga Total'], 200000);
+    assert.equal(b.rows('Pembayaran').length, 1);
+});
+test('custom columns work for a room identifier that matches an object prototype key', () => {
+    const b = initialized(), sheet = b.sheets.get('Data Kamar'); sheet.cells[0].push('Custom');
+    const data = b.objectRow('Data Kamar', { 'No Kamar': 'constructor', Tipe: 'Standard', Harga: 200000, Status: 'Kosong' });
+    assert.equal(write(b, 'addKamar', data).status, 'success');
+    assert.equal(b.rows('Data Kamar').at(-1)['No Kamar'], 'constructor');
+});
+test('check-in refuses an unavailable room even when its active transaction is missing', () => {
+    const b = initialized(); b.sheets.get('Data Kamar').cells[1][6] = 'Terisi';
+    assert.equal(write(b, 'checkIn', checkin(b)).code, 'CONFLICT');
+});

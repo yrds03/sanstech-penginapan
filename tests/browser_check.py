@@ -329,12 +329,16 @@ class BrowserChecks(unittest.TestCase):
 
     def test_16_logout_clears_data_and_stale_checkout(self):
         self.login(); self.fill_ci()
-        self.eval('lockSession()')
+        self.eval('$("ci_cari_tamu").value="Previous identity"; $("ci_cari_resv").value="BK-PRIVATE"; $("pr_guest_name").textContent="Previous guest"; $("lbl_co_nama").textContent="Previous guest"; lockSession()')
         self.assertTrue(self.page.locator('#login-screen').is_visible())
         self.assertEqual(self.eval('globalTamu.length'), 0)
         self.assertEqual(self.eval('value("ci_nama")'), '')
         self.assertEqual(self.page.locator('#tbl-tamu tr').count(), 0)
         self.assertIsNone(self.eval('actTrx'))
+        self.assertEqual(self.page.locator('#ci_cari_tamu').input_value(), '')
+        self.assertEqual(self.page.locator('#ci_cari_resv').input_value(), '')
+        self.assertEqual(self.page.locator('#pr_guest_name').text_content(), '')
+        self.assertEqual(self.page.locator('#lbl_co_nama').text_content(), '')
 
     def test_17_guest_edit_preserves_history(self):
         self.login(); self.eval('editRowTamu("0012345678901234"); $("t_nama").value="Nama baru"')
@@ -373,8 +377,8 @@ class BrowserChecks(unittest.TestCase):
             page.evaluate('navigator.serviceWorker.ready')
             page.wait_for_function('navigator.serviceWorker.controller !== null')
             cache_keys = page.evaluate('caches.keys()')
-            self.assertIn('sanstech-penginapan-v3', cache_keys)
-            cached = page.evaluate('''async () => { const c=await caches.open('sanstech-penginapan-v3'); return (await c.keys()).map(r=>r.url); }''')
+            self.assertIn('sanstech-penginapan-v4', cache_keys)
+            cached = page.evaluate('''async () => { const c=await caches.open('sanstech-penginapan-v4'); return (await c.keys()).map(r=>r.url); }''')
             self.assertFalse(any('script.google' in u for u in cached))
             self.assertTrue(any('/app.js' in u for u in cached))
             context.set_offline(True)
@@ -431,6 +435,73 @@ class BrowserChecks(unittest.TestCase):
         self.page.locator('.swal2-confirm').click()
         self.page.wait_for_function('globalUsers.some(u => u.Username === "Petugas Baru")')
         self.assertEqual(len(self.writes('addUser')), 1)
+
+    def test_26_pasted_rupiah_with_decimal_zero_keeps_whole_amount(self):
+        self.login(); self.fill_ci()
+        self.page.locator('#ci_bayar').fill('Rp 150.000,00')
+        self.assertEqual(self.eval('getRawNum("ci_bayar")'), 150000)
+
+    def test_27_pending_save_protects_inputs_and_navigation(self):
+        self.login(); self.eval('switchPage("tamu"); $("t_nik").value="123"; $("t_nama").value="Tamu"; $("t_hp").value="08123"; postAPI=()=>new Promise(resolve=>window.finishWrite=resolve); submitTamu({preventDefault(){},target:$("form-tamu")}); undefined')
+        disabled = self.page.locator('#t_nama').is_disabled()
+        self.page.locator('[data-page="dashboard"]').click()
+        active = self.page.locator('.page-section.active').get_attribute('id')
+        self.eval('finishWrite(false)'); self.page.wait_for_function('!busy')
+        self.assertTrue(disabled)
+        self.assertEqual(active, 'page-tamu')
+        self.assertFalse(self.page.locator('#t_nama').is_disabled())
+
+    def test_28_old_snapshot_cannot_restore_guest_data_after_logout(self):
+        self.login()
+        self.eval('''() => {
+            backendMode='secure'; const snap={kamar:globalKamar,tamu:globalTamu,reservasi:globalReservasi,transaksi:globalTransaksi,users:globalUsers,pengaturan:[],pembayaran:[{Nominal:12345}]};
+            fetchAPI=()=>new Promise(resolve=>window.finishSnapshot=()=>resolve({data:snap}));
+            window.pendingSync=loadAllData(); lockSession(); finishSnapshot();
+        }''')
+        self.eval('pendingSync')
+        self.assertEqual(self.eval('globalPembayaran.length'), 0)
+        self.assertEqual(self.eval('globalTamu.length'), 0)
+
+    def test_29_background_refresh_preserves_unsaved_profile(self):
+        self.login(); self.eval('switchPage("pengaturan")')
+        self.page.locator('#set_hotel').fill('Nama Belum Disimpan')
+        self.page.locator('#set_alamat').fill('Alamat Belum Disimpan')
+        self.page.locator('#set_telp').fill('08999')
+        self.eval('loadAllData()')
+        self.assertEqual(self.page.locator('#set_hotel').input_value(), 'Nama Belum Disimpan')
+        self.assertEqual(self.page.locator('#set_alamat').input_value(), 'Alamat Belum Disimpan')
+
+    def test_30_expired_response_from_old_shift_does_not_lock_new_shift(self):
+        self.login()
+        self.eval('''() => {
+            backendMode='secure'; authToken='old-token'; const originalFetch=window.fetch;
+            window.fetch=(url, options)=>JSON.parse(options.body).action==='logout' ? Promise.resolve(new Response('{}')) : new Promise(resolve=>window.finishOldRequest=()=>resolve(new Response(JSON.stringify({status:'error',code:'UNAUTHORIZED',message:'expired'}))));
+            window.oldRequest=requestAPI('getSnapshot').catch(()=>null); lockSession();
+            activeUser={Username:'New Shift',Status:'Aktif','Hak Akses':'Semua Akses'}; authToken='new-token'; sessionEpoch++;
+            finishOldRequest(); window.originalFetch=originalFetch;
+        }''')
+        self.eval('oldRequest'); self.eval('window.fetch=window.originalFetch')
+        self.assertEqual(self.eval('activeUser?.Username'), 'New Shift')
+
+    def test_31_invoice_uses_saved_profile_while_settings_draft_is_unsaved(self):
+        self.login(); self.eval('switchPage("pengaturan")')
+        self.page.locator('#set_hotel').fill('Draf Nama Hotel')
+        self.fill_ci()
+        self.invoke('submitCheckin({preventDefault(){},target:$("form-checkin")})')
+        self.assertEqual(self.page.locator('#pr_hotel_name').inner_text(), 'Hotel Uji')
+        self.assertEqual(self.page.locator('#set_hotel').input_value(), 'Draf Nama Hotel')
+
+    def test_32_incomplete_secure_snapshot_keeps_prior_balances_and_blocks_writes(self):
+        self.login()
+        success = self.eval('''async () => {
+            backendMode='secure'; globalPembayaran=[{Nominal:50000}];
+            const data={kamar:[],tamu:[],reservasi:[],transaksi:[],users:globalUsers,pengaturan:[]};
+            fetchAPI=async()=>({data}); return await loadAllData();
+        }''')
+        self.assertFalse(success)
+        self.assertEqual(self.eval('globalPembayaran[0].Nominal'), 50000)
+        self.assertEqual(self.eval('globalKamar.length'), 4)
+        self.assertFalse(self.eval('dataFresh'))
 
 
 if __name__ == '__main__':

@@ -9,6 +9,9 @@ let editMode = { active: false, type: null, idVal: null };
 let activeUser = null, actTrx = null, busy = false, loggingIn = false, dataFresh = false;
 let loadPromise = null, sessionEpoch = 0;
 let backendMode = 'unknown', authToken = '', globalPembayaran = [], pendingWrite = null;
+let profileDirty = false;
+let backendCapabilities = {};
+let hotelProfile = { set_hotel: 'SANSTECH PENGINAPAN', set_alamat: '', set_telp: '' };
 const $ = id => document.getElementById(id);
 const value = id => String($(id)?.value ?? '').trim();
 const text = v => String(v ?? '').trim();
@@ -40,7 +43,9 @@ function setRawNum(id, val) {
     $(id).value = formatRp(val);
 }
 function formatInputUang(el) {
-    const digits = el.value.replace(/[^0-9]/g, '').slice(0, 12);
+    const raw = el.value.trim();
+    const normalized = /,\d{1,2}$/.test(raw) ? String(Math.max(0, parseRpToNum(raw))) : raw.replace(/[^0-9]/g, '');
+    const digits = normalized.slice(0, 12);
     el.dataset.raw = digits || '0';
     el.value = digits ? formatRp(Number(digits)) : '';
     if (el.id.startsWith('co_')) hitungTotalCO();
@@ -169,6 +174,7 @@ function switchPage(id) {
 }
 
 async function requestAPI(action, data) {
+    const requestEpoch = sessionEpoch, requestToken = authToken;
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), backendMode === 'secure' ? 45000 : 20000);
     try {
@@ -176,7 +182,7 @@ async function requestAPI(action, data) {
         let url = `${API_URL}?action=${encodeURIComponent(action)}`;
         if (data !== undefined || (backendMode === 'secure' && action !== 'getCapabilities')) {
             url = API_URL;
-            const payload = { action, data, token: authToken };
+            const payload = { action, data, token: requestToken };
             if (data !== undefined && !['login', 'logout'].includes(action) && backendMode === 'secure') {
                 const signature = JSON.stringify({ action, data });
                 if (!pendingWrite || pendingWrite.signature !== signature) pendingWrite = { signature, requestId: uniqueId('REQ') };
@@ -189,10 +195,10 @@ async function requestAPI(action, data) {
         const result = await response.json();
         if (!result || result.status !== 'success') {
             const error = new Error(result?.message || 'Respons database tidak valid.'); error.code = result?.code;
-            if (error.code === 'UNAUTHORIZED' && activeUser) lockSession();
+            if (error.code === 'UNAUTHORIZED' && activeUser && requestEpoch === sessionEpoch && requestToken === authToken) lockSession();
             throw error;
         }
-        if (options.method === 'POST' && data !== undefined && !['login', 'logout'].includes(action)) pendingWrite = null;
+        if (requestEpoch === sessionEpoch && options.method === 'POST' && data !== undefined && !['login', 'logout'].includes(action)) pendingWrite = null;
         return result;
     } catch (error) {
         if (error.name === 'AbortError') throw new Error('Koneksi melewati batas waktu.');
@@ -203,11 +209,11 @@ async function requestAPI(action, data) {
 async function detectBackend() {
     try {
         const response = await requestAPI('getCapabilities');
-        if (response.data?.serverAuth === true && response.data?.snapshot === true) { backendMode = 'secure'; return; }
+        if (response.data?.serverAuth === true && response.data?.snapshot === true) { backendMode = 'secure'; backendCapabilities = response.data; return; }
         throw new Error('Versi backend belum dikenali.');
     } catch (error) {
         // Only a known unsupported action permits the old API; network/auth failures do not.
-        if (error.code === 'ACTION_NOT_FOUND' || /Action GET tidak ditemukan/i.test(error.message)) { backendMode = 'legacy'; return; }
+        if (error.code === 'ACTION_NOT_FOUND' || /Action GET tidak ditemukan/i.test(error.message)) { backendMode = 'legacy'; backendCapabilities = {}; return; }
         throw error;
     }
 }
@@ -238,12 +244,12 @@ async function runMutation(page, operation) {
     if (!requireAccess(page) || busy) return false;
     if (!dataFresh) { await notify('Data belum tersinkronisasi. Gunakan tombol sinkronkan lagi.'); return false; }
     busy = true;
-    const buttons = [...document.querySelectorAll('#app-container button')];
-    const disabled = buttons.map(b => b.disabled);
-    buttons.forEach(b => { b.disabled = true; });
+    const controls = [...document.querySelectorAll('#app-container button, #app-container input, #app-container select, #app-container textarea')];
+    const disabled = controls.map(control => control.disabled);
+    controls.forEach(control => { control.disabled = true; });
     try { return await operation(); }
     catch (error) { await notify(error.message || 'Gagal memproses data.', 'Terjadi kesalahan', 'error'); return false; }
-    finally { busy = false; buttons.forEach((b, i) => { if (b.isConnected) b.disabled = disabled[i]; }); }
+    finally { busy = false; controls.forEach((control, i) => { if (control.isConnected) control.disabled = disabled[i]; }); }
 }
 async function loadAllData() {
     if (!activeUser) return false;
@@ -253,30 +259,38 @@ async function loadAllData() {
     loadPromise = (async () => {
         try {
             const actions = ['getKamar', 'getTamu', 'getReservasi', 'getTransaksi', 'getUser', 'getPengaturan'];
-            let results;
+            let results, incomingPayments = globalPembayaran, recoveryRequired = false;
             if (backendMode === 'secure') {
                 const snapshot = (await fetchAPI('getSnapshot')).data;
-                if (!snapshot || !Array.isArray(snapshot.kamar) || !Array.isArray(snapshot.transaksi)) throw new Error('Snapshot database tidak valid.');
-                globalPembayaran = Array.isArray(snapshot.pembayaran) ? snapshot.pembayaran : [];
+                if (epoch !== sessionEpoch || !activeUser) return false;
+                if (!snapshot || ['kamar', 'tamu', 'reservasi', 'transaksi', 'users', 'pengaturan', 'pembayaran'].some(key => !Array.isArray(snapshot[key]))) throw new Error('Snapshot database tidak lengkap.');
+                incomingPayments = snapshot.pembayaran.filter(row => row && typeof row === 'object');
+                recoveryRequired = snapshot.recoveryRequired === true;
                 results = ['kamar', 'tamu', 'reservasi', 'transaksi', 'users', 'pengaturan'].map(key => ({ status: 'fulfilled', value: { status: 'success', data: snapshot[key] } }));
             } else results = await Promise.allSettled(actions.map(fetchAPI));
             if (epoch !== sessionEpoch || !activeUser) return false;
             // Commit one complete operational snapshot. Never clear live data on a failed GET.
             const bad = results.slice(0, 4).find(r => r.status !== 'fulfilled' || !Array.isArray(r.value.data));
             if (bad) throw new Error(bad.status === 'rejected' ? bad.reason.message : 'Format data database tidak valid.');
-            [globalKamar, globalTamu, globalReservasi, globalTransaksi] = results.slice(0, 4).map(r => r.value.data.filter(row => row && typeof row === 'object'));
             const usersResult = results[4];
+            let nextUsers = globalUsers, currentUser = activeUser;
             if (usersResult.status === 'fulfilled' && Array.isArray(usersResult.value.data)) {
-                globalUsers = usersResult.value.data.filter(Boolean).map(({ Password, ...u }) => u);
-                const current = globalUsers.find(u => text(u.Username) === text(activeUser.Username) && text(u.Status) === 'Aktif');
+                nextUsers = usersResult.value.data.filter(Boolean).map(({ Password, ...u }) => u);
+                const current = nextUsers.find(u => text(u.Username) === text(activeUser.Username) && text(u.Status) === 'Aktif');
                 if (!current) { lockSession(); await notify('Akun sudah dinonaktifkan atau dihapus.', 'Sesi berakhir'); return false; }
-                const oldAccess = activeUser['Hak Akses']; activeUser = current;
-                if (oldAccess !== current['Hak Akses']) buildSidebarMenu();
+                currentUser = current;
             }
+            const changedAccess = activeUser['Hak Akses'] !== currentUser['Hak Akses'];
+            [globalKamar, globalTamu, globalReservasi, globalTransaksi] = results.slice(0, 4).map(r => r.value.data.filter(row => row && typeof row === 'object'));
+            globalPembayaran = incomingPayments; globalUsers = nextUsers; activeUser = currentUser;
+            if (changedAccess) buildSidebarMenu();
             if (results[5].status === 'fulfilled' && Array.isArray(results[5].value.data)) {
                 results[5].value.data.filter(Boolean).forEach(p => {
                     const id = { 'Nama Penginapan': 'set_hotel', 'Alamat Lengkap': 'set_alamat', 'Nomor Telepon': 'set_telp' }[p.Item];
-                    if (id && document.activeElement !== $(id)) setElem(id, p.Nilai, false, true);
+                    if (id && (!p.Kategori || p.Kategori === 'Profil Invoice')) {
+                        hotelProfile[id] = text(p.Nilai);
+                        if (!profileDirty && document.activeElement !== $(id)) setElem(id, p.Nilai, false, true);
+                    }
                 });
             }
             if (actTrx) {
@@ -284,8 +298,10 @@ async function loadAllData() {
                 if (!current || TRANSACTION_COLUMNS.some(key => text(current[key]) !== text(actTrx[key]))) clearCheckout();
             }
             updateDOMKamar(); updateDOMTamu(); updateDOMReservasi(); updateDOMTransaksi(); updateDOMUser(); renderDashboardUI(); renderLaporanData();
-            dataFresh = true;
+            calcCheckin(); calcReservasi();
+            dataFresh = !recoveryRequired;
             const partial = results.slice(4).some(r => r.status === 'rejected' || !Array.isArray(r.value.data));
+            if (recoveryRequired) { syncStatus('Penyimpanan diblokir: admin perlu memeriksa pemulihan data Google Sheets.', true); return false; }
             syncStatus(partial ? 'Data operasional tersinkron. Pengguna atau profil belum dapat dimuat; coba sinkronkan lagi.' : '', partial);
             return true;
         } catch (error) {
@@ -340,18 +356,23 @@ async function submitPinLogin() {
 function lockSession() {
     const oldToken = authToken;
     if (backendMode === 'secure' && oldToken) fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body: JSON.stringify({ action: 'logout', token: oldToken }) }).catch(() => {});
-    authToken = ''; globalPembayaran = []; pendingWrite = null;
+    authToken = ''; globalPembayaran = []; pendingWrite = null; profileDirty = false;
+    hotelProfile = { set_hotel: 'SANSTECH PENGINAPAN', set_alamat: '', set_telp: '' };
+    Object.entries(hotelProfile).forEach(([id, val]) => { $(id).value = val; });
     sessionEpoch++; activeUser = null; dataFresh = false; loadPromise = null; actTrx = null;
     globalKamar = []; globalTamu = []; globalReservasi = []; globalTransaksi = []; globalUsers = [];
     editMode = { active: false, type: null, idVal: null };
     document.querySelectorAll('#app-container form').forEach(form => form.reset());
     document.querySelectorAll('[data-raw]').forEach(el => { el.dataset.raw = '0'; el.value = ''; });
-    document.querySelectorAll('#app-container tbody').forEach(el => { el.replaceChildren(); });
+    ['tbl-kamar', 'tbl-tamu', 'tbl-reservasi', 'tbl-transaksi', 'tbl-users', 'tbl-dash-ci', 'tbl-dash-resv', 'tbl-lap-tipe'].forEach(id => { $(id)?.replaceChildren(); });
     document.querySelectorAll('#app-container select.option-kamar-kosong, #app-container select.option-kamar-terisi').forEach(el => { el.replaceChildren(); });
     ['k_no', 't_nik'].forEach(id => { $(id).readOnly = false; });
     ['kamar', 'tamu', 'reservasi'].forEach(type => batalEdit(type));
     $('room-grid').replaceChildren(); $('sidebar-menu').replaceChildren(); $('print-area').classList.add('hidden');
-    $('co_area').classList.add('hidden'); $('app-container').classList.add('hidden');
+    document.querySelectorAll('#print-area [id]').forEach(el => { el.textContent = ''; });
+    ['ci_cari_tamu', 'ci_cari_resv', 'cari_riwayat', 'filter_lap_tgl'].forEach(id => { $(id).value = ''; });
+    renderDashboardUI(); renderLaporanData();
+    setElem('top_user_name', ''); setElem('top_user_role', ''); clearCheckout(); $('app-container').classList.add('hidden');
     $('login-screen').classList.remove('hidden', 'opacity-0');
     toggleSidebar(false); syncStatus(); $('pin1').focus();
 }
@@ -401,16 +422,18 @@ function renderDashboardUI() {
     const arrivals = globalTransaksi.filter(t => (isActive(t) || isCompleted(t)) && isToday(t['Tgl Check-in']));
     setElem('d_ci', arrivals.length); setElem('d_co', globalTransaksi.filter(t => isCompleted(t) && isToday(t['Tgl Check-out'])).length);
     const revenue = { tunai: 0, tf: 0, qris: 0 };
+    let receiptCount = 0;
     const receipts = backendMode === 'secure' ? globalPembayaran : globalTransaksi;
     receipts.forEach(t => {
         const amount = backendMode === 'secure' ? (parseDateStandard(t.Tanggal) === today ? parseRpToNum(t.Nominal) : 0) : cashForPeriod(t, date => date === today);
+        if (amount !== 0) receiptCount++;
         const method = text(t['Metode Bayar']).toLowerCase();
         const bucket = method.includes('tunai') ? 'tunai' : /qris|wallet|kredit|debit/.test(method) ? 'qris' : 'tf';
         revenue[bucket] += amount;
     });
     const total = Object.values(revenue).reduce((a, b) => a + b, 0);
     ['d_rev', 'd_rev_big'].forEach(id => setElem(id, formatRp(total)));
-    setElem('d_rev_count', arrivals.length); Object.entries(revenue).forEach(([key, amount]) => setElem(`d_rev_${key}`, formatRp(amount)));
+    setElem('d_rev_count', receiptCount); Object.entries(revenue).forEach(([key, amount]) => setElem(`d_rev_${key}`, formatRp(amount)));
     setElem('tbl-dash-ci', arrivals.slice(-4).reverse().map((t, i) => `<tr><td class="p-3">${i + 1}</td><td class="p-3">${safeStr(t['Nama Tamu'])}</td><td class="p-3">${safeStr(t['No Kamar'])}</td><td class="p-3">${safeStr(parseDateStandard(t['Tgl Check-in']))}</td><td class="p-3">${safeStr(parseDateStandard(t['Tgl Check-out']))}</td></tr>`).join('') || emptyRow(5, 'Belum ada check-in hari ini'), true);
     setElem('tbl-dash-resv', [...globalReservasi].reverse().slice(0, 3).map((r, i) => `<tr><td class="p-3">${i + 1}</td><td class="p-3">${safeStr(r['Nama Pemesan'])}</td><td class="p-3">${safeStr(r['No Kamar'])}</td><td class="p-3">${safeStr(parseDateStandard(r['Tgl Check-in']))}</td><td class="p-3">${safeStr(r['Status Booking'])}</td></tr>`).join('') || emptyRow(5, 'Belum ada reservasi'), true);
     setElem('room-grid', globalKamar.map(k => {
@@ -523,8 +546,14 @@ function editRowTamu(nik) {
 }
 function calcReservasi() {
     const days = stayDays(value('r_in'), value('r_out')), room = roomById(value('r_kamar'));
+    const quote = reservationQuote(room, days);
     $('r_out').min = value('r_in');
-    setElem('r_info', days && room ? `${days} Malam × ${formatRp(room.Harga)} = ${formatRp(days * parseRpToNum(room.Harga))}` : 'Pilih kamar dan tanggal yang valid', false, true);
+    setElem('r_info', days && room ? (quote.preserved ? `${days} Malam · Harga booking ${formatRp(quote.total)}` : `${days} Malam × ${formatRp(room.Harga)} = ${formatRp(quote.total)}`) : 'Pilih kamar dan tanggal yang valid', false, true);
+}
+function reservationQuote(room, days) {
+    const original = editMode.active && editMode.type === 'reservasi' ? globalReservasi.find(r => text(r['Kode Booking']) === text(editMode.idVal)) : null;
+    const preserved = backendCapabilities.preserveBookingPrice === true && original && text(original['No Kamar']) === value('r_kamar') && parseDateStandard(original['Tgl Check-in']) === value('r_in') && parseDateStandard(original['Tgl Check-out']) === value('r_out');
+    return { total: preserved ? parseRpToNum(original['Harga Total']) : days * parseRpToNum(room?.Harga), preserved: !!preserved };
 }
 async function submitReservasi(event) {
     event.preventDefault();
@@ -538,7 +567,7 @@ async function submitReservasi(event) {
         if (value('r_in') < getTodayYMD() && (!original || value('r_in') !== parseDateStandard(original['Tgl Check-in']))) return notify('Tanggal reservasi baru tidak boleh di masa lalu.');
         const conflict = roomConflict(room['No Kamar'], value('r_in'), value('r_out'), editing ? editMode.idVal : '');
         if (conflict) return notify(conflict);
-        const total = days * parseRpToNum(room.Harga), dp = getRawNum('r_dp');
+        const total = reservationQuote(room, days).total, dp = getRawNum('r_dp');
         if (total <= 0 || dp < 0 || dp > total) return notify('DP harus di antara nol dan total biaya kamar.');
         const row = [editing ? editMode.idVal : uniqueId('BK'), value('r_nama'), value('r_hp'), room['No Kamar'], value('r_in'), value('r_out'), days, formatRp(total), formatRp(dp), value('r_metode'), value('r_catatan'), 'Menunggu'];
         if (await postAPI(editing ? 'updateData' : 'addReservasi', editing ? { sheetName: 'Reservasi', searchColIndex: 1, searchValue: editMode.idVal, rowData: row } : row)) { batalEdit('reservasi'); await loadAllData(); }
@@ -645,7 +674,11 @@ async function submitCheckin(event) {
         }
     });
 }
-function clearCheckout() { actTrx = null; $('co_area').classList.add('hidden'); ['co_laundry', 'co_makan', 'co_minibar', 'co_denda', 'co_diskon'].forEach(id => setRawNum(id, 0)); }
+function clearCheckout() {
+    actTrx = null; $('co_area').classList.add('hidden');
+    ['co_laundry', 'co_makan', 'co_minibar', 'co_denda', 'co_diskon'].forEach(id => setRawNum(id, 0));
+    ['lbl_co_inv', 'lbl_co_nama', 'lbl_co_nokamar', 'lbl_co_hari', 'lbl_co_in', 'lbl_co_biaya', 'lbl_co_diskon_awal', 'lbl_co_dp_awal', 'lbl_co_sisa_kamar', 'lbl_co_sisa_tambahan', 'lbl_co_sisa'].forEach(id => setElem(id, ''));
+}
 function loadTagihanCheckout() {
     if (!requireAccess('checkout')) return;
     clearCheckout(); const trx = transactionForRoom(value('co_kamar'));
@@ -691,7 +724,7 @@ function triggerPrint(mode, data = null) {
     if (!record) return notify('Data invoice belum tersedia atau biaya tidak valid.');
     const total = parseRpToNum(record['Total Tagihan']), dp = depositOf(record), paid = paidOf(record);
     const fields = {
-        pr_hotel_name: value('set_hotel') || 'SANSTECH PENGINAPAN', pr_hotel_address: value('set_alamat'), pr_hotel_tel: `Telp: ${value('set_telp')}`,
+        pr_hotel_name: hotelProfile.set_hotel || 'SANSTECH PENGINAPAN', pr_hotel_address: hotelProfile.set_alamat, pr_hotel_tel: `Telp: ${hotelProfile.set_telp}`,
         pr_inv_no: record['No Invoice'], pr_guest_name: record['Nama Tamu'], pr_guest_phone: record['No HP'], pr_guest_address: record.Alamat || '—', pr_room_no: record['No Kamar'],
         pr_checkin: parseDateStandard(record['Tgl Check-in']), pr_checkout: parseDateStandard(record['Tgl Check-out']), pr_room_qty: record['Lama Menginap'], pr_room_price: formatRp(record['Biaya Kamar']),
         pr_laundry: formatRp(record.Laundry), pr_fnb: formatRp(record.Makanan), pr_minibar: formatRp(record.Minibar), pr_denda: formatRp(record.Denda), pr_discount: '- ' + formatRp(record.Diskon),
@@ -730,7 +763,7 @@ async function simpanProfilPengaturan() {
     return runMutation('pengaturan', async () => {
         if (!value('set_hotel') || !value('set_alamat') || !value('set_telp')) return notify('Nama penginapan, alamat, dan telepon wajib diisi.');
         const rows = [['Profil Invoice', 'Nama Penginapan', value('set_hotel'), 'Menyesuaikan Struk Invoice'], ['Profil Invoice', 'Alamat Lengkap', value('set_alamat'), 'Menyesuaikan Struk Invoice'], ['Profil Invoice', 'Nomor Telepon', value('set_telp'), 'Menyesuaikan Struk Invoice']];
-        if (await postAPI('savePengaturan', rows)) { await loadAllData(); await notify('Profil penginapan tersimpan.', 'Tersimpan', 'success'); }
+        if (await postAPI('savePengaturan', rows)) { profileDirty = false; await loadAllData(); await notify('Profil penginapan tersimpan.', 'Tersimpan', 'success'); }
     });
 }
 function changeUserRole() {
@@ -758,12 +791,13 @@ async function tambahUserBaru() {
 
 document.addEventListener('click', event => {
     const button = event.target.closest('[data-action], [data-page]'); if (!button) return;
-    event.preventDefault(); if (button.disabled) return;
+    event.preventDefault(); if (button.disabled || busy) return;
     if (button.dataset.page) { switchPage(button.dataset.page); return; }
     const id = button.dataset.id;
     const handlers = { 'edit-room': () => editRowKamar(id), 'delete-room': () => hapusData('Data Kamar', 1, id), 'edit-guest': () => editRowTamu(id), 'delete-guest': () => hapusData('Data Tamu', 1, id), 'edit-booking': () => editRowReservasi(id), 'delete-booking': () => hapusData('Reservasi', 1, id), 'delete-user': () => hapusData('Data User', 1, id), print: () => triggerPrint('riwayat', id), 'room-detail': () => klikKamarDashboard(id) };
     handlers[button.dataset.action]?.();
 });
+document.addEventListener('input', event => { if (['set_hotel', 'set_alamat', 'set_telp'].includes(event.target.id)) profileDirty = true; });
 window.addEventListener('DOMContentLoaded', () => {
     ['isLoggedIn', 'activeUser', 'activeRole', 'activeAkses'].forEach(key => localStorage.removeItem(key));
     const updateClock = () => setElem('current-date', new Date().toLocaleString('id-ID', { timeZone: HOTEL_TIMEZONE, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }));

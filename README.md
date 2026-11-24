@@ -24,9 +24,9 @@ GitHub Pages dapat menyajikan isi repositori ini secara langsung. Pertahankan `i
 
 ## Kontrak API yang dipertahankan
 
-Endpoint dan tautan cadangan spreadsheet yang sudah dipakai proyek dipertahankan di `app.js`. GET menggunakan `?action=...`. POST mengirim JSON `{ "action": "...", "data": ... }` dengan `Content-Type: text/plain;charset=UTF-8`, agar cocok dengan deployment Apps Script yang ada.
+Endpoint dan tautan cadangan spreadsheet yang sudah dipakai proyek dipertahankan di `app.js`. Dalam mode API lama, GET menggunakan `?action=...` dan POST mengirim JSON `{ "action": "...", "data": ... }` dengan `Content-Type: text/plain;charset=UTF-8`. Versi 2 hanya membuka `getCapabilities` melalui GET; pembacaan data dan penulisan memakai POST dengan token sesi. Frontend mendeteksi kemampuan backend sebelum memilih kontrak tersebut.
 
-GET: `getKamar`, `getTamu`, `getReservasi`, `getTransaksi`, `getUser`, `getPengaturan`.
+Pembacaan: `getKamar`, `getTamu`, `getReservasi`, `getTransaksi`, `getUser`, `getPengaturan`; versi 2 menggabungkan pembacaan operasional melalui `getSnapshot`.
 
 POST: `addKamar`, `addTamu`, `addReservasi`, `addUser`, `updateData`, `deleteData`, `updateStatusKamar`, `checkIn`, `checkOut`, `savePengaturan`.
 
