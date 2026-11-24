@@ -153,3 +153,9 @@ test('new empty spreadsheets bootstrap an admin from the owner property only', (
     assert.equal(b.login('887766').data.user.Username, 'admin');
     assert.equal(b.properties.has('PIN_ADMIN_AWAL'), false); assert.equal(b.login('123456').code, 'INVALID_PIN');
 });
+test('recovery flag blocks mutations and scheduled writes until owner review', () => {
+    const b = initialized(); b.properties.set('RECOVERY_REQUIRED', 'needs-review');
+    assert.equal(write(b, 'checkIn', checkin(b)).code, 'RECOVERY_REQUIRED');
+    const before = b.rows('Dashboard'); assert.equal(b.context.sinkronkanSistemPenginapan().code, 'RECOVERY_REQUIRED');
+    assert.deepEqual(b.rows('Dashboard'), before);
+});

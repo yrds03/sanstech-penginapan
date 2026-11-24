@@ -174,6 +174,7 @@ function installTriggers_() {
 }
 function sinkronkanSistemPenginapan() {
   return lock_(function () {
+    if (PropertiesService.getScriptProperties().getProperty('RECOVERY_REQUIRED')) return { status: 'blocked', code: 'RECOVERY_REQUIRED' };
     const ss = SpreadsheetApp.openById(SS_ID);
     Object.keys(SHEET_SCHEMA).forEach(name => {
       const sheet = ss.getSheetByName(name), expected = SHEET_SCHEMA[name];

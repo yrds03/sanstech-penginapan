@@ -56,7 +56,7 @@ Semua perubahan memakai `LockService.getScriptLock()` dan memeriksa ulang izin, 
 
 Google Sheets tidak menyediakan transaksi lintas sheet yang setara database SQL. Implementasi menyimpan snapshot rentang yang akan berubah, berusaha memulihkannya jika penulisan gagal, dan menandai request yang hasilnya belum pasti. Penghentian proses secara paksa atau kegagalan saat mencatat hasil masih memerlukan pemeriksaan admin. Status `DIPROSES` atau `GAGAL` tidak diputar ulang otomatis.
 
-Jika properti `RECOVERY_REQUIRED` muncul, penyimpanan diblokir. Periksa tab, cadangan, dan Permintaan API; pulihkan data yang perlu, jalankan setup/sinkronisasi untuk memvalidasi, lalu hapus properti itu melalui Project Settings setelah hasilnya benar. Jangan menghapusnya hanya untuk melewati pemeriksaan.
+Jika properti `RECOVERY_REQUIRED` muncul, penyimpanan dan rekonsiliasi otomatis diblokir. Periksa tab, cadangan, dan Permintaan API; pulihkan data yang perlu, jalankan setup untuk memvalidasi, lalu hapus properti itu melalui Project Settings setelah hasilnya benar. Jangan menghapusnya hanya untuk melewati pemeriksaan.
 
 Pembatasan login berlaku global karena web app Apps Script tidak memberikan alamat IP klien pada parameter request: 15 kegagalan dalam lima menit. Login yang benar tidak menghapus hitungan kegagalan.
 
