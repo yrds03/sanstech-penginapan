@@ -18,7 +18,7 @@ GitHub Pages dapat menyajikan isi repositori ini secara langsung. Pertahankan `i
 - **Reservasi:** tanggal dan jadwal tumpang tindih diperiksa. Tanggal keluar sama dengan masuk dikenai minimum satu malam. Reservasi dengan DP tidak dapat dihapus tanpa proses pengembalian dana yang tercatat.
 - **Check-in:** tanggal masuk harus hari ini menurut Asia/Jakarta. Tarik kode reservasi untuk menggunakan kamar berstatus Booking dan membawa DP serta metode bayarnya. Ubah jadwal melalui Reservasi sebelum check-in bila tanggal berbeda. Pembuatan tamu ditunggu sebelum transaksi disimpan.
 - **Check-out:** tambahan layanan dan diskon dihitung bersama pembayaran yang sudah diterima. Konfirmasi pelunasan hanya setelah uang diterima. Pratinjau invoice tetap menampilkan sisa yang belum dibayar. Tarif kamar mengikuti durasi yang disepakati saat check-in; perpanjangan atau pengembalian dana memerlukan pencatatan tersendiri.
-- **Laporan:** penerimaan dihitung dari DP pada tanggal check-in dan pelunasan pada tanggal check-out. Nilai nol pada DP dipertahankan. Ini mengikuti informasi tanggal yang tersedia pada skema lama; tanggal penerimaan DP reservasi dan perubahan metode saat pelunasan belum dicatat terpisah.
+- **Laporan:** backend versi 2 memakai waktu penerimaan pada jurnal Pembayaran, termasuk DP reservasi sebelum check-in. Mode API lama tetap memakai tanggal check-in dan checkout karena hanya tanggal itu yang tersedia. Nilai nol pada DP dipertahankan.
 - **Sinkronisasi:** kegagalan baca tidak mengganti data terakhir dengan tabel kosong. Penyimpanan diblokir sampai sinkronisasi pulih. Jika hasil POST tidak diketahui karena koneksi terputus, periksa hasil sinkronisasi sebelum mengirim ulang.
 - **Offline:** shell aplikasi dapat dibuka setelah kunjungan online pertama. Data tamu, PIN, dan respons API tidak disimpan dalam cache service worker. Transaksi tetap memerlukan koneksi ke Google Apps Script.
 
@@ -32,13 +32,11 @@ POST: `addKamar`, `addTamu`, `addReservasi`, `addUser`, `updateData`, `deleteDat
 
 Urutan kolom dikonfirmasi melalui pemeriksaan baca API pada 24 November 2026. `Data Tamu` memakai `Total Menginap` dan `Total Pembayaran`; `Reservasi` memakai `Jumlah Hari` dan `Harga Total`; kolom saldo transaksi bernama `Sisa`. Perubahan profil memakai pasangan `Item` / `Nilai`.
 
-## Batas verifikasi backend
+## Backend dan sinkronisasi Google Sheets
 
-Kode Google Apps Script tidak terdapat dalam repositori ini. Pengujian browser memakai respons dan penulisan simulasi dengan kontrak kolom yang sama; tidak mengirim transaksi percobaan ke database operasional.
+Backend lengkap tersedia pada [backend/Code.gs](backend/Code.gs). Panduan pemasangan, daftar 10 sheet, migrasi data, trigger otomatis, autentikasi server, dan batas verifikasi tersedia di [backend/README.md](backend/README.md).
 
-API lama menyediakan `getUser` untuk pemeriksaan PIN di browser. Menghapus PIN master, mencegah pemulihan sesi dari localStorage, dan membatasi menu memperbaiki perilaku klien, tetapi **tidak memberi otorisasi pada server**. Autentikasi server, hash PIN, pembatasan percobaan login, pemeriksaan izin setiap operasi, dan `LockService` untuk bentrok antarperangkat harus diterapkan pada proyek Google Apps Script sebelum aplikasi dianggap aman untuk data produksi. Pemeriksaan bentrok di browser tidak menjamin dua perangkat tidak memesan bersamaan. Endpoint lama yang tetap membuka pembacaan PIN juga harus diperbarui.
-
-Pembuatan tamu dan check-in masih merupakan dua operasi API. Jika check-in gagal setelah tamu tersimpan, data tamu tetap tersimpan dan dapat dipakai saat mencoba kembali. Transaksi lintas sheet secara atomik dan idempotensi POST memerlukan dukungan backend.
+Frontend mendeteksi backend versi 2 dan memakai login server, token sesi di memori, snapshot konsisten, serta jurnal pembayaran. Selama deployment lama masih aktif, frontend tetap memakai kontrak lama; keamanan server dan otomatisasi baru baru berlaku setelah backend tersebut diterapkan.
 
 ## Pengembangan dan pengujian
 
@@ -47,9 +45,11 @@ npm ci
 npm run check
 npm run build:css
 python tests/check_static.py
+node --test tests/backend_check.cjs
 python -m pip install -r requirements-dev.txt
 python -m playwright install chromium
 python tests/browser_check.py
+python tests/secure_browser_check.py
 ```
 
 Di Windows, pengujian memakai Chrome atau Edge yang sudah terpasang. Untuk browser lain, tentukan `BROWSER_EXECUTABLE`. Pengujian juga mengenali instalasi paket lokal dalam `.test-deps`.

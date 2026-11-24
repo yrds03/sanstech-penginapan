@@ -16,12 +16,14 @@ jobs:
           python-version: '3.13'
       - run: npm ci
       - run: npm run check
+      - run: node --test tests/backend_check.cjs
       - run: npm run build:css
       - run: git diff --exit-code -- vendor/tailwind.css
       - run: python tests/check_static.py
       - run: python -m pip install -r requirements-dev.txt
       - run: python -m playwright install --with-deps chromium
       - run: python tests/browser_check.py
+      - run: python tests/secure_browser_check.py
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

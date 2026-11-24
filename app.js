@@ -8,6 +8,7 @@ let globalKamar = [], globalTamu = [], globalReservasi = [], globalTransaksi = [
 let editMode = { active: false, type: null, idVal: null };
 let activeUser = null, actTrx = null, busy = false, loggingIn = false, dataFresh = false;
 let loadPromise = null, sessionEpoch = 0;
+let backendMode = 'unknown', authToken = '', globalPembayaran = [], pendingWrite = null;
 const $ = id => document.getElementById(id);
 const value = id => String($(id)?.value ?? '').trim();
 const text = v => String(v ?? '').trim();
@@ -169,24 +170,46 @@ function switchPage(id) {
 
 async function requestAPI(action, data) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 20000);
+    const timer = setTimeout(() => controller.abort(), backendMode === 'secure' ? 45000 : 20000);
     try {
         const options = { signal: controller.signal, cache: 'no-store', redirect: 'follow' };
         let url = `${API_URL}?action=${encodeURIComponent(action)}`;
-        if (data !== undefined) {
+        if (data !== undefined || (backendMode === 'secure' && action !== 'getCapabilities')) {
             url = API_URL;
-            Object.assign(options, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body: JSON.stringify({ action, data }) });
+            const payload = { action, data, token: authToken };
+            if (data !== undefined && !['login', 'logout'].includes(action) && backendMode === 'secure') {
+                const signature = JSON.stringify({ action, data });
+                if (!pendingWrite || pendingWrite.signature !== signature) pendingWrite = { signature, requestId: uniqueId('REQ') };
+                payload.requestId = pendingWrite.requestId;
+            }
+            Object.assign(options, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body: JSON.stringify(payload) });
         }
         const response = await fetch(url, options);
         if (!response.ok) throw new Error(`Server merespons HTTP ${response.status}.`);
         const result = await response.json();
-        if (!result || result.status !== 'success') throw new Error(result?.message || 'Respons database tidak valid.');
+        if (!result || result.status !== 'success') {
+            const error = new Error(result?.message || 'Respons database tidak valid.'); error.code = result?.code;
+            if (error.code === 'UNAUTHORIZED' && activeUser) lockSession();
+            throw error;
+        }
+        if (options.method === 'POST' && data !== undefined && !['login', 'logout'].includes(action)) pendingWrite = null;
         return result;
     } catch (error) {
         if (error.name === 'AbortError') throw new Error('Koneksi melewati batas waktu.');
         if (error instanceof SyntaxError) throw new Error('Server tidak mengirim JSON. Periksa deployment Google Apps Script.');
         throw error;
     } finally { clearTimeout(timer); }
+}
+async function detectBackend() {
+    try {
+        const response = await requestAPI('getCapabilities');
+        if (response.data?.serverAuth === true && response.data?.snapshot === true) { backendMode = 'secure'; return; }
+        throw new Error('Versi backend belum dikenali.');
+    } catch (error) {
+        // Only a known unsupported action permits the old API; network/auth failures do not.
+        if (error.code === 'ACTION_NOT_FOUND' || /Action GET tidak ditemukan/i.test(error.message)) { backendMode = 'legacy'; return; }
+        throw error;
+    }
 }
 function syncStatus(message = '', error = false) {
     const el = $('sync-status');
@@ -230,7 +253,13 @@ async function loadAllData() {
     loadPromise = (async () => {
         try {
             const actions = ['getKamar', 'getTamu', 'getReservasi', 'getTransaksi', 'getUser', 'getPengaturan'];
-            const results = await Promise.allSettled(actions.map(fetchAPI));
+            let results;
+            if (backendMode === 'secure') {
+                const snapshot = (await fetchAPI('getSnapshot')).data;
+                if (!snapshot || !Array.isArray(snapshot.kamar) || !Array.isArray(snapshot.transaksi)) throw new Error('Snapshot database tidak valid.');
+                globalPembayaran = Array.isArray(snapshot.pembayaran) ? snapshot.pembayaran : [];
+                results = ['kamar', 'tamu', 'reservasi', 'transaksi', 'users', 'pengaturan'].map(key => ({ status: 'fulfilled', value: { status: 'success', data: snapshot[key] } }));
+            } else results = await Promise.allSettled(actions.map(fetchAPI));
             if (epoch !== sessionEpoch || !activeUser) return false;
             // Commit one complete operational snapshot. Never clear live data on a failed GET.
             const bad = results.slice(0, 4).find(r => r.status !== 'fulfilled' || !Array.isArray(r.value.data));
@@ -285,9 +314,17 @@ async function submitPinLogin() {
     loggingIn = true;
     Swal.fire({ title: 'Memeriksa akses…', allowOutsideClick: false, allowEscapeKey: false, didOpen: () => Swal.showLoading() });
     try {
-        const result = await fetchAPI('getUser');
-        if (!Array.isArray(result.data)) throw new Error('Format pengguna tidak valid.');
-        const user = result.data.find(u => u && String(u.Password).padStart(6, '0') === pin && text(u.Status) === 'Aktif');
+        await detectBackend();
+        let user;
+        if (backendMode === 'secure') {
+            const login = (await requestAPI('login', { pin })).data;
+            if (!login?.token || !login?.user) throw new Error('Respons login tidak valid.');
+            authToken = login.token; user = login.user;
+        } else {
+            const result = await fetchAPI('getUser');
+            if (!Array.isArray(result.data)) throw new Error('Format pengguna tidak valid.');
+            user = result.data.find(u => u && String(u.Password).padStart(6, '0') === pin && text(u.Status) === 'Aktif');
+        }
         if (!user) { await notify('PIN tidak terdaftar atau akun nonaktif.', 'Akses ditolak', 'error'); return; }
         const { Password, ...profile } = user;
         activeUser = profile; sessionEpoch++; dataFresh = false;
@@ -297,10 +334,13 @@ async function submitPinLogin() {
         $('app-container').classList.remove('hidden', 'opacity-0');
         setElem('top_user_name', profile.Username); setElem('top_user_role', profile.Role);
         buildSidebarMenu(); Swal.close(); await loadAllData();
-    } catch (error) { await notify(`Database tidak dapat dihubungi. ${error.message}`, 'Login gagal', 'error'); }
+    } catch (error) { await notify(error.message, error.code === 'INVALID_PIN' ? 'Akses ditolak' : 'Login gagal', 'error'); }
     finally { loggingIn = false; document.querySelectorAll('.pin-box').forEach(el => { el.value = ''; }); if (!activeUser) $('pin1').focus(); }
 }
 function lockSession() {
+    const oldToken = authToken;
+    if (backendMode === 'secure' && oldToken) fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body: JSON.stringify({ action: 'logout', token: oldToken }) }).catch(() => {});
+    authToken = ''; globalPembayaran = []; pendingWrite = null;
     sessionEpoch++; activeUser = null; dataFresh = false; loadPromise = null; actTrx = null;
     globalKamar = []; globalTamu = []; globalReservasi = []; globalTransaksi = []; globalUsers = [];
     editMode = { active: false, type: null, idVal: null };
@@ -361,8 +401,9 @@ function renderDashboardUI() {
     const arrivals = globalTransaksi.filter(t => (isActive(t) || isCompleted(t)) && isToday(t['Tgl Check-in']));
     setElem('d_ci', arrivals.length); setElem('d_co', globalTransaksi.filter(t => isCompleted(t) && isToday(t['Tgl Check-out'])).length);
     const revenue = { tunai: 0, tf: 0, qris: 0 };
-    globalTransaksi.forEach(t => {
-        const amount = cashForPeriod(t, date => date === today);
+    const receipts = backendMode === 'secure' ? globalPembayaran : globalTransaksi;
+    receipts.forEach(t => {
+        const amount = backendMode === 'secure' ? (parseDateStandard(t.Tanggal) === today ? parseRpToNum(t.Nominal) : 0) : cashForPeriod(t, date => date === today);
         const method = text(t['Metode Bayar']).toLowerCase();
         const bucket = method.includes('tunai') ? 'tunai' : /qris|wallet|kredit|debit/.test(method) ? 'qris' : 'tf';
         revenue[bucket] += amount;
@@ -386,7 +427,7 @@ function renderLaporanData() {
     const popularity = new Map(); let total = 0;
     globalTransaksi.forEach(t => {
         if (!isActive(t) && !isCompleted(t)) return;
-        const income = cashForPeriod(t, matches); total += income;
+        const income = backendMode === 'secure' ? 0 : cashForPeriod(t, matches); total += income;
         const type = text(roomById(t['No Kamar'])?.Tipe) || 'Kamar terhapus';
         if (!types.has(type)) types.set(type, { count: 0, revenue: 0 });
         types.get(type).revenue += income;
@@ -394,6 +435,16 @@ function renderLaporanData() {
             types.get(type).count++;
             const room = text(t['No Kamar']); popularity.set(room, (popularity.get(room) || 0) + 1);
         }
+    });
+    if (backendMode === 'secure') globalPembayaran.forEach(payment => {
+        if (!matches(parseDateStandard(payment.Tanggal))) return;
+        const income = parseRpToNum(payment.Nominal); total += income;
+        const transaction = globalTransaksi.find(t => text(t['No Invoice']) === text(payment['No Invoice']) && text(payment['No Invoice']));
+        const booking = globalReservasi.find(r => text(r['Kode Booking']) === text(payment['Kode Booking']) && text(payment['Kode Booking']));
+        const room = roomById(transaction?.['No Kamar'] ?? booking?.['No Kamar']);
+        const type = text(room?.Tipe) || 'Kamar terhapus';
+        if (!types.has(type)) types.set(type, { count: 0, revenue: 0 });
+        types.get(type).revenue += income;
     });
     const favorite = [...popularity].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] || '—';
     const occupied = globalKamar.filter(k => transactionForRoom(k['No Kamar']) || text(k.Status) === 'Terisi').length;
@@ -559,8 +610,10 @@ function cariReservasiCI() {
 }
 function calcCheckin() {
     const days = stayDays(value('ci_in'), value('ci_out')), room = roomById(value('ci_kamar'));
+    const booking = backendMode === 'secure' ? globalReservasi.find(r => text(r['Kode Booking']) === value('ci_kode_booking') && text(r['No Kamar']) === value('ci_kamar')) : null;
+    const roomCost = booking ? parseRpToNum(booking['Harga Total']) : days && room ? days * parseRpToNum(room.Harga) : 0;
     $('ci_out').min = value('ci_in'); setElem('ci_lbl_hari', days && room ? days : 0);
-    setRawNum('ci_biaya', days && room ? days * parseRpToNum(room.Harga) - getRawNum('ci_diskon') : 0);
+    setRawNum('ci_biaya', days && room ? roomCost - getRawNum('ci_diskon') : 0);
 }
 async function submitCheckin(event) {
     event.preventDefault();
@@ -575,13 +628,13 @@ async function submitCheckin(event) {
         if (booking && (value('ci_in') !== parseDateStandard(booking['Tgl Check-in']) || value('ci_out') !== parseDateStandard(booking['Tgl Check-out']))) return notify('Jadwal berbeda dari reservasi. Ubah reservasi terlebih dahulu.');
         if (transactionForRoom(room['No Kamar']) || !(['Kosong', ...(booking ? ['Booking'] : [])].includes(text(room.Status)))) return notify('Kamar belum siap atau sudah terisi.');
         const conflict = roomConflict(room['No Kamar'], value('ci_in'), value('ci_out'), bookingCode); if (conflict) return notify(conflict);
-        const price = parseRpToNum(room.Harga) * days, discount = getRawNum('ci_diskon'), total = price - discount, dp = getRawNum('ci_bayar');
+        const price = backendMode === 'secure' && booking ? parseRpToNum(booking['Harga Total']) : parseRpToNum(room.Harga) * days, discount = getRawNum('ci_diskon'), total = price - discount, dp = getRawNum('ci_bayar');
         if (price <= 0 || discount < 0 || discount > price || dp < 0 || dp > total) return notify('Diskon atau pembayaran melebihi total tagihan.');
         if (booking && dp < parseRpToNum(booking.DP)) return notify('Pembayaran awal tidak boleh lebih kecil daripada DP reservasi.');
         const invoice = uniqueId('INV');
         const row = [invoice, value('ci_nama'), nik, value('ci_hp'), value('ci_alamat'), room['No Kamar'], value('ci_in'), value('ci_out'), days, formatRp(price), 0, 0, 0, 0, formatRp(discount), formatRp(dp), formatRp(total), formatRp(dp), formatRp(total - dp), value('ci_metode'), 'Aktif (Check-in)'];
         // Await guest creation: concurrent writes to the Apps Script used to race check-in.
-        if (!globalTamu.some(t => text(t.NIK) === nik)) {
+        if (backendMode !== 'secure' && !globalTamu.some(t => text(t.NIK) === nik)) {
             if (!await postAPI('addTamu', [nik, row[1], '-', '-', row[3], '-', row[4], 0, 0])) return false;
             globalTamu.push({ NIK: nik, 'Nama Lengkap': row[1], 'No HP': row[3], Alamat: row[4] });
         }
@@ -698,7 +751,7 @@ async function tambahUserBaru() {
     await runMutation('pengaturan', async () => {
         const users = await fetchAPI('getUser');
         if (!Array.isArray(users.data)) throw new Error('Data pengguna tidak valid.');
-        if (users.data.some(u => String(u.Password).padStart(6, '0') === result.value[1] || text(u.Username).toLowerCase() === result.value[0].toLowerCase())) return notify('Nama atau PIN sudah digunakan. Pilih yang lain.');
+        if (users.data.some(u => (backendMode !== 'secure' && String(u.Password).padStart(6, '0') === result.value[1]) || text(u.Username).toLowerCase() === result.value[0].toLowerCase())) return notify('Nama atau PIN sudah digunakan. Pilih yang lain.');
         if (await postAPI('addUser', result.value)) await loadAllData();
     });
 }
@@ -715,6 +768,9 @@ window.addEventListener('DOMContentLoaded', () => {
     ['isLoggedIn', 'activeUser', 'activeRole', 'activeAkses'].forEach(key => localStorage.removeItem(key));
     const updateClock = () => setElem('current-date', new Date().toLocaleString('id-ID', { timeZone: HOTEL_TIMEZONE, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }));
     updateClock(); setInterval(updateClock, 1000); renderFacilities();
+    setInterval(() => {
+        if (activeUser && backendMode === 'secure' && !busy && !loadPromise && !editMode.active && !Swal.isVisible() && !document.activeElement?.matches('input,select,textarea')) loadAllData();
+    }, 30000);
     document.querySelectorAll('.pin-box').forEach((el, i) => {
         el.inputMode = 'numeric'; el.autocomplete = 'off'; el.setAttribute('aria-label', `Digit PIN ${i + 1}`);
         if (i > 0) el.addEventListener('paste', handlePaste);

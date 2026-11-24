@@ -6,3 +6,7 @@ __pycache__/
 test-results/
 *.log
 node_modules/
+.clasprc.json
+.clasprc*.json
+.clasp.json
+*.credentials.json

@@ -5,7 +5,7 @@
   "scripts": {
     "build:css": "tailwindcss -i styles.css -o vendor/tailwind.css --minify",
     "check": "node --check app.js && node --check sw.js",
-    "test": "python tests/browser_check.py"
+    "test": "node --test tests/backend_check.cjs && python tests/browser_check.py && python tests/secure_browser_check.py"
   },
   "devDependencies": {
     "tailwindcss": "3.4.17"

@@ -126,7 +126,10 @@ class BrowserChecks(unittest.TestCase):
                 raise AssertionError(f'Unexpected write: {action}')
             route.fulfill(status=200, json={'status': 'success', 'message': 'Tersimpan'})
         else:
-            route.fulfill(status=200, json={'status': 'success', 'data': self.db[action]})
+            if action not in self.db:
+                route.fulfill(status=200, json={'status': 'error', 'message': 'Action GET tidak ditemukan.'})
+            else:
+                route.fulfill(status=200, json={'status': 'success', 'data': self.db[action]})
 
     def login(self, pin='654321'):
         # Physical key events verify focus advances exactly one box per digit.
@@ -370,8 +373,8 @@ class BrowserChecks(unittest.TestCase):
             page.evaluate('navigator.serviceWorker.ready')
             page.wait_for_function('navigator.serviceWorker.controller !== null')
             cache_keys = page.evaluate('caches.keys()')
-            self.assertIn('sanstech-penginapan-v2', cache_keys)
-            cached = page.evaluate('''async () => { const c=await caches.open('sanstech-penginapan-v2'); return (await c.keys()).map(r=>r.url); }''')
+            self.assertIn('sanstech-penginapan-v3', cache_keys)
+            cached = page.evaluate('''async () => { const c=await caches.open('sanstech-penginapan-v3'); return (await c.keys()).map(r=>r.url); }''')
             self.assertFalse(any('script.google' in u for u in cached))
             self.assertTrue(any('/app.js' in u for u in cached))
             context.set_offline(True)
